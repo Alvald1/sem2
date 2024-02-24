@@ -4,42 +4,42 @@
 
 typedef struct _patient {
     char* id;
-    size_t ta;
-    size_t ts;
+    int ta;
+    int ts;
     char status;
 } Patient;
 
 typedef struct _dequeue {
     Patient** patients;
-    size_t len;
-    size_t head;
-    size_t tail;
-    size_t cnt;
+    int len;
+    int head;
+    int tail;
+    int cnt;
 } Dequeue;
 
 void set_patients(Dequeue* dequeue, Patient** patients);
-void set_len(Dequeue* dequeue, size_t len);
-void set_head(Dequeue* dequeue, size_t head);
-void set_tail(Dequeue* dequeue, size_t tail);
-void set_cnt(Dequeue* dequeue, size_t cnt);
+void set_len(Dequeue* dequeue, int len);
+void set_head(Dequeue* dequeue, int head);
+void set_tail(Dequeue* dequeue, int tail);
+void set_cnt(Dequeue* dequeue, int cnt);
 
 Patient** get_patients(const Dequeue* dequeue);
-size_t get_len(const Dequeue* dequeue);
-size_t get_head(const Dequeue* dequeue);
-size_t get_tail(const Dequeue* dequeue);
-size_t get_cnt(const Dequeue* dequeue);
+int get_len(const Dequeue* dequeue);
+int get_head(const Dequeue* dequeue);
+int get_tail(const Dequeue* dequeue);
+int get_cnt(const Dequeue* dequeue);
 
 void init_patient(Patient* patient);
-int init_dequeu(Dequeue* dequeue, size_t len);
+int init_dequeu(Dequeue* dequeue, int len);
 
 void set_id(Patient* patient, char* id);
-void set_ta(Patient* patient, size_t ta);
-void set_ts(Patient* patient, size_t ts);
+void set_ta(Patient* patient, int ta);
+void set_ts(Patient* patient, int ts);
 void set_status(Patient* patient, char status);
 
 char* get_id(const Patient* patient);
-size_t get_ta(const Patient* patient);
-size_t get_ts(const Patient* patient);
+int get_ta(const Patient* patient);
+int get_ts(const Patient* patient);
 char get_status(const Patient* patient);
 
 int push_front(Dequeue* dequeue, Patient* patient);
@@ -48,26 +48,88 @@ int push_back(Dequeue* dequeue, Patient* patient);
 void print_dequeue(const Dequeue* dequeue);
 void print_patient(const Patient* patient);
 
-void fill_patient(Patient* patient, char* id, size_t get_ta, size_t get_ts, char get_status);
+void fill_patient(Patient* patient, char* id, int get_ta, int get_ts, char get_status);
 
 void dealloc_dequeue(Dequeue* dequeue);
 void dealloc_patient(Patient* patient);
 
+Patient* pop_front(Dequeue* dequeue);
+Patient* get_patient(Dequeue* dequeue, int pos);
+
 int
 main() {
-    Patient p1, p2, p3;
+    Patient p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12;
     Dequeue dequeue;
+    init_patient(&p1);
+    init_patient(&p2);
+    init_patient(&p3);
+    init_patient(&p4);
+    init_patient(&p5);
+    init_patient(&p6);
+    init_patient(&p7);
+    init_patient(&p8);
+    init_patient(&p9);
+    init_patient(&p10);
+    init_patient(&p11);
+    init_patient(&p12);
+    init_dequeu(&dequeue, 15);
     fill_patient(&p1, "a", 0, 0, 0);
     fill_patient(&p2, "b", 0, 0, 0);
     fill_patient(&p3, "c", 0, 0, 0);
+    fill_patient(&p4, "d", 0, 0, 0);
+    fill_patient(&p5, "e", 0, 0, 0);
+    fill_patient(&p6, "f", 0, 0, 0);
+    fill_patient(&p7, "g", 0, 0, 0);
+    fill_patient(&p8, "h", 0, 0, 0);
+    fill_patient(&p9, "j", 0, 0, 0);
+    fill_patient(&p10, "k", 0, 0, 0);
+    fill_patient(&p11, "l", 0, 0, 0);
+    fill_patient(&p12, "m", 0, 0, 0);
     push_back(&dequeue, &p1);
     print_dequeue(&dequeue);
     push_front(&dequeue, &p2);
     print_dequeue(&dequeue);
     push_back(&dequeue, &p3);
     print_dequeue(&dequeue);
+    push_back(&dequeue, &p4);
+    print_dequeue(&dequeue);
+    push_front(&dequeue, &p5);
+    print_dequeue(&dequeue);
+    pop_front(&dequeue);
+    print_dequeue(&dequeue);
+    pop_front(&dequeue);
+    print_dequeue(&dequeue);
+    push_back(&dequeue, &p6);
+    print_dequeue(&dequeue);
+    push_back(&dequeue, &p7);
+    print_dequeue(&dequeue);
+    push_front(&dequeue, &p8);
+    print_dequeue(&dequeue);
+    pop_front(&dequeue);
+    print_dequeue(&dequeue);
+    push_back(&dequeue, &p9);
+    print_dequeue(&dequeue);
+    push_back(&dequeue, &p10);
+    print_dequeue(&dequeue);
+    push_front(&dequeue, &p11);
+    print_dequeue(&dequeue);
+    push_back(&dequeue, &p12);
+    print_dequeue(&dequeue);
     dealloc_dequeue(&dequeue);
     return 0;
+}
+
+Patient*
+get_patient(Dequeue* dequeue, int pos) {
+    Patient** patients = get_patients(dequeue);
+    return patients[pos];
+}
+
+Patient*
+pop_front(Dequeue* dequeue) {
+    int head = get_head(dequeue);
+    set_head(dequeue, head + 1);
+    return get_patient(dequeue, head);
 }
 
 void
@@ -81,7 +143,7 @@ dealloc_dequeue(Dequeue* dequeue) {
 }
 
 void
-fill_patient(Patient* patient, char* id, size_t ta, size_t ts, char status) {
+fill_patient(Patient* patient, char* id, int ta, int ts, char status) {
     char* id_src = get_id(patient);
     if (id_src != NULL) {
         free(id_src);
@@ -94,23 +156,22 @@ fill_patient(Patient* patient, char* id, size_t ta, size_t ts, char status) {
 
 void
 print_patient(const Patient* patient) {
-    printf("%s", patient->id);
+    printf("%s ", patient->id);
 }
 
 void
 print_dequeue(const Dequeue* dequeue) {
-    size_t len = get_len(dequeue);
-    size_t head = get_head(dequeue);
-    size_t tail = get_tail(dequeue);
+    int len = get_len(dequeue);
+    int head = get_head(dequeue);
+    int tail = get_tail(dequeue);
     Patient** patients = get_patients(dequeue);
-    for (size_t i = head; i < len; ++i) {
+    for (int i = head; i < len; ++i) {
         print_patient(patients[i]);
-        printf("\n");
     }
-    for (size_t i = tail; i <= len; --i) {
+    for (int i = 0; i <= tail; ++i) {
         print_patient(patients[i]);
-        printf("\n");
     }
+    printf("\n");
 }
 
 void
@@ -119,22 +180,22 @@ set_patients(Dequeue* dequeue, Patient** patients) {
 }
 
 void
-set_len(Dequeue* dequeue, size_t len) {
+set_len(Dequeue* dequeue, int len) {
     dequeue->len = len;
 }
 
 void
-set_head(Dequeue* dequeue, size_t head) {
+set_head(Dequeue* dequeue, int head) {
     dequeue->head = head;
 }
 
 void
-set_tail(Dequeue* dequeue, size_t tail) {
+set_tail(Dequeue* dequeue, int tail) {
     dequeue->tail = tail;
 }
 
 void
-set_cnt(Dequeue* dequeue, size_t cnt) {
+set_cnt(Dequeue* dequeue, int cnt) {
     dequeue->cnt = cnt;
 }
 
@@ -143,22 +204,22 @@ get_patients(const Dequeue* dequeue) {
     return dequeue->patients;
 }
 
-size_t
+int
 get_len(const Dequeue* dequeue) {
     return dequeue->len;
 }
 
-size_t
+int
 get_head(const Dequeue* dequeue) {
     return dequeue->head;
 }
 
-size_t
+int
 get_tail(const Dequeue* dequeue) {
     return dequeue->tail;
 }
 
-size_t
+int
 get_cnt(const Dequeue* dequeue) {
     return dequeue->cnt;
 }
@@ -169,12 +230,12 @@ set_id(Patient* patient, char* id) {
 }
 
 void
-set_ta(Patient* patient, size_t ta) {
+set_ta(Patient* patient, int ta) {
     patient->ta = ta;
 }
 
 void
-set_ts(Patient* patient, size_t ts) {
+set_ts(Patient* patient, int ts) {
     patient->ts = ts;
 }
 
@@ -188,12 +249,12 @@ get_id(const Patient* patient) {
     return patient->id;
 }
 
-size_t
+int
 get_ta(const Patient* patient) {
     return patient->ta;
 }
 
-size_t
+int
 get_ts(const Patient* patient) {
     return patient->ts;
 }
@@ -212,24 +273,23 @@ init_patient(Patient* patient) {
 }
 
 int
-init_dequeu(Dequeue* dequeue, size_t len) {
-    Patient* patient = (Patient*)malloc(len * sizeof(Patient));
-    if (patient == NULL) {
+init_dequeu(Dequeue* dequeue, int len) {
+    Patient** patients = (Patient**)malloc(len * sizeof(Patient*));
+    if (patients == NULL) {
         return BAD_ALLOC;
     }
-    init_patient(patient);
-    set_patients(dequeue, &patient);
+    set_patients(dequeue, patients);
     set_len(dequeue, len);
-    set_head(dequeue, 0);
-    set_tail(dequeue, 0);
+    set_head(dequeue, len);
+    set_tail(dequeue, -1);
     return OK;
 }
 
 int
 push_front(Dequeue* dequeue, Patient* patient) {
-    size_t head = get_head(dequeue);
-    size_t len = get_len(dequeue);
-    size_t cnt = get_cnt(dequeue);
+    int head = get_head(dequeue);
+    int len = get_len(dequeue);
+    int cnt = get_cnt(dequeue);
     Patient** patients = get_patients(dequeue);
     if (cnt == len) {
         return OVERFLOW;
@@ -248,9 +308,9 @@ push_front(Dequeue* dequeue, Patient* patient) {
 
 int
 push_back(Dequeue* dequeue, Patient* patient) {
-    size_t tail = get_tail(dequeue);
-    size_t len = get_len(dequeue);
-    size_t cnt = get_cnt(dequeue);
+    int tail = get_tail(dequeue);
+    int len = get_len(dequeue);
+    int cnt = get_cnt(dequeue);
     Patient** patients = get_patients(dequeue);
     if (cnt == len) {
         return OVERFLOW;
