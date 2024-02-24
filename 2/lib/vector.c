@@ -3,13 +3,13 @@
 #include "code_status.h"
 #include "dequeue.h"
 
-typedef struct _dequeue {
+struct _dequeue {
     Patient** patients;
     int len;
     int head;
     int tail;
     int cnt;
-} Dequeue;
+};
 
 void set_cnt(Dequeue* dequeue, int cnt);
 void set_len(Dequeue* dequeue, int len);
@@ -27,8 +27,6 @@ Patient** get_patients(const Dequeue* dequeue);
 int get_head(const Dequeue* dequeue);
 int get_tail(const Dequeue* dequeue);
 
-int init_dequeu(Dequeue* dequeue, int len);
-
 Patient*
 get_patient(Dequeue* dequeue, int pos) {
     Patient** patients = get_patients(dequeue);
@@ -38,8 +36,14 @@ get_patient(Dequeue* dequeue, int pos) {
 Patient*
 pop_front(Dequeue* dequeue) {
     int head = get_head(dequeue);
+    int len = get_len(dequeue);
+    void* res = NULL;
+    if (head == len) {
+        head = 0;
+    }
     set_head(dequeue, head + 1);
-    return get_patient(dequeue, head);
+    res = get_patient(dequeue, head);
+    return (Patient*)res;
 }
 
 void
@@ -113,15 +117,19 @@ get_cnt(const Dequeue* dequeue) {
 }
 
 int
-init_dequeu(Dequeue* dequeue, int len) {
-    Patient** patients = (Patient**)malloc(len * sizeof(Patient*));
+init_dequeu(Dequeue** dequeue, int len) {
+    *dequeue = malloc(sizeof(Dequeue));
+    if (*dequeue == NULL) {
+        return BAD_ALLOC;
+    }
+    Patient** patients = malloc(len * sizeof(Patient*));
     if (patients == NULL) {
         return BAD_ALLOC;
     }
-    set_patients(dequeue, patients);
-    set_len(dequeue, len);
-    set_head(dequeue, len);
-    set_tail(dequeue, -1);
+    set_patients(*dequeue, patients);
+    set_len(*dequeue, len);
+    set_head(*dequeue, len);
+    set_tail(*dequeue, -1);
     return OK;
 }
 
