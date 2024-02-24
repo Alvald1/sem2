@@ -1,8 +1,0 @@
-{
-    "files.associations": {
-        "patient.h": "c",
-        "vector.h": "c",
-        "stdio.h": "c",
-        "code_status.h": "c"
-    }
-}
