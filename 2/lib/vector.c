@@ -1,7 +1,33 @@
-#include "vector.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include "code_status.h"
+#include "dequeue.h"
+
+typedef struct _dequeue {
+    Patient** patients;
+    int len;
+    int head;
+    int tail;
+    int cnt;
+} Dequeue;
+
+void set_cnt(Dequeue* dequeue, int cnt);
+void set_len(Dequeue* dequeue, int len);
+
+int get_len(const Dequeue* dequeue);
+int get_cnt(const Dequeue* dequeue);
+
+Patient* get_patient(Dequeue* dequeue, int pos);
+
+void set_patients(Dequeue* dequeue, Patient** patients);
+void set_head(Dequeue* dequeue, int head);
+void set_tail(Dequeue* dequeue, int tail);
+
+Patient** get_patients(const Dequeue* dequeue);
+int get_head(const Dequeue* dequeue);
+int get_tail(const Dequeue* dequeue);
+
+int init_dequeu(Dequeue* dequeue, int len);
 
 Patient*
 get_patient(Dequeue* dequeue, int pos) {

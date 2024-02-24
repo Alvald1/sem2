@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "patient.h": "c"
+        "patient.h": "c",
+        "vector.h": "c",
+        "stdio.h": "c"
     }
 }
