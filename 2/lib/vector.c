@@ -37,18 +37,22 @@ Patient*
 pop_front(Dequeue* dequeue) {
     int head = get_head(dequeue);
     int len = get_len(dequeue);
-    void* res = NULL;
+    int cnt = get_cnt(dequeue);
+    if (cnt == 0) {
+        return NULL;
+    }
     if (head == len) {
         head = 0;
     }
     set_head(dequeue, head + 1);
-    res = get_patient(dequeue, head);
-    return (Patient*)res;
+    set_cnt(dequeue, cnt - 1);
+    return get_patient(dequeue, head);
 }
 
 void
 dealloc_dequeue(Dequeue* dequeue) {
     free(dequeue->patients);
+    free(dequeue);
 }
 
 void
@@ -56,12 +60,21 @@ print_dequeue(const Dequeue* dequeue) {
     int len = get_len(dequeue);
     int head = get_head(dequeue);
     int tail = get_tail(dequeue);
+    int cnt = get_cnt(dequeue);
     Patient** patients = get_patients(dequeue);
-    for (int i = head; i < len; ++i) {
-        print_patient(patients[i]);
-    }
-    for (int i = 0; i <= tail; ++i) {
-        print_patient(patients[i]);
+    if (cnt) {
+        if (head <= tail) {
+            for (int i = head; i <= tail; ++i) {
+                print_patient(patients[i]);
+            }
+        } else {
+            for (int i = head; i < len; ++i) {
+                print_patient(patients[i]);
+            }
+            for (int i = 0; i <= tail; ++i) {
+                print_patient(patients[i]);
+            }
+        }
     }
     printf("\n");
 }
@@ -130,6 +143,7 @@ init_dequeu(Dequeue** dequeue, int len) {
     set_len(*dequeue, len);
     set_head(*dequeue, len);
     set_tail(*dequeue, -1);
+    set_cnt(*dequeue, 0);
     return OK;
 }
 

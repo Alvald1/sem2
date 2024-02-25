@@ -15,4 +15,6 @@ void print_dequeue(const Dequeue* dequeue);
 void dealloc_dequeue(Dequeue* dequeue);
 
 int init_dequeu(Dequeue** dequeue, int len);
+
+int get_cnt(const Dequeue* dequeue);
 #endif
