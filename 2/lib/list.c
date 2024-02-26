@@ -19,6 +19,16 @@ init_node(Node* node) {
     node->next = NULL;
 }
 
+Node*
+get_head(Dequeue* dequeue) {
+    return dequeue->head;
+}
+
+Node*
+get_tail(Dequeue* dequeue) {
+    return dequeue->tail;
+}
+
 int
 init_dequeue(Dequeue** dequeue, int _, size_t size) {
     (void)_;
@@ -26,6 +36,7 @@ init_dequeue(Dequeue** dequeue, int _, size_t size) {
     if (*dequeue == NULL) {
         return BAD_ALLOC;
     }
-    init_node((*dequeue)->head);
-    init_node((*dequeue)->tail);
+    init_node(get_head(*dequeue));
+    init_node(get_tail(*dequeue));
+    return OK;
 }
