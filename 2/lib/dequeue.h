@@ -13,8 +13,6 @@ void print_dequeue(const Dequeue* dequeue, fptr_print_data fptr);
 
 void dealloc_dequeue(Dequeue* dequeue);
 
-int init_dequeu(Dequeue** dequeue, int len, size_t size);
-
-int get_cnt(const Dequeue* dequeue);
+int init_dequeue(Dequeue** dequeue, int len, size_t size);
 
 #endif
