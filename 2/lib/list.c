@@ -13,7 +13,19 @@ struct _dequeue {
     Node* tail;
 };
 
+void
+init_node(Node* node) {
+    node->data = NULL;
+    node->next = NULL;
+}
+
 int
 init_dequeue(Dequeue** dequeue, int _, size_t size) {
     (void)_;
+    *dequeue = malloc(sizeof(Dequeue));
+    if (*dequeue == NULL) {
+        return BAD_ALLOC;
+    }
+    init_node((*dequeue)->head);
+    init_node((*dequeue)->tail);
 }

@@ -131,6 +131,9 @@ get_cnt(const Dequeue* dequeue) {
 
 int
 init_dequeue(Dequeue** dequeue, int len, size_t size) {
+    if (len < 0) {
+        return BAD_POS;
+    }
     *dequeue = malloc(sizeof(Dequeue));
     if (*dequeue == NULL) {
         return BAD_ALLOC;
