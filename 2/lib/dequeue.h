@@ -1,20 +1,20 @@
-#ifndef __VECTOR_MY__
-#define __VECTOR_MY__
-
-#include "patient.h"
+#ifndef __DEQUEUE__
+#define __DEQUEUE__
 
 typedef struct _dequeue Dequeue;
+typedef void (*fptr_print_data)(void* data);
 
-int push_front(Dequeue* dequeue, Patient* patient);
-int push_back(Dequeue* dequeue, Patient* patient);
+int push_front(Dequeue* dequeue, void* data);
+int push_back(Dequeue* dequeue, void* data);
 
-Patient* pop_front(Dequeue* dequeue);
+void* pop_front(Dequeue* dequeue);
 
-void print_dequeue(const Dequeue* dequeue);
+void print_dequeue(const Dequeue* dequeue, fptr_print_data fptr);
 
 void dealloc_dequeue(Dequeue* dequeue);
 
-int init_dequeu(Dequeue** dequeue, int len);
+int init_dequeu(Dequeue** dequeue, int len, size_t size);
 
 int get_cnt(const Dequeue* dequeue);
+
 #endif

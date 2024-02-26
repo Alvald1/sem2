@@ -20,8 +20,8 @@ fill_patient(Patient* patient, char* id, int ta, int ts, char status) {
 }
 
 void
-print_patient(const Patient* patient) {
-    printf("%s ", patient->id);
+print_patient(void* patient) {
+    printf("%s ", ((Patient*)patient)->id);
 }
 
 void
