@@ -29,7 +29,7 @@ void* get_data(const Node* node);
 void set_data(Node* node, void* data);
 
 int
-push_back(Dequeue* dequeue, const void* data) {
+push_back(Dequeue* dequeue, void* data) {
     Node* new_node = get_node(data);
     if (new_node == NULL) {
         return BAD_ALLOC;
@@ -43,8 +43,9 @@ get_node(const void* data) {
     if (new_node == NULL) {
         return NULL;
     }
-    new_node->data = data;
-    new_node->next = new_node->prev = NULL;
+    set_data(new_node, data);
+    set_next(new_node, NULL);
+    set_prev(new_node, NULL);
     return new_node;
 }
 
