@@ -41,12 +41,25 @@ pop_front(Dequeue* dequeue) {
     if (cnt == 0) {
         return NULL;
     }
-    if (head == len) {
-        head = 0;
-    }
-    set_head(dequeue, head + 1);
+    set_head(dequeue, (head + 1) % len);
     set_cnt(dequeue, cnt - 1);
     return get_data(dequeue, head);
+}
+
+void*
+pop_back(Dequeue* dequeue) {
+    int tail = get_tail(dequeue);
+    int len = get_len(dequeue);
+    int cnt = get_cnt(dequeue);
+    if (cnt == 0) {
+        return NULL;
+    }
+    if (tail == -1) {
+        tail = len - 1;
+    }
+    set_tail(dequeue, tail - 1);
+    set_cnt(dequeue, cnt - 1);
+    return get_data(dequeue, tail);
 }
 
 void
@@ -130,7 +143,7 @@ get_cnt(const Dequeue* dequeue) {
 }
 
 int
-init_dequeue(Dequeue** dequeue, int len, size_t size) {
+init_dequeue(Dequeue** dequeue, int len) {
     if (len < 0) {
         return BAD_POS;
     }
@@ -138,7 +151,7 @@ init_dequeue(Dequeue** dequeue, int len, size_t size) {
     if (*dequeue == NULL) {
         return BAD_ALLOC;
     }
-    void** dataset = malloc(len * size);
+    void** dataset = malloc(len * sizeof(void*));
     if (dataset == NULL) {
         return BAD_ALLOC;
     }

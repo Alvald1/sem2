@@ -5,7 +5,7 @@
 
 typedef struct _node {
     void* data;
-    Node* next;
+    struct _node* next;
 } Node;
 
 struct _dequeue {
@@ -30,7 +30,7 @@ get_tail(Dequeue* dequeue) {
 }
 
 int
-init_dequeue(Dequeue** dequeue, int _, size_t size) {
+init_dequeue(Dequeue** dequeue, int _) {
     (void)_;
     *dequeue = malloc(sizeof(Dequeue));
     if (*dequeue == NULL) {

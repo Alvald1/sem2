@@ -5,29 +5,28 @@ ASAN = -fsanitize=address,undefined -g
 LIB_DIR = lib
 EXECUTABLE = bin
 
+TARGET = vector
+
 OPTIM = -O0
 
 LDFLAGS = 
 
 all: compile
 
-compile: 
-	cc -c *.c $(CFLAGS) $(LDFLAGS) $(OPTIM)
-	cc -c $(LIB_DIR)/*.c $(CFLAGS) $(LDFLAGS) $(OPTIM)
-	cc *.o $(CFLAGS) -o $(EXECUTABLE)_clean $(LDFLAGS) $(OPTIM)
-	rm *.o
+patient.o: $(LIB_DIR)/patient.c $(LIB_DIR)/patient.h
+	clang -c $< $(ASAN) $(CFLAGS) $(OPTIM)
 
-debug: 
-	cc -c -g *.c $(LDFLAGS) $(OPTIM)
-	cc -c -g $(LIB_DIR)/*.c $(LDFLAGS) $(OPTIM)
-	cc *.o -o $(EXECUTABLE)_debug $(LDFLAGS) $(OPTIM)
-	rm *.o
+vector.o: $(LIB_DIR)/vector.c $(LIB_DIR)/dequeue.h
+	clang -c $< $(ASAN) $(CFLAGS) $(OPTIM)
 
-asan: 
-	clang -c *.c $(CFLAGS) $(ASAN) $(OPTIM)
-	clang -c $(LIB_DIR)/*.c $(CFLAGS) $(ASAN) $(OPTIM)
-	clang *.o $(CFLAGS) $(ASAN) -o $(EXECUTABLE)_asan $(LDFLAGS) $(OPTIM)
-	rm *.o
+list.o: $(LIB_DIR)/list.c $(LIB_DIR)/dequeue.h
+	clang -c $< $(ASAN) $(CFLAGS) $(OPTIM)
+
+main.o: main.c
+	clang -c $< $(ASAN) $(CFLAGS) $(OPTIM)
+
+compile: patient.o main.o $(TARGET).o
+	clang $? -o $(EXECUTABLE) $(ASAN) $(LDFLAGS) $(OPTIM) 
 
 static: 
 	clang --analyze -Xanalyzer -analyzer-output=html *.c $(LIB_DIR)/*.c
@@ -36,7 +35,7 @@ formating:
 	clang-format *.c -i -style=file
 
 clean:
-	rm -rf $(EXECUTABLE)* *plist
+	rm -rf $(EXECUTABLE)* *plist *.o
 
 help:
 	@echo "Available targets:"
