@@ -28,13 +28,44 @@ void set_prev(Node* node, Node* prev);
 void* get_data(const Node* node);
 void set_data(Node* node, void* data);
 
+int push_back(Dequeue* dequeue, void* data);
+
+int
+push_front(Dequeue* dequeue, void* data) {
+    Node* new_node = get_node(data);
+    if (new_node == NULL) {
+        return BAD_ALLOC;
+    } else {
+        Node* head = get_head(dequeue);
+        if (head == NULL) {
+            set_head(dequeue, new_node);
+            set_tail(dequeue, new_node);
+        } else {
+            set_next(new_node, head);
+            set_prev(head, new_node);
+            set_head(dequeue, new_node);
+        }
+    }
+    return OK;
+}
+
 int
 push_back(Dequeue* dequeue, void* data) {
     Node* new_node = get_node(data);
     if (new_node == NULL) {
         return BAD_ALLOC;
     } else {
+        Node* tail = get_tail(dequeue);
+        if (tail == NULL) {
+            set_head(dequeue, new_node);
+            set_tail(dequeue, new_node);
+        } else {
+            set_prev(new_node, tail);
+            set_next(tail, new_node);
+            set_tail(dequeue, new_node);
+        }
     }
+    return OK;
 }
 
 Node*
@@ -56,6 +87,8 @@ init_dequeue(Dequeue** dequeue, int _) {
     if (*dequeue == NULL) {
         return BAD_ALLOC;
     }
+    set_head(*dequeue, NULL);
+    set_tail(*dequeue, NULL);
     return OK;
 }
 
