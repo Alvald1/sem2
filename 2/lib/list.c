@@ -29,6 +29,22 @@ void* get_data(const Node* node);
 void set_data(Node* node, void* data);
 
 void*
+pop_front(Dequeue* dequeue) {
+    Node* head = get_head(dequeue);
+    Node* next = get_next(head);
+    if (head == NULL) {
+        return NULL;
+    } else if (next == NULL) {
+        set_head(dequeue, NULL);
+        set_tail(dequeue, NULL);
+    } else {
+        set_prev(next, NULL);
+        set_head(dequeue, next);
+    }
+    return get_data(next);
+}
+
+void*
 pop_back(Dequeue* dequeue) {
     Node* tail = get_tail(dequeue);
     Node* prev = get_prev(tail);
