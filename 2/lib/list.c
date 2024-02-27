@@ -14,72 +14,22 @@ struct _dequeue {
     Node* tail;
 };
 
-Node* get_head(Dequeue* dequeue);
-Node* get_tail(Dequeue* dequeue);
-Node* get_node(void* data);
+Node* get_head(const Dequeue* dequeue);
+Node* get_tail(const Dequeue* dequeue);
+Node* get_node(const void* data);
 void set_head(Dequeue* dequeue, Node* head);
 void set_tail(Dequeue* dequeue, Node* tail);
 int init_dequeue(Dequeue** dequeue, int _);
 
-Node* get_next(Node* node);
-Node* get_prev(Node* node);
+Node* get_next(const Node* node);
+Node* get_prev(const Node* node);
 void set_next(Node* node, Node* next);
 void set_prev(Node* node, Node* prev);
-void* get_data(Node* node);
+void* get_data(const Node* node);
 void set_data(Node* node, void* data);
 
-Node*
-get_next(Node* node) {
-    return node->next;
-}
-
-Node*
-get_prev(Node* node) {
-    return node->prev;
-}
-
-void
-set_next(Node* node, Node* next) {
-    node->next = next;
-}
-
-void
-set_prev(Node* node, Node* prev) {
-    node->prev = prev;
-}
-
-void*
-get_data(Node* node) {
-    return node->data;
-}
-
-void
-set_data(Node* node, void* data) {
-    node->data = data;
-}
-
-Node*
-get_head(Dequeue* dequeue) {
-    return dequeue->head;
-}
-
-void
-set_head(Dequeue* dequeue, Node* head) {
-    dequeue->head = head;
-}
-
-Node*
-get_tail(Dequeue* dequeue) {
-    return dequeue->tail;
-}
-
-void
-set_tail(Dequeue* dequeue, Node* tail) {
-    dequeue->tail = tail;
-}
-
 int
-push_back(Dequeue* dequeue, void* data) {
+push_back(Dequeue* dequeue, const void* data) {
     Node* new_node = get_node(data);
     if (new_node == NULL) {
         return BAD_ALLOC;
@@ -88,7 +38,7 @@ push_back(Dequeue* dequeue, void* data) {
 }
 
 Node*
-get_node(void* data) {
+get_node(const void* data) {
     Node* new_node = (Node*)malloc(sizeof(Node));
     if (new_node == NULL) {
         return NULL;
@@ -106,4 +56,54 @@ init_dequeue(Dequeue** dequeue, int _) {
         return BAD_ALLOC;
     }
     return OK;
+}
+
+Node*
+get_next(const Node* node) {
+    return node->next;
+}
+
+Node*
+get_prev(const Node* node) {
+    return node->prev;
+}
+
+void
+set_next(Node* node, Node* next) {
+    node->next = next;
+}
+
+void
+set_prev(Node* node, Node* prev) {
+    node->prev = prev;
+}
+
+void*
+get_data(const Node* node) {
+    return node->data;
+}
+
+void
+set_data(Node* node, void* data) {
+    node->data = data;
+}
+
+Node*
+get_head(const Dequeue* dequeue) {
+    return dequeue->head;
+}
+
+void
+set_head(Dequeue* dequeue, Node* head) {
+    dequeue->head = head;
+}
+
+Node*
+get_tail(const Dequeue* dequeue) {
+    return dequeue->tail;
+}
+
+void
+set_tail(Dequeue* dequeue, Node* tail) {
+    dequeue->tail = tail;
 }

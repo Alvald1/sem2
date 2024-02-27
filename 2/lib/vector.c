@@ -17,7 +17,7 @@ void set_len(Dequeue* dequeue, int len);
 int get_len(const Dequeue* dequeue);
 int get_cnt(const Dequeue* dequeue);
 
-void* get_data(Dequeue* dequeue, int pos);
+void* get_data(const Dequeue* dequeue, int pos);
 
 void set_dataset(Dequeue* dequeue, void** dataset);
 void set_head(Dequeue* dequeue, int head);
@@ -27,10 +27,55 @@ void** get_dataset(const Dequeue* dequeue);
 int get_head(const Dequeue* dequeue);
 int get_tail(const Dequeue* dequeue);
 
-void*
-get_data(Dequeue* dequeue, int pos) {
+void
+dealloc_dequeue(Dequeue* dequeue) {
+    free(dequeue->dataset);
+    free(dequeue);
+}
+
+void
+print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
+    int len = get_len(dequeue);
+    int head = get_head(dequeue);
+    int tail = get_tail(dequeue);
+    int cnt = get_cnt(dequeue);
     void** dataset = get_dataset(dequeue);
-    return dataset[pos];
+    if (cnt) {
+        if (head <= tail) {
+            for (int i = head; i <= tail; ++i) {
+                (fptr)(dataset[i]);
+            }
+        } else {
+            for (int i = head; i < len; ++i) {
+                (*fptr)(dataset[i]);
+            }
+            for (int i = 0; i <= tail; ++i) {
+                (*fptr)(dataset[i]);
+            }
+        }
+    }
+    printf("\n");
+}
+
+int
+init_dequeue(Dequeue** dequeue, int len) {
+    if (len < 0) {
+        return BAD_POS;
+    }
+    *dequeue = malloc(sizeof(Dequeue));
+    if (*dequeue == NULL) {
+        return BAD_ALLOC;
+    }
+    void** dataset = malloc(len * sizeof(void*));
+    if (dataset == NULL) {
+        return BAD_ALLOC;
+    }
+    set_dataset(*dequeue, dataset);
+    set_len(*dequeue, len);
+    set_head(*dequeue, len);
+    set_tail(*dequeue, -1);
+    set_cnt(*dequeue, 0);
+    return OK;
 }
 
 void*
@@ -62,34 +107,48 @@ pop_back(Dequeue* dequeue) {
     return get_data(dequeue, tail);
 }
 
-void
-dealloc_dequeue(Dequeue* dequeue) {
-    free(dequeue->dataset);
-    free(dequeue);
-}
-
-void
-print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
-    int len = get_len(dequeue);
+int
+push_front(Dequeue* dequeue, void* data) {
     int head = get_head(dequeue);
-    int tail = get_tail(dequeue);
+    int len = get_len(dequeue);
     int cnt = get_cnt(dequeue);
     void** dataset = get_dataset(dequeue);
-    if (cnt) {
-        if (head <= tail) {
-            for (int i = head; i <= tail; ++i) {
-                (fptr)(dataset[i]);
-            }
-        } else {
-            for (int i = head; i < len; ++i) {
-                (*fptr)(dataset[i]);
-            }
-            for (int i = 0; i <= tail; ++i) {
-                (*fptr)(dataset[i]);
-            }
-        }
+    if (cnt == len) {
+        return OVERFLOW;
     }
-    printf("\n");
+    if (head == 0) {
+        head = len - 1;
+    } else {
+        --head;
+    }
+    dataset[head] = data;
+    ++cnt;
+    set_cnt(dequeue, cnt);
+    set_head(dequeue, head);
+    return OK;
+}
+
+int
+push_back(Dequeue* dequeue, void* data) {
+    int tail = get_tail(dequeue);
+    int len = get_len(dequeue);
+    int cnt = get_cnt(dequeue);
+    void** dataset = get_dataset(dequeue);
+    if (cnt == len) {
+        return OVERFLOW;
+    }
+    tail = (tail + 1) % len;
+    dataset[tail] = data;
+    ++cnt;
+    set_cnt(dequeue, cnt);
+    set_tail(dequeue, tail);
+    return OK;
+}
+
+void*
+get_data(const Dequeue* dequeue, int pos) {
+    void** dataset = get_dataset(dequeue);
+    return dataset[pos];
 }
 
 void
@@ -140,63 +199,4 @@ get_tail(const Dequeue* dequeue) {
 int
 get_cnt(const Dequeue* dequeue) {
     return dequeue->cnt;
-}
-
-int
-init_dequeue(Dequeue** dequeue, int len) {
-    if (len < 0) {
-        return BAD_POS;
-    }
-    *dequeue = malloc(sizeof(Dequeue));
-    if (*dequeue == NULL) {
-        return BAD_ALLOC;
-    }
-    void** dataset = malloc(len * sizeof(void*));
-    if (dataset == NULL) {
-        return BAD_ALLOC;
-    }
-    set_dataset(*dequeue, dataset);
-    set_len(*dequeue, len);
-    set_head(*dequeue, len);
-    set_tail(*dequeue, -1);
-    set_cnt(*dequeue, 0);
-    return OK;
-}
-
-int
-push_front(Dequeue* dequeue, void* data) {
-    int head = get_head(dequeue);
-    int len = get_len(dequeue);
-    int cnt = get_cnt(dequeue);
-    void** dataset = get_dataset(dequeue);
-    if (cnt == len) {
-        return OVERFLOW;
-    }
-    if (head == 0) {
-        head = len - 1;
-    } else {
-        --head;
-    }
-    dataset[head] = data;
-    ++cnt;
-    set_cnt(dequeue, cnt);
-    set_head(dequeue, head);
-    return OK;
-}
-
-int
-push_back(Dequeue* dequeue, void* data) {
-    int tail = get_tail(dequeue);
-    int len = get_len(dequeue);
-    int cnt = get_cnt(dequeue);
-    void** dataset = get_dataset(dequeue);
-    if (cnt == len) {
-        return OVERFLOW;
-    }
-    tail = (tail + 1) % len;
-    dataset[tail] = data;
-    ++cnt;
-    set_cnt(dequeue, cnt);
-    set_tail(dequeue, tail);
-    return OK;
 }
