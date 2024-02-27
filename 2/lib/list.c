@@ -28,6 +28,20 @@ void set_prev(Node* node, Node* prev);
 void* get_data(const Node* node);
 void set_data(Node* node, void* data);
 
+void
+print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
+    Node* head = get_head(dequeue);
+    Node* cur = head;
+    if (head == NULL) {
+        return;
+    } else {
+        do {
+            (*fptr)(get_data(cur));
+        } while ((cur = cur->next));
+    }
+    printf("\n");
+}
+
 void*
 pop_front(Dequeue* dequeue) {
     Node* head = get_head(dequeue);
