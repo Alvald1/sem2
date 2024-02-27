@@ -28,16 +28,37 @@ void set_prev(Node* node, Node* prev);
 void* get_data(const Node* node);
 void set_data(Node* node, void* data);
 
+void dealloc_node(Node* node);
+
+void
+dealloc_dequeue(Dequeue* dequeue) {
+    Node* head = get_head(dequeue);
+    if (head == NULL) {
+        return;
+    } else {
+        while (head) {
+            Node* tmp = head;
+            head = head->next;
+            free(tmp);
+        }
+        free(dequeue);
+    }
+}
+
+void
+dealloc_node(Node* node) {
+    free(node);
+}
+
 void
 print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
     Node* head = get_head(dequeue);
-    Node* cur = head;
     if (head == NULL) {
         return;
     } else {
         do {
-            (*fptr)(get_data(cur));
-        } while ((cur = cur->next));
+            (*fptr)(get_data(head));
+        } while ((head = head->next));
     }
     printf("\n");
 }
@@ -55,6 +76,7 @@ pop_front(Dequeue* dequeue) {
         set_prev(next, NULL);
         set_head(dequeue, next);
     }
+    dealloc_node(head);
     return get_data(next);
 }
 
@@ -71,6 +93,7 @@ pop_back(Dequeue* dequeue) {
         set_next(prev, NULL);
         set_tail(dequeue, prev);
     }
+    dealloc_node(tail);
     return get_data(tail);
 }
 
