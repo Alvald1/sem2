@@ -6,7 +6,7 @@ LIB_DIR = lib
 OBJECT_DIR = object
 EXECUTABLE = bin
 
-TARGET = vector
+TARGET = list
 
 OPTIM = -O0
 

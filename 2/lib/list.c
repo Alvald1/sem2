@@ -16,7 +16,7 @@ struct _dequeue {
 
 Node* get_head(const Dequeue* dequeue);
 Node* get_tail(const Dequeue* dequeue);
-Node* get_node(const void* data);
+Node* get_node(void* data);
 void set_head(Dequeue* dequeue, Node* head);
 void set_tail(Dequeue* dequeue, Node* tail);
 int init_dequeue(Dequeue** dequeue, int _);
@@ -136,7 +136,7 @@ push_back(Dequeue* dequeue, void* data) {
 }
 
 Node*
-get_node(const void* data) {
+get_node(void* data) {
     Node* new_node = (Node*)malloc(sizeof(Node));
     if (new_node == NULL) {
         return NULL;
