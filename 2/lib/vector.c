@@ -28,6 +28,8 @@ print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
             (fptr)(dataset[i]);
         }
         printf("\n");
+    } else {
+        return EMPTY;
     }
     return OK;
 }
@@ -62,7 +64,7 @@ pop_front(Dequeue* dequeue, void* data) {
     int len = get_len(dequeue);
     int cnt = get_cnt(dequeue);
     if (cnt == 0) {
-        return NULL;
+        return EMPTY;
     }
     set_head(dequeue, (head + 1) % len);
     set_cnt(dequeue, cnt - 1);
@@ -79,7 +81,7 @@ pop_back(Dequeue* dequeue, void* data) {
     int len = get_len(dequeue);
     int cnt = get_cnt(dequeue);
     if (cnt == 0) {
-        return NULL;
+        return EMPTY;
     }
     set_tail(dequeue, (tail - 1 + len) % len);
     set_cnt(dequeue, cnt - 1);
