@@ -3,14 +3,21 @@
 #include "code_status.h"
 #include "vector.h"
 
-void
+int
 dealloc_dequeue(Dequeue* dequeue) {
+    if (dequeue == NULL) {
+        return BAD_DEQUEUE;
+    }
     free(dequeue->dataset);
     free(dequeue);
+    return OK;
 }
 
-void
+int
 print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
+    if (dequeue == NULL) {
+        return BAD_DEQUEUE;
+    }
     int len = get_len(dequeue);
     int head = get_head(dequeue);
     int tail = get_tail(dequeue);
@@ -22,6 +29,7 @@ print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
         }
         printf("\n");
     }
+    return OK;
 }
 
 int
@@ -45,8 +53,11 @@ init_dequeue(Dequeue** dequeue, int len) {
     return OK;
 }
 
-void*
-pop_front(Dequeue* dequeue) {
+int
+pop_front(Dequeue* dequeue, void* data) {
+    if (dequeue == NULL) {
+        return BAD_DEQUEUE;
+    }
     int head = get_head(dequeue);
     int len = get_len(dequeue);
     int cnt = get_cnt(dequeue);
@@ -55,11 +66,15 @@ pop_front(Dequeue* dequeue) {
     }
     set_head(dequeue, (head + 1) % len);
     set_cnt(dequeue, cnt - 1);
-    return get_data(dequeue, head);
+    data = get_data(dequeue, head);
+    return OK;
 }
 
-void*
-pop_back(Dequeue* dequeue) {
+int
+pop_back(Dequeue* dequeue, void* data) {
+    if (dequeue == NULL) {
+        return BAD_DEQUEUE;
+    }
     int tail = get_tail(dequeue);
     int len = get_len(dequeue);
     int cnt = get_cnt(dequeue);
@@ -68,11 +83,15 @@ pop_back(Dequeue* dequeue) {
     }
     set_tail(dequeue, (tail - 1 + len) % len);
     set_cnt(dequeue, cnt - 1);
-    return get_data(dequeue, tail);
+    data = get_data(dequeue, tail);
+    return OK;
 }
 
 int
 push_front(Dequeue* dequeue, void* data) {
+    if (dequeue == NULL) {
+        return BAD_DEQUEUE;
+    }
     int head = get_head(dequeue);
     int len = get_len(dequeue);
     int cnt = get_cnt(dequeue);
@@ -89,6 +108,9 @@ push_front(Dequeue* dequeue, void* data) {
 
 int
 push_back(Dequeue* dequeue, void* data) {
+    if (dequeue == NULL) {
+        return BAD_DEQUEUE;
+    }
     int tail = get_tail(dequeue);
     int len = get_len(dequeue);
     int cnt = get_cnt(dequeue);

@@ -3,8 +3,11 @@
 #include "code_status.h"
 #include "list.h"
 
-void
+int
 dealloc_dequeue(Dequeue* dequeue) {
+    if (dequeue == NULL) {
+        return BAD_DEQUEUE;
+    }
     Node* head = get_head(dequeue);
     while (head) {
         Node* tmp = head;
@@ -12,6 +15,7 @@ dealloc_dequeue(Dequeue* dequeue) {
         free(tmp);
     }
     free(dequeue);
+    return OK;
 }
 
 void
@@ -19,24 +23,30 @@ dealloc_node(Node* node) {
     free(node);
 }
 
-void
+int
 print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
+    if (dequeue == NULL) {
+        return BAD_DEQUEUE;
+    }
     Node* head = get_head(dequeue);
     if (head == NULL) {
-        return;
+        return EMPTY;
     }
     do {
         (*fptr)(get_data(head));
     } while ((head = head->next));
-
     printf("\n");
+    return OK;
 }
 
-void*
-pop_front(Dequeue* dequeue) {
+int
+pop_front(Dequeue* dequeue, void* data) {
+    if (dequeue == NULL) {
+        return BAD_DEQUEUE;
+    }
     Node* head = get_head(dequeue);
     if (head == NULL) {
-        return NULL;
+        return EMPTY;
     }
     Node* next = get_next(head);
     if (next == NULL) {
@@ -46,16 +56,19 @@ pop_front(Dequeue* dequeue) {
         set_prev(next, NULL);
         set_head(dequeue, next);
     }
-    void* data = get_data(head);
+    data = get_data(head);
     dealloc_node(head);
-    return data;
+    return OK;
 }
 
-void*
-pop_back(Dequeue* dequeue) {
+int
+pop_back(Dequeue* dequeue, void* data) {
+    if (dequeue == NULL) {
+        return BAD_DEQUEUE;
+    }
     Node* tail = get_tail(dequeue);
     if (tail == NULL) {
-        return NULL;
+        return EMPTY;
     }
     Node* prev = get_prev(tail);
     if (prev == NULL) {
@@ -65,13 +78,16 @@ pop_back(Dequeue* dequeue) {
         set_next(prev, NULL);
         set_tail(dequeue, prev);
     }
-    void* data = get_data(tail);
+    data = get_data(tail);
     dealloc_node(tail);
-    return data;
+    return OK;
 }
 
 int
 push_front(Dequeue* dequeue, void* data) {
+    if (dequeue == NULL) {
+        return BAD_DEQUEUE;
+    }
     Node* new_node = get_node(data);
     if (new_node == NULL) {
         return BAD_ALLOC;
@@ -91,6 +107,9 @@ push_front(Dequeue* dequeue, void* data) {
 
 int
 push_back(Dequeue* dequeue, void* data) {
+    if (dequeue == NULL) {
+        return BAD_DEQUEUE;
+    }
     Node* new_node = get_node(data);
     if (new_node == NULL) {
         return BAD_ALLOC;
