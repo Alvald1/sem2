@@ -8,7 +8,7 @@ dealloc_patient(Patient* patient) {
 }
 
 void
-fill_patient(Patient* patient, char* id, int ta, int ts, char status) {
+fill_patient(Patient* patient, char* id, size_t ta, size_t ts, char status) {
     char* id_src = get_id(patient);
     if (id_src != NULL) {
         free(id_src);
@@ -30,12 +30,12 @@ set_id(Patient* patient, char* id) {
 }
 
 void
-set_ta(Patient* patient, int ta) {
+set_ta(Patient* patient, size_t ta) {
     patient->ta = ta;
 }
 
 void
-set_ts(Patient* patient, int ts) {
+set_ts(Patient* patient, size_t ts) {
     patient->ts = ts;
 }
 
@@ -49,12 +49,12 @@ get_id(const Patient* patient) {
     return patient->id;
 }
 
-int
+size_t
 get_ta(const Patient* patient) {
     return patient->ta;
 }
 
-int
+size_t
 get_ts(const Patient* patient) {
     return patient->ts;
 }
