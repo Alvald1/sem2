@@ -5,26 +5,26 @@
 
 struct _dequeue {
     void** dataset;
-    int len;
-    int head;
-    int tail;
-    int cnt;
+    size_t len;
+    size_t head;
+    size_t tail;
+    size_t cnt;
 };
 
-void set_cnt(Dequeue* dequeue, int cnt);
-void set_len(Dequeue* dequeue, int len);
+void set_cnt(Dequeue* dequeue, size_t cnt);
+void set_len(Dequeue* dequeue, size_t len);
 
-int get_len(const Dequeue* dequeue);
-int get_cnt(const Dequeue* dequeue);
+size_t get_len(const Dequeue* dequeue);
+size_t get_cnt(const Dequeue* dequeue);
 
-void* get_data(const Dequeue* dequeue, int pos);
+void* get_data(const Dequeue* dequeue, size_t pos);
 
 void set_dataset(Dequeue* dequeue, void** dataset);
-void set_head(Dequeue* dequeue, int head);
-void set_tail(Dequeue* dequeue, int tail);
+void set_head(Dequeue* dequeue, size_t head);
+void set_tail(Dequeue* dequeue, size_t tail);
 
 void** get_dataset(const Dequeue* dequeue);
-int get_head(const Dequeue* dequeue);
-int get_tail(const Dequeue* dequeue);
+size_t get_head(const Dequeue* dequeue);
+size_t get_tail(const Dequeue* dequeue);
 
 #endif

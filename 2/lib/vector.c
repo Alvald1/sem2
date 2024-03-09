@@ -18,13 +18,13 @@ print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
     if (dequeue == NULL) {
         return BAD_DEQUEUE;
     }
-    int len = get_len(dequeue);
-    int head = get_head(dequeue);
-    int tail = get_tail(dequeue);
-    int cnt = get_cnt(dequeue);
+    size_t len = get_len(dequeue);
+    size_t head = get_head(dequeue);
+    size_t tail = get_tail(dequeue);
+    size_t cnt = get_cnt(dequeue);
     void** dataset = get_dataset(dequeue);
     if (cnt) {
-        for (int i = head % len; i <= tail; i = (i + 1) % len) {
+        for (size_t i = head % len; i <= tail; i = (i + 1) % len) {
             (fptr)(dataset[i]);
         }
         printf("\n");
@@ -35,10 +35,7 @@ print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
 }
 
 int
-init_dequeue(Dequeue** dequeue, int len) {
-    if (len < 0) {
-        return BAD_POS;
-    }
+init_dequeue(Dequeue** dequeue, size_t len) {
     *dequeue = malloc(sizeof(Dequeue));
     if (*dequeue == NULL) {
         return BAD_ALLOC;
@@ -56,36 +53,36 @@ init_dequeue(Dequeue** dequeue, int len) {
 }
 
 int
-pop_front(Dequeue* dequeue, void* data) {
+pop_front(Dequeue* dequeue, void** data) {
     if (dequeue == NULL) {
         return BAD_DEQUEUE;
     }
-    int head = get_head(dequeue);
-    int len = get_len(dequeue);
-    int cnt = get_cnt(dequeue);
+    size_t head = get_head(dequeue);
+    size_t len = get_len(dequeue);
+    size_t cnt = get_cnt(dequeue);
     if (cnt == 0) {
         return EMPTY;
     }
     set_head(dequeue, (head + 1) % len);
     set_cnt(dequeue, cnt - 1);
-    data = get_data(dequeue, head);
+    *data = get_data(dequeue, head);
     return OK;
 }
 
 int
-pop_back(Dequeue* dequeue, void* data) {
+pop_back(Dequeue* dequeue, void** data) {
     if (dequeue == NULL) {
         return BAD_DEQUEUE;
     }
-    int tail = get_tail(dequeue);
-    int len = get_len(dequeue);
-    int cnt = get_cnt(dequeue);
+    size_t tail = get_tail(dequeue);
+    size_t len = get_len(dequeue);
+    size_t cnt = get_cnt(dequeue);
     if (cnt == 0) {
         return EMPTY;
     }
     set_tail(dequeue, (tail - 1 + len) % len);
     set_cnt(dequeue, cnt - 1);
-    data = get_data(dequeue, tail);
+    *data = get_data(dequeue, tail);
     return OK;
 }
 
@@ -94,9 +91,9 @@ push_front(Dequeue* dequeue, void* data) {
     if (dequeue == NULL) {
         return BAD_DEQUEUE;
     }
-    int head = get_head(dequeue);
-    int len = get_len(dequeue);
-    int cnt = get_cnt(dequeue);
+    size_t head = get_head(dequeue);
+    size_t len = get_len(dequeue);
+    size_t cnt = get_cnt(dequeue);
     void** dataset = get_dataset(dequeue);
     if (cnt == len) {
         return OVERFLOW;
@@ -113,9 +110,9 @@ push_back(Dequeue* dequeue, void* data) {
     if (dequeue == NULL) {
         return BAD_DEQUEUE;
     }
-    int tail = get_tail(dequeue);
-    int len = get_len(dequeue);
-    int cnt = get_cnt(dequeue);
+    size_t tail = get_tail(dequeue);
+    size_t len = get_len(dequeue);
+    size_t cnt = get_cnt(dequeue);
     void** dataset = get_dataset(dequeue);
     if (cnt == len) {
         return OVERFLOW;
@@ -128,7 +125,7 @@ push_back(Dequeue* dequeue, void* data) {
 }
 
 void*
-get_data(const Dequeue* dequeue, int pos) {
+get_data(const Dequeue* dequeue, size_t pos) {
     void** dataset = get_dataset(dequeue);
     return dataset[pos];
 }
@@ -139,22 +136,22 @@ set_dataset(Dequeue* dequeue, void** dataset) {
 }
 
 void
-set_len(Dequeue* dequeue, int len) {
+set_len(Dequeue* dequeue, size_t len) {
     dequeue->len = len;
 }
 
 void
-set_head(Dequeue* dequeue, int head) {
+set_head(Dequeue* dequeue, size_t head) {
     dequeue->head = head;
 }
 
 void
-set_tail(Dequeue* dequeue, int tail) {
+set_tail(Dequeue* dequeue, size_t tail) {
     dequeue->tail = tail;
 }
 
 void
-set_cnt(Dequeue* dequeue, int cnt) {
+set_cnt(Dequeue* dequeue, size_t cnt) {
     dequeue->cnt = cnt;
 }
 
@@ -163,22 +160,22 @@ get_dataset(const Dequeue* dequeue) {
     return dequeue->dataset;
 }
 
-int
+size_t
 get_len(const Dequeue* dequeue) {
     return dequeue->len;
 }
 
-int
+size_t
 get_head(const Dequeue* dequeue) {
     return dequeue->head;
 }
 
-int
+size_t
 get_tail(const Dequeue* dequeue) {
     return dequeue->tail;
 }
 
-int
+size_t
 get_cnt(const Dequeue* dequeue) {
     return dequeue->cnt;
 }

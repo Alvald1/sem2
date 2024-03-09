@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "lib/code_status.h"
 #include "lib/dequeue.h"
 #include "lib/patient.h"
@@ -7,6 +8,7 @@ int
 main() {
     Patient p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12;
     Dequeue* dequeue = NULL;
+    void* data = malloc(sizeof(Patient));
     init_patient(&p1);
     init_patient(&p2);
     init_patient(&p3);
@@ -42,9 +44,9 @@ main() {
     print_dequeue(dequeue, print_patient);
     push_back(dequeue, &p5);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
     push_back(dequeue, &p6);
     print_dequeue(dequeue, print_patient);
@@ -52,7 +54,7 @@ main() {
     print_dequeue(dequeue, print_patient);
     push_back(dequeue, &p8);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
     push_back(dequeue, &p9);
     print_dequeue(dequeue, print_patient);
@@ -62,30 +64,31 @@ main() {
     print_dequeue(dequeue, print_patient);
     push_back(dequeue, &p12);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
-    pop_back(dequeue);
+    pop_back(dequeue, data);
     print_dequeue(dequeue, print_patient);
     dealloc_dequeue(dequeue);
+    free(data);
     return 0;
 }

@@ -40,7 +40,7 @@ print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
 }
 
 int
-pop_front(Dequeue* dequeue, void* data) {
+pop_front(Dequeue* dequeue, void** data) {
     if (dequeue == NULL) {
         return BAD_DEQUEUE;
     }
@@ -56,13 +56,13 @@ pop_front(Dequeue* dequeue, void* data) {
         set_prev(next, NULL);
         set_head(dequeue, next);
     }
-    data = get_data(head);
+    *data = get_data(head);
     dealloc_node(head);
     return OK;
 }
 
 int
-pop_back(Dequeue* dequeue, void* data) {
+pop_back(Dequeue* dequeue, void** data) {
     if (dequeue == NULL) {
         return BAD_DEQUEUE;
     }
@@ -78,7 +78,7 @@ pop_back(Dequeue* dequeue, void* data) {
         set_next(prev, NULL);
         set_tail(dequeue, prev);
     }
-    data = get_data(tail);
+    *data = get_data(tail);
     dealloc_node(tail);
     return OK;
 }
@@ -140,7 +140,7 @@ get_node(void* data) {
 }
 
 int
-init_dequeue(Dequeue** dequeue, int _) {
+init_dequeue(Dequeue** dequeue, size_t _) {
     (void)_;
     *dequeue = malloc(sizeof(Dequeue));
     if (*dequeue == NULL) {
