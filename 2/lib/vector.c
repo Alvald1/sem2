@@ -17,17 +17,8 @@ print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
     int cnt = get_cnt(dequeue);
     void** dataset = get_dataset(dequeue);
     if (cnt) {
-        if (head <= tail) {
-            for (int i = head; i <= tail; ++i) {
-                (fptr)(dataset[i]);
-            }
-        } else {
-            for (int i = head; i < len; ++i) {
-                (*fptr)(dataset[i]);
-            }
-            for (int i = 0; i <= tail; ++i) {
-                (*fptr)(dataset[i]);
-            }
+        for (int i = head % len; i <= tail; i = (i + 1) % len) {
+            (fptr)(dataset[i]);
         }
         printf("\n");
     }
@@ -48,8 +39,8 @@ init_dequeue(Dequeue** dequeue, int len) {
     }
     set_dataset(*dequeue, dataset);
     set_len(*dequeue, len);
-    set_head(*dequeue, len);
-    set_tail(*dequeue, -1);
+    set_head(*dequeue, len + 1);
+    set_tail(*dequeue, 0);
     set_cnt(*dequeue, 0);
     return OK;
 }
@@ -75,10 +66,7 @@ pop_back(Dequeue* dequeue) {
     if (cnt == 0) {
         return NULL;
     }
-    if (tail == -1) {
-        tail = len - 1;
-    }
-    set_tail(dequeue, tail - 1);
+    set_tail(dequeue, (tail - 1 + len) % len);
     set_cnt(dequeue, cnt - 1);
     return get_data(dequeue, tail);
 }
@@ -92,14 +80,9 @@ push_front(Dequeue* dequeue, void* data) {
     if (cnt == len) {
         return OVERFLOW;
     }
-    if (head == 0) {
-        head = len - 1;
-    } else {
-        --head;
-    }
+    head = (head - 1 + len) % len;
     dataset[head] = data;
-    ++cnt;
-    set_cnt(dequeue, cnt);
+    set_cnt(dequeue, cnt + 1);
     set_head(dequeue, head);
     return OK;
 }
@@ -115,8 +98,7 @@ push_back(Dequeue* dequeue, void* data) {
     }
     tail = (tail + 1) % len;
     dataset[tail] = data;
-    ++cnt;
-    set_cnt(dequeue, cnt);
+    set_cnt(dequeue, cnt + 1);
     set_tail(dequeue, tail);
     return OK;
 }
