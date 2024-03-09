@@ -34,10 +34,10 @@ msan: compile
 $(OBJECT_DIR)/patient.o: $(LIB_DIR)/patient.c $(LIB_DIR)/patient.h
 	clang -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
 
-$(OBJECT_DIR)/vector.o: $(LIB_DIR)/vector.c $(LIB_DIR)/dequeue.h
+$(OBJECT_DIR)/vector.o: $(LIB_DIR)/vector.c $(LIB_DIR)/dequeue.h $(LIB_DIR)/vector.h
 	clang -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
 
-$(OBJECT_DIR)/list.o: $(LIB_DIR)/list.c $(LIB_DIR)/dequeue.h
+$(OBJECT_DIR)/list.o: $(LIB_DIR)/list.c $(LIB_DIR)/dequeue.h $(LIB_DIR)/list.h
 	clang -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
 
 $(OBJECT_DIR)/main.o: main.c
