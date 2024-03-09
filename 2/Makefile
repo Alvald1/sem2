@@ -29,7 +29,7 @@ msan: SAN := $(SAN),memory
 msan: EXECUTABLE := $(EXECUTABLE)_msan
 msan: compile
 
-.PHONY: all compile debug asan msan static clean formatting help
+.PHONY: all compile preparation linker debug asan msan static clean formatting help 
 
 $(OBJECT_DIR)/patient.o: $(LIB_DIR)/patient.c $(LIB_DIR)/patient.h
 	clang -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
@@ -43,7 +43,13 @@ $(OBJECT_DIR)/list.o: $(LIB_DIR)/list.c $(LIB_DIR)/dequeue.h $(LIB_DIR)/list.h
 $(OBJECT_DIR)/main.o: main.c
 	clang -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
 
-compile: $(OBJECT_DIR)/patient.o $(OBJECT_DIR)/main.o $(OBJECT_DIR)/$(TARGET).o
+compile: preparation linker
+
+preparation:
+	mkdir -p $(LIB_DIR)
+	mkdir -p $(OBJECT_DIR)
+
+linker: $(OBJECT_DIR)/patient.o $(OBJECT_DIR)/main.o $(OBJECT_DIR)/$(TARGET).o	
 	clang $? -o $(EXECUTABLE) $(SAN) $(LDFLAGS) $(OPTIM) 
 
 static: 
@@ -58,7 +64,7 @@ clean:
 help:
 	@echo "Available targets:"
 	@echo "  all      : Build the executable with default settings"
-	@echo "  compile  : Build the executable"
+	@echo "  linker  : Build the executable"
 	@echo "  debug    : Build the executable with debugging information"
 	@echo "  asan     : Build the executable with AddressSanitizer"
 	@echo "  msan     : Build the executable with MemorySanitizer"
