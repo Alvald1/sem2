@@ -1,11 +1,12 @@
 #include <stdio.h>
-#include <stdlib.h>
 #include "lib/code_status.h"
 #include "lib/dequeue.h"
 #include "lib/patient.h"
+#include "lib/task.h"
 
 int
 main() {
+    task(NULL);
     Patient p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12;
     Dequeue* dequeue = NULL;
     Patient* data = NULL;

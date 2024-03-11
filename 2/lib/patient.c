@@ -63,11 +63,3 @@ char
 get_status(const Patient* patient) {
     return patient->status;
 }
-
-void
-init_patient(Patient* patient) {
-    set_id(patient, NULL);
-    set_ta(patient, 0);
-    set_ts(patient, 0);
-    set_status(patient, 0);
-}

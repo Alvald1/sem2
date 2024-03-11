@@ -10,8 +10,6 @@ typedef struct _patient {
     char status;
 } Patient;
 
-void init_patient(Patient* patient);
-
 void set_id(Patient* patient, char* id);
 void set_ta(Patient* patient, size_t ta);
 void set_ts(Patient* patient, size_t ts);
