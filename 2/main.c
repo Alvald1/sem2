@@ -7,7 +7,7 @@
 
 int
 main() {
-    //task(NULL);
+    task(NULL);
     Patient p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12;
     Dequeue* dequeue = NULL;
     Patient* data = NULL;
