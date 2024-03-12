@@ -1,6 +1,5 @@
 #include "lib/code_status.h"
 #include "lib/dequeue.h"
-#include "lib/patient.h"
 #include "lib/task.h"
 
 int

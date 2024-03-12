@@ -33,6 +33,12 @@ msan: compile
 
 .PHONY: all compile preparation linker debug asan msan static clean formatting help 
 
+$(OBJECT_DIR)/read.o: $(LIB_DIR)/read.c $(LIB_DIR)/read.h $(LIB_DIR)/code_status.h
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
+
+$(OBJECT_DIR)/sort.o: $(LIB_DIR)/sort.c $(LIB_DIR)/sort.h $(LIB_DIR)/code_status.h
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
+
 $(OBJECT_DIR)/task.o: $(LIB_DIR)/task.c $(LIB_DIR)/task.h $(LIB_DIR)/code_status.h
 	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
 
@@ -54,7 +60,7 @@ preparation:
 	mkdir -p $(LIB_DIR)
 	mkdir -p $(OBJECT_DIR)
 
-linker: $(OBJECT_DIR)/patient.o $(OBJECT_DIR)/main.o $(OBJECT_DIR)/task.o $(OBJECT_DIR)/$(TARGET).o	
+linker: $(OBJECT_DIR)/sort.o $(OBJECT_DIR)/read.o $(OBJECT_DIR)/patient.o $(OBJECT_DIR)/main.o $(OBJECT_DIR)/task.o $(OBJECT_DIR)/$(TARGET).o	
 	$(CC) $? -o $(EXECUTABLE) $(SAN) $(LDFLAGS) $(OPTIM) 
 
 static: 

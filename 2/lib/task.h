@@ -4,9 +4,16 @@
 #include "dequeue.h"
 #include "patient.h"
 
-int read_time(char* str, size_t* time);
+typedef struct _patients {
+    Patient** arr;
+    size_t len;
+} Patients;
+
+typedef int (*fptr_push)(Dequeue* dequeue, void* data);
+
 int task(Dequeue* dequeue);
-int read_patient(char* info, Patient** patient);
-int valid_id(char* str);
+int append(Patients* patients, Patient* patient);
+int make_patients(Patients** patients);
+void dealloc_patients(Patients* patients, size_t cnt);
 
 #endif
