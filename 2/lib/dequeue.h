@@ -16,6 +16,8 @@ int print_dequeue(const Dequeue* dequeue, fptr_print_data fptr);
 
 int dealloc_dequeue(Dequeue* dequeue);
 
+int is_empty(Dequeue* dequeue);
+
 int init_dequeue(Dequeue** dequeue, size_t len);
 
 #endif

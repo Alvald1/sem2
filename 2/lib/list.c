@@ -84,6 +84,11 @@ pop_back(Dequeue* dequeue, void** data) {
 }
 
 int
+is_empty(Dequeue* dequeue) {
+    return get_head(dequeue) == NULL;
+}
+
+int
 push_front(Dequeue* dequeue, void* data) {
     if (dequeue == NULL) {
         return BAD_DEQUEUE;
