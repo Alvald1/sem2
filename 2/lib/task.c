@@ -68,7 +68,9 @@ task(Dequeue* dequeue) {
                     window_end = clock + window->ts;
                 }
             }
-            printf("%zu\n%s\t", clock, window->id);
+            if (window) {
+                printf("%zu\n%s\t", clock, window->id);
+            }
             print_dequeue(dequeue, print_patient);
             printf("\n");
             if (i < len) {
