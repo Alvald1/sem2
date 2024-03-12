@@ -92,10 +92,7 @@ valid_id(char* str) {
         return BAD_READ;
     }
     size_t len = strlen(str);
-    if (len == 0) {
-        return BAD_READ;
-    }
-    if (len == 1 && str[0] == '*') {
+    if ((len == 0) || (len == 1 && str[0] == '*')) {
         return BAD_READ;
     }
     return OK;
@@ -106,13 +103,7 @@ read_time(char* str, size_t* time) {
     errno = 0;
     char* end_ptr = NULL;
     size_t value = strtol(str, &end_ptr, 10);
-    if (errno != 0) {
-        return BAD_READ;
-    }
-    if (str == end_ptr) {
-        return BAD_READ;
-    }
-    if (*end_ptr != '\0') {
+    if (errno != 0 || str == end_ptr || *end_ptr != '\0') {
         return BAD_READ;
     }
     *time = value;
