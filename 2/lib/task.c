@@ -2,13 +2,14 @@
 #include <errno.h>
 #include <readline/readline.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include "code_status.h"
 #include "patient.h"
 
 int read_time(char* str, size_t* time);
 int task(Dequeue* dequeue);
-Patient* read_patient(char* info);
+int read_patient(char* info, Patient** patient);
 int valid_id(char* str);
 
 int
@@ -18,52 +19,72 @@ task(Dequeue* dequeue) {
     char* save_line = NULL;
     char* info = NULL;
     while ((line = readline("Введите строку\n"))) {
-        while ((info = strtok_r(line, " ", &save_line))) {
+        info = strtok_r(line, " ", &save_line);
+        do {
             printf("%s\n", info);
-        }
+        } while ((info = strtok_r(NULL, " ", &save_line)));
     }
     return OK;
 }
 
-Patient*
-read_patient(char* info) {
+int
+read_patient(char* info, Patient** patient) {
     char* save_info = NULL;
     char* tmp = NULL;
     char* id = NULL;
     size_t ta = 0, ts = 0;
     char status = 0;
     int stage = 1, flag = 1;
-    while (flag && (tmp = strtok_r(info, "/", &save_info))) {
+    tmp = strtok_r(info, "/", &save_info);
+    if (!(tmp = strtok_r(info, "/", &save_info))) {
+        return BAD_READ;
+    }
+    do {
         switch (stage) {
             case 1:
-                if (valid_id(tmp)) {
-                    id = strdup(tmp);
-                    status = id[0] == '*';
+                if (valid_id(tmp) == OK) {
+                    status = tmp[0] == '*';
+                    if (status) {
+                        id = strdup(tmp + 1);
+                    } else {
+                        id = strdup(tmp);
+                    }
                     ++stage;
                 } else {
                     stage = flag = 0;
                 }
                 break;
             case 2:
-                if (read_time(tmp, &ta)) {
+                if (read_time(tmp, &ta) == OK) {
                     ++stage;
                 } else {
                     stage = flag = 0;
                 }
                 break;
             case 3:
-                if (read_time(tmp, &ts)) {
+                if (read_time(tmp, &ts) == OK) {
+                    ++stage;
                     flag = 0;
                 } else {
                     stage = flag = 0;
                 }
                 break;
         }
-    }
-    if (flag == stage) {
+    } while (flag && (tmp = strtok_r(NULL, "/", &save_info)));
+    if (flag == stage || stage < 4) {
         free(id);
-        return NULL;
+        return BAD_READ;
     }
+    *patient = (Patient*)malloc(sizeof(Patient));
+    if (patient == NULL) {
+        free(id);
+        return BAD_ALLOC;
+    }
+    set_id(*patient, id);
+    set_status(*patient, status);
+    set_ta(*patient, ta);
+    set_ts(*patient, ts);
+    return OK;
 }
 
 int
@@ -85,7 +106,7 @@ int
 read_time(char* str, size_t* time) {
     errno = 0;
     char* end_ptr = NULL;
-    size_t value = strtol(str, end_ptr, 10);
+    size_t value = strtol(str, &end_ptr, 10);
     if (errno != 0) {
         return BAD_READ;
     }

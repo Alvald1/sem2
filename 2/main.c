@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "lib/code_status.h"
 #include "lib/dequeue.h"
 #include "lib/patient.h"
@@ -6,22 +7,10 @@
 
 int
 main() {
-    task(NULL);
+    //task(NULL);
     Patient p1, p2, p3, p4, p5, p6, p7, p8, p9, p10, p11, p12;
     Dequeue* dequeue = NULL;
     Patient* data = NULL;
-    init_patient(&p1);
-    init_patient(&p2);
-    init_patient(&p3);
-    init_patient(&p4);
-    init_patient(&p5);
-    init_patient(&p6);
-    init_patient(&p7);
-    init_patient(&p8);
-    init_patient(&p9);
-    init_patient(&p10);
-    init_patient(&p11);
-    init_patient(&p12);
     init_dequeue(&dequeue, 15);
     fill_patient(&p1, "a", 0, 0, 0);
     fill_patient(&p2, "b", 0, 0, 0);
