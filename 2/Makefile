@@ -8,9 +8,15 @@ EXECUTABLE = bin
 
 TARGET = list
 
+TARGET_COMPILE = so
+
+SHARED_LIB =
+
+PWD = $(shell pwd)
+
 OPTIM = -O0
 
-LDFLAGS = -lreadline
+LDFLAGS = -L$(OBJECT_DIR) -lreadline -l$(TARGET)
 
 CC = clang
 
@@ -46,21 +52,29 @@ $(OBJECT_DIR)/patient.o: $(LIB_DIR)/patient.c $(LIB_DIR)/patient.h $(LIB_DIR)/co
 	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
 
 $(OBJECT_DIR)/vector.o: $(LIB_DIR)/vector.c $(LIB_DIR)/dequeue.h $(LIB_DIR)/vector.h $(LIB_DIR)/code_status.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(SHARED_LIB)
 
 $(OBJECT_DIR)/list.o: $(LIB_DIR)/list.c $(LIB_DIR)/dequeue.h $(LIB_DIR)/list.h $(LIB_DIR)/code_status.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(SHARED_LIB)
 
 $(OBJECT_DIR)/main.o: main.c $(LIB_DIR)/code_status.h
 	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
 
-compile: preparation linker
+$(OBJECT_DIR)/lib$(TARGET).a: $(OBJECT_DIR)/$(TARGET).o
+	ar rcs $@ $?
+
+$(OBJECT_DIR)/lib$(TARGET).so: SHARED_LIB = -fPIC 
+$(OBJECT_DIR)/lib$(TARGET).so: $(OBJECT_DIR)/$(TARGET).o
+	$(CC) -shared $? -o $@
+	export LD_LIBRARY_PATH=$(PWD)/$(OBJECT_DIR);
+
+compile: preparation $(OBJECT_DIR)/lib$(TARGET).$(TARGET_COMPILE) linker 
 
 preparation:
 	mkdir -p $(LIB_DIR)
 	mkdir -p $(OBJECT_DIR)
 
-linker: $(OBJECT_DIR)/sort.o $(OBJECT_DIR)/read.o $(OBJECT_DIR)/patient.o $(OBJECT_DIR)/main.o $(OBJECT_DIR)/task.o $(OBJECT_DIR)/$(TARGET).o	
+linker: $(OBJECT_DIR)/sort.o $(OBJECT_DIR)/read.o $(OBJECT_DIR)/patient.o $(OBJECT_DIR)/main.o $(OBJECT_DIR)/task.o 	
 	$(CC) $? -o $(EXECUTABLE) $(SAN) $(LDFLAGS) $(OPTIM) 
 
 static: 
@@ -70,7 +84,7 @@ formating:
 	clang-format *.c -i -style=file
 
 clean:
-	rm -rf $(EXECUTABLE)* *plist $(OBJECT_DIR)/*.o
+	rm -rf $(EXECUTABLE)* *plist $(OBJECT_DIR)/*.o $(OBJECT_DIR)/*.a $(OBJECT_DIR)/*.so
 
 help:
 	@echo "Available targets:"
