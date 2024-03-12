@@ -95,6 +95,9 @@ push_front(Dequeue* dequeue, void* data) {
     size_t len = get_len(dequeue);
     size_t cnt = get_cnt(dequeue);
     void** dataset = get_dataset(dequeue);
+    if (dataset == NULL) {
+        return BAD_DEQUEUE;
+    }
     if (cnt == len) {
         return OVERFLOW;
     }
@@ -114,6 +117,9 @@ push_back(Dequeue* dequeue, void* data) {
     size_t len = get_len(dequeue);
     size_t cnt = get_cnt(dequeue);
     void** dataset = get_dataset(dequeue);
+    if (dataset == NULL) {
+        return BAD_DEQUEUE;
+    }
     if (cnt == len) {
         return OVERFLOW;
     }

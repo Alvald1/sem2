@@ -4,7 +4,11 @@
 
 void
 dealloc_patient(Patient* patient) {
+    if (patient == NULL) {
+        return;
+    }
     free(patient->id);
+    free(patient);
 }
 
 void
