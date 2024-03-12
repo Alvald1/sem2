@@ -35,7 +35,6 @@ read_patient(char* info, Patient** patient) {
     size_t ta = 0, ts = 0;
     char status = 0;
     int stage = 1, flag = 1;
-    tmp = strtok_r(info, "/", &save_info);
     if (!(tmp = strtok_r(info, "/", &save_info))) {
         return BAD_READ;
     }
