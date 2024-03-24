@@ -1,4 +1,5 @@
 #include "task.h"
+#include <limits.h>
 #include <readline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -19,7 +20,11 @@ task(Dequeue* dequeue) {
         if (make_patients(&patients) == BAD_ALLOC) {
             return BAD_ALLOC;
         }
-        info = strtok_r(line, " ", &save_line);
+        if ((info = strtok_r(line, " ", &save_line)) == NULL) {
+            free(line);
+            dealloc_patients(patients, 0);
+            continue;
+        }
         do {
             switch (read_patient(info, &patient)) {
                 case BAD_READ: break;
@@ -38,12 +43,12 @@ task(Dequeue* dequeue) {
         } while ((info = strtok_r(NULL, " ", &save_line)));
         gnome_sort(patients);
         size_t len = patients->len;
-        size_t clock = 1, i = 0;
+        size_t clock = (len > 0 ? (patients->arr)[0]->ta : 0), i = 0;
         size_t window_end = 0;
         Patient* window = NULL;
         fptr_push push = NULL;
         int flag = 1;
-        while (flag) {
+        while (flag && len) {
             while (i < len && (patients->arr)[i]->ta == clock) {
                 if ((patients->arr)[i]->status) {
                     push = push_front;
@@ -63,22 +68,21 @@ task(Dequeue* dequeue) {
                 }
                 ++i;
             }
-            if (window == NULL || clock == window_end) {
+            if (window == NULL || (window_end == clock && !is_empty(dequeue))) {
                 if (pop_front(dequeue, (void*)&window) != EMPTY) {
                     window_end = clock + window->ts;
                 }
+            } else if (window_end == clock) {
+                window_end = INT_MAX;
+                window = NULL;
             }
-            if (window) {
-                printf("%zu\n%s\t", clock, window->id);
-            }
-            print_dequeue(dequeue, print_patient);
-            printf("\n");
-            if (i < len) {
+            print(window, clock, dequeue);
+            if (i < len && (patients->arr)[i]->ta < window_end) {
                 clock = (patients->arr)[i]->ta;
             } else {
                 clock = window_end;
             }
-            if (i == len && is_empty(dequeue)) {
+            if (i == len && is_empty(dequeue) && window == NULL) {
                 flag = 0;
             }
         }
@@ -86,6 +90,17 @@ task(Dequeue* dequeue) {
         dealloc_patients(patients, len);
     }
     return OK;
+}
+
+void
+print(Patient* window, size_t clock, Dequeue* dequeue) {
+    printf("%zu\n", clock);
+    if (window) {
+        printf("%s\t", window->id);
+    } else {
+        printf("\t");
+    }
+    print_dequeue(dequeue, print_patient);
 }
 
 void
