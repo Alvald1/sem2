@@ -30,6 +30,7 @@ print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
     }
     Node* head = get_head(dequeue);
     if (head == NULL) {
+        printf("\n");
         return EMPTY;
     }
     do {

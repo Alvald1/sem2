@@ -20,17 +20,17 @@ print_dequeue(const Dequeue* dequeue, fptr_print_data fptr) {
     }
     size_t len = get_len(dequeue);
     size_t head = get_head(dequeue);
-    size_t tail = get_tail(dequeue);
     size_t cnt = get_cnt(dequeue);
     void** dataset = get_dataset(dequeue);
     if (cnt) {
-        for (size_t i = head % len; i <= tail; i = (i + 1) % len) {
+        for (size_t i = head % len; cnt--; i = (i + 1) % len) {
             (fptr)(dataset[i]);
         }
-        printf("\n");
     } else {
+        printf("\n");
         return EMPTY;
     }
+    printf("\n");
     return OK;
 }
 
@@ -109,7 +109,7 @@ push_front(Dequeue* dequeue, void* data) {
     head = (head - 1 + len) % len;
     dataset[head] = data;
     set_cnt(dequeue, cnt + 1);
-    set_head(dequeue, head % len);
+    set_head(dequeue, head);
     return OK;
 }
 
@@ -131,7 +131,7 @@ push_back(Dequeue* dequeue, void* data) {
     tail = (tail + 1) % len;
     dataset[tail] = data;
     set_cnt(dequeue, cnt + 1);
-    set_tail(dequeue, tail % len);
+    set_tail(dequeue, tail);
     return OK;
 }
 
