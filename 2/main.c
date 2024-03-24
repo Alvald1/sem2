@@ -5,7 +5,7 @@
 int
 main() {
     Dequeue* dequeue;
-    init_dequeue(&dequeue, 15);
+    init_dequeue(&dequeue, 3);
     task(dequeue);
     dealloc_dequeue(dequeue);
     return 0;
