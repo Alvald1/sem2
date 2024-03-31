@@ -16,7 +16,7 @@ CC = clang
 
 .PHONY: compile preparation linker debug asan msan static clean formatting help 
 
-$(OBJECT_DIR)/main.o: main.c
+$(OBJECT_DIR)/main.o: main.c $(LIB_DIR)/code_status.h
 	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
 
 all: SAN = 
