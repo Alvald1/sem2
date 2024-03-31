@@ -6,19 +6,18 @@ LIB_DIR = lib
 OBJECT_DIR = object
 EXECUTABLE = bin
 
-TARGET = list
-
-TARGET_COMPILE = so
-
-SHARED_LIB =
-
-PWD = $(shell pwd)
+TARGET = without_iter
 
 OPTIM = -O0
 
-LDFLAGS = -L$(OBJECT_DIR) -lreadline -l$(TARGET)
+LDFLAGS = 
 
 CC = clang
+
+.PHONY: compile preparation linker debug asan msan static clean formatting help 
+
+$(OBJECT_DIR)/main.o: main.c
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
 
 all: SAN = 
 all: EXECUTABLE := $(EXECUTABLE)_clean 
@@ -37,44 +36,13 @@ msan: SAN := $(SAN),memory
 msan: EXECUTABLE := $(EXECUTABLE)_msan
 msan: compile
 
-.PHONY: all compile preparation linker debug asan msan static clean formatting help 
-
-$(OBJECT_DIR)/read.o: $(LIB_DIR)/read.c $(LIB_DIR)/read.h $(LIB_DIR)/code_status.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
-
-$(OBJECT_DIR)/sort.o: $(LIB_DIR)/sort.c $(LIB_DIR)/sort.h $(LIB_DIR)/code_status.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
-
-$(OBJECT_DIR)/task.o: $(LIB_DIR)/task.c $(LIB_DIR)/task.h $(LIB_DIR)/code_status.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
-
-$(OBJECT_DIR)/patient.o: $(LIB_DIR)/patient.c $(LIB_DIR)/patient.h $(LIB_DIR)/code_status.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
-
-$(OBJECT_DIR)/vector.o: $(LIB_DIR)/vector.c $(LIB_DIR)/dequeue.h $(LIB_DIR)/vector.h $(LIB_DIR)/code_status.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(SHARED_LIB)
-
-$(OBJECT_DIR)/list.o: $(LIB_DIR)/list.c $(LIB_DIR)/dequeue.h $(LIB_DIR)/list.h $(LIB_DIR)/code_status.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(SHARED_LIB)
-
-$(OBJECT_DIR)/main.o: main.c $(LIB_DIR)/code_status.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
-
-$(OBJECT_DIR)/lib$(TARGET).a: $(OBJECT_DIR)/$(TARGET).o
-	ar rcs $@ $?
-
-$(OBJECT_DIR)/lib$(TARGET).so: SHARED_LIB = -fPIC 
-$(OBJECT_DIR)/lib$(TARGET).so: $(OBJECT_DIR)/$(TARGET).o
-	$(CC) -shared $? -o $@
-	export LD_LIBRARY_PATH=$(PWD)/$(OBJECT_DIR);
-
-compile: preparation $(OBJECT_DIR)/lib$(TARGET).$(TARGET_COMPILE) linker 
+compile: preparation linker
 
 preparation:
 	mkdir -p $(LIB_DIR)
 	mkdir -p $(OBJECT_DIR)
 
-linker: $(OBJECT_DIR)/sort.o $(OBJECT_DIR)/read.o $(OBJECT_DIR)/patient.o $(OBJECT_DIR)/main.o $(OBJECT_DIR)/task.o 	
+linker: $(OBJECT_DIR)/main.o	
 	$(CC) $? -o $(EXECUTABLE) $(SAN) $(LDFLAGS) $(OPTIM) 
 
 static: 
@@ -84,7 +52,7 @@ formating:
 	clang-format *.c -i -style=file
 
 clean:
-	rm -rf $(EXECUTABLE)* *plist $(OBJECT_DIR)/*.o $(OBJECT_DIR)/*.a $(OBJECT_DIR)/*.so
+	rm -rf $(EXECUTABLE)* *plist $(OBJECT_DIR)/*.o
 
 help:
 	@echo "Available targets:"
