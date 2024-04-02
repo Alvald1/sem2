@@ -3,9 +3,11 @@
 #include "lib/code_status.h"
 
 typedef int (*fptr_compare)(void* left, void* right);
+typedef int (*fptr_print)(void* data);
 
 typedef struct _info {
     fptr_compare compare;
+    fptr_print key_print, data_print;
 } Info;
 
 typedef struct _item {
@@ -22,7 +24,15 @@ typedef struct _table {
 
 int
 info_valid(Info* info) {
-    if (info == NULL || info->compare == NULL) {
+    if (info == NULL || info->compare == NULL || info->data_print == NULL || info->key_print == NULL) {
+        return BAD_DATA;
+    }
+    return OK;
+}
+
+int
+table_valid(Table* table) {
+    if (table == NULL || table->items == NULL || table->info == NULL) {
         return BAD_DATA;
     }
     return OK;
@@ -30,7 +40,7 @@ info_valid(Info* info) {
 
 int
 table_init(Table* table, size_t size, Info* info) {
-    if (table == NULL || info_valid(info) == BAD_DATA) {
+    if (table_valid(table) == BAD_DATA || info_valid(info) == BAD_DATA) {
         return BAD_DATA;
     }
     Item** items = (Item**)malloc(size * sizeof(Item*));
@@ -63,11 +73,11 @@ item_valid(Item* item) {
 }
 
 Item*
-searchR(Item** items, fptr_compare compare, size_t left, size_t right, void* key) {
+searchR(Item** items, fptr_compare compare, long left, long right, void* key) {
     if (left > right) {
         return NULL;
     }
-    size_t middle = left + (right - left) / 2;
+    long middle = left + (right - left) / 2;
     int cmp = (*compare)(items[middle]->key, key);
     if (cmp == 0) {
         return items[middle];
@@ -84,6 +94,9 @@ searchR(Item** items, fptr_compare compare, size_t left, size_t right, void* key
 
 Item*
 table_search(Table* table, void* key) {
+    if (table_valid(table) == BAD_DATA) {
+        return NULL;
+    }
     Item** items = table->items;
     fptr_compare compare = table->info->compare;
     return searchR(items, compare, 0, table_cnt(table) - 1, key);
@@ -118,6 +131,18 @@ item_make(Item** item, void* key, void* data) {
     return OK;
 }
 
+int
+table_print(Table* table) {
+    if (table_valid(table) == BAD_DATA) {
+        return BAD_DATA;
+    }
+    size_t cnt = table_cnt(cnt);
+    if (cnt) {
+        printf("key\tdata\n");
+    }
+    for (size_t i = 0; i < cnt; ++i) {}
+}
+
 void
 set_cnt(Table* table, size_t cnt) {
     table->cnt = cnt;
@@ -125,7 +150,7 @@ set_cnt(Table* table, size_t cnt) {
 
 int
 table_insert(Table* table, Item* item) {
-    if (table == NULL || item_valid(item) == BAD_DATA) {
+    if (table_valid(table) == BAD_DATA || item_valid(item) == BAD_DATA) {
         return BAD_DATA;
     }
     size_t cnt = table->cnt;
@@ -136,11 +161,11 @@ table_insert(Table* table, Item* item) {
     void* key = item->key;
     Item** items = table->items;
     fptr_compare compare = table->info->compare;
+    if (table_search(table, key) != NULL) {
+        return BAD_KEY;
+    }
     for (i = cnt; i > 0 && (*compare)(items[i - 1]->key, key) == 1; --i) {
         items[i] = items[i - 1];
-    }
-    if (cnt && (*compare)(items[i - 1]->key, key) == 0) {
-        return BAD_KEY;
     }
     items[i] = item;
     set_cnt(table, cnt + 1);
