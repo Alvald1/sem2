@@ -62,13 +62,40 @@ item_valid(Item* item) {
     return OK;
 }
 
+Item*
+searchR(Item** items, fptr_compare compare, size_t left, size_t right, void* key) {
+    if (left > right) {
+        return NULL;
+    }
+    size_t middle = left + (right - left) / 2;
+    int cmp = (*compare)(items[middle]->key, key);
+    if (cmp == 0) {
+        return items[middle];
+    }
+    if (left == right) {
+        return NULL;
+    }
+    if (cmp == 1) {
+        return searchR(items, compare, left, middle - 1, key);
+    } else {
+        return searchR(items, compare, middle + 1, right, key);
+    }
+}
+
+Item*
+table_search(Table* table, void* key) {
+    Item** items = table->items;
+    fptr_compare compare = table->info->compare;
+    return searchR(items, compare, 0, table_cnt(table) - 1, key);
+}
+
 int
 cmp(void* left, void* right) {
-    if (*(size_t*)left > *(size_t*)right) {
+    if (*((size_t*)left) > *((size_t*)right)) {
         return 1;
-    } else if (*(size_t*)left == *(size_t*)right) {
+    } else if (*((size_t*)left) == *((size_t*)right)) {
         return 0;
-    } else if (*(size_t*)left < *(size_t*)right) {
+    } else if (*((size_t*)left) < *((size_t*)right)) {
         return -1;
     }
     return OK;
@@ -109,14 +136,14 @@ table_insert(Table* table, Item* item) {
     void* key = item->key;
     Item** items = table->items;
     fptr_compare compare = table->info->compare;
-    for (i = cnt++; i > 0 && (*compare)(items[i - 1]->key, key) == 1; --i) {
+    for (i = cnt; i > 0 && (*compare)(items[i - 1]->key, key) == 1; --i) {
         items[i] = items[i - 1];
     }
-    if ((*compare)(items[i - 1]->key, key) == 0) {
+    if (cnt && (*compare)(items[i - 1]->key, key) == 0) {
         return BAD_KEY;
     }
     items[i] = item;
-    set_cnt(table, cnt);
+    set_cnt(table, cnt + 1);
     return OK;
 }
 
