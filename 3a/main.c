@@ -3,11 +3,11 @@
 #include "lib/code_status.h"
 
 typedef int (*fptr_compare)(void* left, void* right);
-typedef int (*fptr_print)(void* data);
+typedef void (*fptr_default)(void* data);
 
 typedef struct _info {
     fptr_compare compare;
-    fptr_print key_print, data_print;
+    fptr_default key_print, data_print, key_dealloc, data_dealloc;
 } Info;
 
 typedef struct _item {
@@ -21,6 +21,16 @@ typedef struct _table {
     size_t cnt;
     Info* info;
 } Table;
+
+void
+nothing(void* data) {
+    (void)data;
+}
+
+void
+item_print(void* data) {
+    printf("%zu\t", *((size_t*)data));
+}
 
 int
 info_valid(Info* info) {
@@ -40,7 +50,7 @@ table_valid(Table* table) {
 
 int
 table_init(Table* table, size_t size, Info* info) {
-    if (table_valid(table) == BAD_DATA || info_valid(info) == BAD_DATA) {
+    if (table == NULL || info_valid(info) == BAD_DATA) {
         return BAD_DATA;
     }
     Item** items = (Item**)malloc(size * sizeof(Item*));
@@ -72,34 +82,24 @@ item_valid(Item* item) {
     return OK;
 }
 
-Item*
-searchR(Item** items, fptr_compare compare, long left, long right, void* key) {
-    if (left > right) {
-        return NULL;
-    }
-    long middle = left + (right - left) / 2;
-    int cmp = (*compare)(items[middle]->key, key);
-    if (cmp == 0) {
-        return items[middle];
-    }
-    if (left == right) {
-        return NULL;
-    }
-    if (cmp == 1) {
-        return searchR(items, compare, left, middle - 1, key);
-    } else {
-        return searchR(items, compare, middle + 1, right, key);
-    }
-}
-
-Item*
-table_search(Table* table, void* key) {
+int
+table_search(Table* table, void* key, Item** result) {
     if (table_valid(table) == BAD_DATA) {
-        return NULL;
+        return BAD_DATA;
     }
     Item** items = table->items;
     fptr_compare compare = table->info->compare;
-    return searchR(items, compare, 0, table_cnt(table) - 1, key);
+    size_t middle = 0, left = 0, right = table_cnt(table);
+    while (right > left) {
+        middle = left + (right - left) / 2;
+        switch ((*compare)(items[middle]->key, key)) {
+            case 0: *result = items[middle]; return OK;
+            case 1: right = middle; break;
+            case -1: left = middle + 1; break;
+            default: return BAD_COMP;
+        }
+    }
+    return NOT_FOUND;
 }
 
 int
@@ -136,11 +136,19 @@ table_print(Table* table) {
     if (table_valid(table) == BAD_DATA) {
         return BAD_DATA;
     }
-    size_t cnt = table_cnt(cnt);
+    size_t cnt = table_cnt(table);
     if (cnt) {
         printf("key\tdata\n");
     }
-    for (size_t i = 0; i < cnt; ++i) {}
+    fptr_default key_print = table->info->key_print;
+    fptr_default data_print = table->info->data_print;
+    Item** items = table->items;
+    for (size_t i = 0; i < cnt; ++i) {
+        key_print(items[i]->key);
+        data_print(items[i]->data);
+        printf("\n");
+    }
+    return OK;
 }
 
 void
@@ -161,8 +169,11 @@ table_insert(Table* table, Item* item) {
     void* key = item->key;
     Item** items = table->items;
     fptr_compare compare = table->info->compare;
-    if (table_search(table, key) != NULL) {
-        return BAD_KEY;
+    void* result = NULL;
+    switch (table_search(table, key, result)) {
+        case BAD_DATA: return BAD_DATA;
+        case BAD_COMP: return BAD_COMP;
+        case OK: return BAD_KEY;
     }
     for (i = cnt; i > 0 && (*compare)(items[i - 1]->key, key) == 1; --i) {
         items[i] = items[i - 1];
@@ -172,12 +183,30 @@ table_insert(Table* table, Item* item) {
     return OK;
 }
 
+void
+table_dealloc(Table* table) {
+    size_t cnt = table_cnt(table);
+    Item** items = table->items;
+    fptr_default key_dealloc = table->info->key_dealloc;
+    fptr_default data_dealloc = table->info->data_dealloc;
+    for (size_t i = 0; i < cnt; ++i) {
+        (*key_dealloc)(items[i]->key);
+        (*data_dealloc)(items[i]->data);
+        free(items[i]);
+    }
+    free(items);
+}
+
 int
 main() {
     Table table;
     Info info;
     info.compare = cmp;
-    size_t k1 = 1, k2 = 2, k3 = 2, k4 = 4, k5 = 5, k6 = 6;
+    info.data_print = item_print;
+    info.key_print = item_print;
+    info.data_dealloc = nothing;
+    info.key_dealloc = nothing;
+    size_t k1 = 1, k2 = 3, k3 = 5, k4 = 0, k5 = 9, k6 = 11;
     size_t data = 1;
     Item *i1, *i2, *i3, *i4, *i5, *i6;
     table_init(&table, 10, &info);
@@ -193,5 +222,7 @@ main() {
     table_insert(&table, i5);
     table_insert(&table, i3);
     table_insert(&table, i6);
+    table_print(&table);
+    table_dealloc(&table);
     return 0;
 }

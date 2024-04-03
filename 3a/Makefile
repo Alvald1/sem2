@@ -16,9 +16,6 @@ CC = clang
 
 .PHONY: compile preparation linker debug asan msan static clean formatting help 
 
-$(OBJECT_DIR)/main.o: main.c $(LIB_DIR)/code_status.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
-
 all: SAN = 
 all: EXECUTABLE := $(EXECUTABLE)_clean 
 all: compile
@@ -44,6 +41,9 @@ preparation:
 
 linker: $(OBJECT_DIR)/main.o	
 	$(CC) $? -o $(EXECUTABLE) $(SAN) $(LDFLAGS) $(OPTIM) 
+
+$(OBJECT_DIR)/main.o: main.c $(LIB_DIR)/code_status.h
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
 
 static: 
 	clang --analyze -Xanalyzer -analyzer-output=html *.c $(LIB_DIR)/*.c
