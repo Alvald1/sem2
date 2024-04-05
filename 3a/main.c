@@ -83,6 +83,7 @@ main() {
                     table_dealloc(&table);
                 }
                 table_remove(&table, key);
+                free(key);
                 break;
             case 'c':
                 key = malloc(sizeof(size_t));
