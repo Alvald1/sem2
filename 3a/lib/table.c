@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "code_status.h"
-#include "item.h"
 #include "item_lib.h"
 #include "table_lib.h"
 
