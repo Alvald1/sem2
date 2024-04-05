@@ -39,10 +39,19 @@ preparation:
 	mkdir -p $(LIB_DIR)
 	mkdir -p $(OBJECT_DIR)
 
-linker: $(OBJECT_DIR)/main.o	
+linker: $(OBJECT_DIR)/main.o $(OBJECT_DIR)/info.o $(OBJECT_DIR)/item.o $(OBJECT_DIR)/table.o
 	$(CC) $? -o $(EXECUTABLE) $(SAN) $(LDFLAGS) $(OPTIM) 
 
-$(OBJECT_DIR)/main.o: main.c $(LIB_DIR)/code_status.h
+$(OBJECT_DIR)/main.o: main.c main.h $(LIB_DIR)/code_status.h 
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
+
+$(OBJECT_DIR)/info.o: $(LIB_DIR)/info.c $(LIB_DIR)/code_status.h $(LIB_DIR)/info.h
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
+
+$(OBJECT_DIR)/item.o: $(LIB_DIR)/item.c $(LIB_DIR)/code_status.h $(LIB_DIR)/item.h $(LIB_DIR)/item_lib.h
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
+
+$(OBJECT_DIR)/table.o: $(LIB_DIR)/table.c $(LIB_DIR)/code_status.h $(LIB_DIR)/table.h $(LIB_DIR)/table_lib.h
 	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
 
 static: 
