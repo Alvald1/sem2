@@ -1,6 +1,7 @@
 #include "table.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "code_status.h"
 #include "item_lib.h"
 #include "table_lib.h"
@@ -45,6 +46,16 @@ __table_data(Table* table, size_t pos) {
 }
 
 int
+__copy(size_t size, void* src, void** dest) {
+    *dest = malloc(size);
+    if (*dest == NULL) {
+        return BAD_ALLOC;
+    }
+    memcpy(*dest, src, size);
+    return OK;
+}
+
+int
 table_search(Table* table, void* key, Item** result) {
     size_t pos_res = 0;
     if (__table_valid(table) == BAD_DATA || key == NULL) {
@@ -54,7 +65,11 @@ table_search(Table* table, void* key, Item** result) {
         case BAD_COMP: return BAD_COMP;
         case NOT_FOUND: return NOT_FOUND;
     }
-    if (__item_make(result, key, __table_data(table, pos_res)) == BAD_ALLOC) {
+    void* new_data = NULL;
+    if (__copy(table->info->data_size, __table_data(table, pos_res), &new_data) == BAD_ALLOC) {
+        return BAD_ALLOC;
+    }
+    if (__item_make(result, key, new_data) == BAD_ALLOC) {
         return BAD_ALLOC;
     }
     return OK;
@@ -104,9 +119,6 @@ table_remove(Table* table, void* key) {
         return BAD_DATA;
     }
     size_t cnt = table->cnt;
-    if ((cnt = __table_cnt(table)) == __table_size(table)) {
-        return OVERFLOW;
-    }
     Item** items = table->items;
     size_t pos_del = 0;
     switch (__table_search(table, key, &pos_del)) {

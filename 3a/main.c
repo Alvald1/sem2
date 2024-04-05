@@ -1,13 +1,14 @@
 #include "main.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include "lib/code_status.h"
 #include "lib/info.h"
 #include "lib/item.h"
 #include "lib/table.h"
 
 void
-nothing(void* data) {
-    (void)data;
+dealloc(void* data) {
+    free(data);
 }
 
 void
@@ -28,30 +29,80 @@ cmp(void* left, void* right) {
 }
 
 int
+get_number(const char* format, void* number) {
+    int call_back = scanf(format, number);
+    while (!call_back) {
+        scanf("%*[^\n]");
+        printf("Incorrect input\n");
+        call_back = scanf(format, number);
+    }
+    return call_back;
+}
+
+int
+read_key(size_t* key) {
+    printf("Key: ");
+    return get_number("%zu", key);
+}
+
+int
+read_data(size_t* data) {
+    printf("data: ");
+    return get_number("%zu", data);
+}
+
+int
 main() {
     Table table;
     Info info;
     info.compare = cmp;
     info.data_print = print;
     info.key_print = print;
-    info.data_dealloc = nothing;
-    info.key_dealloc = nothing;
-    size_t k1 = 1, k2 = 3, k3 = 5, k4 = 0, k5 = 5, k6 = 11;
-    size_t data = 1, data2 = 0;
-    table_init(&table, 10, &info);
-    table_insert(&table, &k1, &data);
-    table_insert(&table, &k2, &data);
-    table_insert(&table, &k3, &data);
-    table_insert(&table, &k6, &data);
-    table_insert(&table, &k5, &data2);
-    table_insert(&table, &k4, &data);
-    table_print(&table);
-    table_remove(&table, &k1);
-    table_print(&table);
+    info.data_dealloc = dealloc;
+    info.key_dealloc = dealloc;
+    info.key_size = sizeof(size_t);
+    info.data_size = sizeof(size_t);
+    char status = 0;
+    size_t *key, *data;
     Item* item;
-    table_search(&table, &k2, &item);
-    item_print(&info, item);
-    item_dealloc(&info, item);
+    table_init(&table, 10, &info);
+    printf("(a) - insert\n(b) - remove\n(c) - search\n(d) - print\n");
+    while (scanf("%c", &status) != EOF) {
+        switch (status) {
+            case 'a':
+                key = malloc(sizeof(size_t));
+                data = malloc(sizeof(size_t));
+                if (read_key(key) == EOF || read_data(data) == EOF) {
+                    table_dealloc(&table);
+                }
+                table_insert(&table, key, data);
+                break;
+            case 'b':
+                key = malloc(sizeof(size_t));
+                if (read_key(key) == EOF) {
+                    table_dealloc(&table);
+                }
+                table_remove(&table, key);
+                break;
+            case 'c':
+                key = malloc(sizeof(size_t));
+                if (read_key(key) == EOF) {
+                    table_dealloc(&table);
+                }
+                table_search(&table, key, &item);
+                printf("\n");
+                if (item) {
+                    item_print(&info, item);
+                    item_dealloc(&info, item);
+                }
+                break;
+            case 'd': table_print(&table); break;
+            default: printf("Incorrect input_2\n"); break;
+        }
+        scanf("%*[^\n]");
+        scanf("%*c");
+        printf("(a) - insert\n(b) - remove\n(c) - search\n(d) - print\n");
+    }
     table_dealloc(&table);
     return 0;
 }

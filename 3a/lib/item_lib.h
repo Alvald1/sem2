@@ -7,4 +7,6 @@ int __item_valid(Item* item);
 
 int __item_make(Item** item, void* key, void* data);
 
+int __copy(size_t size, void* src, void** dest);
+
 #endif
