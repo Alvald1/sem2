@@ -1,7 +1,9 @@
 #include "main.h"
+#include <readline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include "lib/code_status.h"
+#include "lib/fstream.h"
 #include "lib/info.h"
 #include "lib/item.h"
 #include "lib/table.h"
@@ -65,8 +67,9 @@ main() {
     char status = 0;
     size_t *key, *data;
     Item* item;
-    table_init(&table, 10, &info);
-    printf("(a) - insert\n(b) - remove\n(c) - search\n(d) - print\n");
+    read_from_file("test", &table, &info);
+    //table_init(&table, 10, &info);
+    printf("(a) - insert\n(b) - remove\n(c) - search\n(d) - print\n(e) - import\n");
     while (scanf("%c", &status) != EOF) {
         switch (status) {
             case 'a':
@@ -98,11 +101,13 @@ main() {
                 }
                 break;
             case 'd': table_print(&table); break;
+            case 'e':
+
             default: printf("Incorrect input_2\n"); break;
         }
         scanf("%*[^\n]");
         scanf("%*c");
-        printf("(a) - insert\n(b) - remove\n(c) - search\n(d) - print\n");
+        printf("(a) - insert\n(b) - remove\n(c) - search\n(d) - print\n(e) - import\n");
     }
     table_dealloc(&table);
     return 0;
