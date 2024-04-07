@@ -21,7 +21,7 @@ main() {
     char status = 0;
     size_t *key_ptr, *data;
     size_t num, num2;
-    Item* item;
+    Item* item = NULL;
     char* name = NULL;
     table_init(&table, 10, &info);
     printf("(a) - insert\n(b) - remove\n(c) - search\n(d) - print\n(e) - import\n(f) - task\n");

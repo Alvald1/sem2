@@ -152,6 +152,7 @@ __table_insert(Table* table, Item* item) {
     }
     size_t cnt;
     if ((cnt = __table_cnt(table)) == __table_size(table)) {
+        item_dealloc(table->info, item);
         return OVERFLOW;
     }
     size_t i;
