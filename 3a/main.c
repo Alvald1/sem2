@@ -67,8 +67,8 @@ main() {
     char status = 0;
     size_t *key, *data;
     Item* item;
-    read_from_file("test", &table, &info);
-    //table_init(&table, 10, &info);
+    char* name = NULL;
+    table_init(&table, 10, &info);
     printf("(a) - insert\n(b) - remove\n(c) - search\n(d) - print\n(e) - import\n");
     while (scanf("%c", &status) != EOF) {
         switch (status) {
@@ -76,14 +76,19 @@ main() {
                 key = malloc(sizeof(size_t));
                 data = malloc(sizeof(size_t));
                 if (read_key(key) == EOF || read_data(data) == EOF) {
+                    free(key);
+                    free(data);
                     table_dealloc(&table);
+                    return 0;
                 }
                 table_insert(&table, key, data);
                 break;
             case 'b':
                 key = malloc(sizeof(size_t));
                 if (read_key(key) == EOF) {
+                    free(key);
                     table_dealloc(&table);
+                    return 0;
                 }
                 table_remove(&table, key);
                 free(key);
@@ -91,7 +96,9 @@ main() {
             case 'c':
                 key = malloc(sizeof(size_t));
                 if (read_key(key) == EOF) {
+                    free(key);
                     table_dealloc(&table);
+                    return 0;
                 }
                 table_search(&table, key, &item);
                 printf("\n");
@@ -102,7 +109,10 @@ main() {
                 break;
             case 'd': table_print(&table); break;
             case 'e':
-
+                name = readline("File name: ");
+                read_from_file(name, &table, &info);
+                free(name);
+                break;
             default: printf("Incorrect input_2\n"); break;
         }
         scanf("%*[^\n]");

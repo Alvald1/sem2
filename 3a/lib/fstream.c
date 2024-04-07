@@ -13,12 +13,12 @@ read_from_file(char* f_name, Table* table, Info* info) {
     if (file == NULL) {
         return BAD_FILE;
     }
-    int call_back = 0;
     size_t size = 0;
-    if ((call_back = fscanf(file, "%zu;", &size)) != 1) {
+    if (fscanf(file, "%zu;", &size) != 1) {
         fclose(file);
         return BAD_FILE;
     }
+    table_dealloc(table);
     switch (table_init(table, size, info)) {
         case BAD_ALLOC: fclose(file); return BAD_ALLOC;
         case BAD_DATA: fclose(file); return BAD_DATA;
@@ -49,5 +49,6 @@ read_from_file(char* f_name, Table* table, Info* info) {
             default: table_insert(table, key, data);
         }
     }
+    fclose(file);
     return OK;
 }

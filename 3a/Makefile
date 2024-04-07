@@ -10,7 +10,7 @@ TARGET = without_iter
 
 OPTIM = -O0
 
-LDFLAGS = 
+LDFLAGS = -lreadline
 
 CC = clang
 

@@ -150,7 +150,7 @@ __table_insert(Table* table, Item* item) {
     if (__table_valid(table) == BAD_DATA) {
         return BAD_DATA;
     }
-    size_t cnt = table->cnt;
+    size_t cnt;
     if ((cnt = __table_cnt(table)) == __table_size(table)) {
         return OVERFLOW;
     }
