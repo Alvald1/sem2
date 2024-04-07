@@ -2,6 +2,7 @@
 #define __MAIN__
 
 #include <stddef.h>
+#include "lib/table.h"
 
 void dealloc(void* data);
 void print(void* data);

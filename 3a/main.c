@@ -6,7 +6,6 @@
 #include "lib/fstream.h"
 #include "lib/info.h"
 #include "lib/item.h"
-#include "lib/table.h"
 
 int
 main() {
@@ -58,12 +57,16 @@ main() {
                 if (item) {
                     item_print(&info, item);
                     item_dealloc(&info, item);
+                } else {
+                    free(key_ptr);
                 }
+                item = NULL;
                 break;
             case 'd': table_print(&table); break;
             case 'e':
                 name = readline("File name: ");
                 if (read_from_file(name, &table, &info) == BAD_NAME) {
+                    table_dealloc(&table);
                     return 0;
                 }
                 free(name);
