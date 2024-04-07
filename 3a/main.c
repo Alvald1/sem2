@@ -8,51 +8,6 @@
 #include "lib/item.h"
 #include "lib/table.h"
 
-void
-dealloc(void* data) {
-    free(data);
-}
-
-void
-print(void* data) {
-    printf("%zu\t", *((size_t*)data));
-}
-
-int
-cmp(void* left, void* right) {
-    if (*((size_t*)left) > *((size_t*)right)) {
-        return 1;
-    } else if (*((size_t*)left) == *((size_t*)right)) {
-        return 0;
-    } else if (*((size_t*)left) < *((size_t*)right)) {
-        return -1;
-    }
-    return OK;
-}
-
-int
-get_number(const char* format, void* number) {
-    int call_back = scanf(format, number);
-    while (!call_back) {
-        scanf("%*[^\n]");
-        printf("Incorrect input\n");
-        call_back = scanf(format, number);
-    }
-    return call_back;
-}
-
-int
-read_key(size_t* key) {
-    printf("Key: ");
-    return get_number("%zu", key);
-}
-
-int
-read_data(size_t* data) {
-    printf("data: ");
-    return get_number("%zu", data);
-}
-
 int
 main() {
     Table table;
@@ -121,4 +76,49 @@ main() {
     }
     table_dealloc(&table);
     return 0;
+}
+
+void
+dealloc(void* data) {
+    free(data);
+}
+
+void
+print(void* data) {
+    printf("%zu\t", *((size_t*)data));
+}
+
+int
+cmp(void* left, void* right) {
+    if (*((size_t*)left) > *((size_t*)right)) {
+        return 1;
+    } else if (*((size_t*)left) == *((size_t*)right)) {
+        return 0;
+    } else if (*((size_t*)left) < *((size_t*)right)) {
+        return -1;
+    }
+    return OK;
+}
+
+int
+get_number(const char* format, void* number) {
+    int call_back = scanf(format, number);
+    while (!call_back) {
+        scanf("%*[^\n]");
+        printf("Incorrect input\n");
+        call_back = scanf(format, number);
+    }
+    return call_back;
+}
+
+int
+read_key(size_t* key) {
+    printf("Key: ");
+    return get_number("%zu", key);
+}
+
+int
+read_data(size_t* data) {
+    printf("data: ");
+    return get_number("%zu", data);
 }
