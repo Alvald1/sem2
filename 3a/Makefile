@@ -1,4 +1,4 @@
-CFLAGS = -Wall -Wextra -Werror
+CFLAGS = -Wall -Wextra -Werror 
 
 SAN = -g -fsanitize=undefined
 
@@ -13,6 +13,8 @@ OPTIM = -O0
 LDFLAGS = -lreadline
 
 CC = clang
+
+COV_FLAG = 
 
 .PHONY: compile preparation linker debug asan msan static clean formatting help 
 
@@ -33,6 +35,16 @@ msan: SAN := $(SAN),memory
 msan: EXECUTABLE := $(EXECUTABLE)_msan
 msan: compile
 
+coverage: SAN =
+coverage: COV_FLAG = -fprofile-instr-generate -fcoverage-mapping
+coverage: EXECUTABLE := $(EXECUTABLE)_cov
+coverage: compile
+	./get_cover.sh
+	llvm-profdata merge -sparse default.profraw -o foo.profdata
+	llvm-cov show  $(EXECUTABLE) -instr-profile=foo.profdata
+	llvm-cov report $(EXECUTABLE) -instr-profile=foo.profdata
+	rm foo.profdata default.profraw 
+
 compile: preparation linker
 
 preparation:
@@ -40,22 +52,22 @@ preparation:
 	mkdir -p $(OBJECT_DIR)
 
 linker: $(OBJECT_DIR)/main.o $(OBJECT_DIR)/info.o $(OBJECT_DIR)/item.o $(OBJECT_DIR)/table.o $(OBJECT_DIR)/fstream.o
-	$(CC) $? -o $(EXECUTABLE) $(SAN) $(LDFLAGS) $(OPTIM) 
+	$(CC) $? -o $(EXECUTABLE) $(SAN) $(LDFLAGS) $(OPTIM) $(COV_FLAG)
 
 $(OBJECT_DIR)/main.o: main.c main.h $(LIB_DIR)/code_status.h 
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(COV_FLAG)
 
 $(OBJECT_DIR)/info.o: $(LIB_DIR)/info.c $(LIB_DIR)/code_status.h $(LIB_DIR)/info.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(COV_FLAG)
 
 $(OBJECT_DIR)/fstream.o: $(LIB_DIR)/fstream.c $(LIB_DIR)/code_status.h $(LIB_DIR)/fstream.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(COV_FLAG)
 
 $(OBJECT_DIR)/item.o: $(LIB_DIR)/item.c $(LIB_DIR)/code_status.h $(LIB_DIR)/item.h $(LIB_DIR)/item_lib.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(COV_FLAG)
 
 $(OBJECT_DIR)/table.o: $(LIB_DIR)/table.c $(LIB_DIR)/code_status.h $(LIB_DIR)/table.h $(LIB_DIR)/table_lib.h
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM)
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(COV_FLAG)
 
 static: 
 	clang --analyze -Xanalyzer -analyzer-output=html *.c $(LIB_DIR)/*.c
@@ -64,7 +76,7 @@ formating:
 	clang-format *.c -i -style=file
 
 clean:
-	rm -rf $(EXECUTABLE)* *plist $(OBJECT_DIR)/*.o
+	rm -rf $(EXECUTABLE)* *plist $(OBJECT_DIR)/*.o $(OBJECT_DIR)/*.gcda $(OBJECT_DIR)/*.gcno *.profraw
 
 help:
 	@echo "Available targets:"
