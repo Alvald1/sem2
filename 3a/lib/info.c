@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include "code_status.h"
 
-int
+Foo
 __info_valid(Info* info) {
     if (info == NULL || info->compare == NULL || info->data_print == NULL || info->key_print == NULL) {
         return BAD_DATA;

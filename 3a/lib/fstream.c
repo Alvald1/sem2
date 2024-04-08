@@ -4,7 +4,7 @@
 #include "code_status.h"
 #include "info.h"
 
-int
+Foo
 read_from_file(char* f_name, Table* table, Info* info) {
     if (f_name == NULL) {
         return BAD_NAME;

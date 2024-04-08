@@ -11,6 +11,6 @@ typedef struct _info {
     size_t key_size, data_size;
 } Info;
 
-int __info_valid(Info* info);
+Foo __info_valid(Info* info);
 
 #endif

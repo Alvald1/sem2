@@ -6,7 +6,7 @@
 #include "item_lib.h"
 #include "table_lib.h"
 
-int
+Foo
 __table_valid(Table* table) {
     if (table == NULL || table->items == NULL || __info_valid(table->info) == NOT_FOUND) {
         return BAD_DATA;
@@ -14,7 +14,7 @@ __table_valid(Table* table) {
     return OK;
 }
 
-int
+Foo
 table_init(Table* table, size_t capacity, Info* info) {
     if (table == NULL || __info_valid(info) == BAD_DATA) {
         return BAD_DATA;
@@ -45,7 +45,7 @@ __table_data(Table* table, size_t pos) {
     return (table->items)[pos]->data;
 }
 
-int
+Foo
 table_search(Table* table, void* key, Item** result) {
     size_t pos_res = 0;
     if (__table_valid(table) == BAD_DATA || key == NULL || result == NULL) {
@@ -67,7 +67,7 @@ table_search(Table* table, void* key, Item** result) {
     return OK;
 }
 
-int
+Foo
 __table_search(Table* table, void* key, size_t* result) {
     if (result == NULL) {
         return BAD_DATA;
@@ -87,7 +87,7 @@ __table_search(Table* table, void* key, size_t* result) {
     return NOT_FOUND;
 }
 
-int
+Foo
 table_print(Table* table) {
     if (__table_valid(table) == BAD_DATA) {
         return BAD_DATA;
@@ -108,7 +108,7 @@ __set_size(Table* table, size_t size) {
     table->size = size;
 }
 
-int
+Foo
 table_remove(Table* table, void* key) {
     if (__table_valid(table) || key == NULL) {
         return BAD_DATA;
@@ -127,7 +127,7 @@ table_remove(Table* table, void* key) {
     return OK;
 }
 
-int
+Foo
 table_insert(Table* table, void* key, void* data) {
     Item* item = NULL;
     if (__table_valid(table) == BAD_DATA) {
@@ -144,7 +144,7 @@ table_insert(Table* table, void* key, void* data) {
     return __table_insert(table, item);
 }
 
-int
+Foo
 __table_insert(Table* table, Item* item) {
     size_t size = __table_size(table);
     size_t i;
@@ -165,7 +165,7 @@ __table_insert(Table* table, Item* item) {
     return OK;
 }
 
-int
+Foo
 table_dealloc(Table* table) {
     if (__table_valid(table) == BAD_DATA) {
         return BAD_DATA;

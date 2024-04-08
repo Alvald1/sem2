@@ -8,8 +8,8 @@ typedef struct _item {
 
 #include "info.h"
 
-int item_dealloc(Info* info, Item* item);
+Foo item_dealloc(Info* info, Item* item);
 
-int item_print(Info* info, Item* item);
+Foo item_print(Info* info, Item* item);
 
 #endif

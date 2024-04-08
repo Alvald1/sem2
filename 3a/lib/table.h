@@ -12,16 +12,16 @@ typedef struct _table {
     Info* info;
 } Table;
 
-int table_init(Table* table, size_t capacity, Info* info);
+Foo table_init(Table* table, size_t capacity, Info* info);
 
-int table_search(Table* table, void* key, Item** result);
+Foo table_search(Table* table, void* key, Item** result);
 
-int table_print(Table* table);
+Foo table_print(Table* table);
 
-int table_insert(Table* table, void* key, void* data);
+Foo table_insert(Table* table, void* key, void* data);
 
-int table_dealloc(Table* table);
+Foo table_dealloc(Table* table);
 
-int table_remove(Table* table, void* key);
+Foo table_remove(Table* table, void* key);
 
 #endif
