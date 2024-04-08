@@ -25,14 +25,14 @@ table_init(Table* table, size_t capacity, Info* info) {
     }
     table->capacity = capacity;
     table->items = items;
-    table->cnt = 0;
+    table->size = 0;
     table->info = info;
     return OK;
 }
 
 size_t
-__table_cnt(Table* table) {
-    return table->cnt;
+__table_size(Table* table) {
+    return table->size;
 }
 
 size_t
@@ -74,7 +74,7 @@ __table_search(Table* table, void* key, size_t* result) {
     }
     Item** items = table->items;
     fptr_compare compare = table->info->compare;
-    size_t middle = 0, left = 0, right = __table_cnt(table);
+    size_t middle = 0, left = 0, right = __table_size(table);
     while (right > left) {
         middle = left + (right - left) / 2;
         switch ((*compare)(items[middle]->key, key)) {
@@ -92,20 +92,20 @@ table_print(Table* table) {
     if (__table_valid(table) == BAD_DATA) {
         return BAD_DATA;
     }
-    size_t cnt = __table_cnt(table);
-    if (cnt) {
+    size_t size = __table_size(table);
+    if (size) {
         printf("\nkey\tdata\n");
     }
     Item** items = table->items;
-    for (size_t i = 0; i < cnt; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         item_print(table->info, items[i]);
     }
     return OK;
 }
 
 void
-__set_cnt(Table* table, size_t cnt) {
-    table->cnt = cnt;
+__set_size(Table* table, size_t size) {
+    table->size = size;
 }
 
 int
@@ -113,7 +113,7 @@ table_remove(Table* table, void* key) {
     if (__table_valid(table) || key == NULL) {
         return BAD_DATA;
     }
-    size_t cnt = table->cnt;
+    size_t size = table->size;
     Item** items = table->items;
     size_t pos_del = 0;
     switch (__table_search(table, key, &pos_del)) {
@@ -122,8 +122,8 @@ table_remove(Table* table, void* key) {
         case NOT_FOUND: return BAD_KEY;
     }
     item_dealloc(table->info, items[pos_del]);
-    memmove(items + pos_del, items + pos_del + 1, (cnt - 1 - pos_del) * sizeof(items));
-    __set_cnt(table, cnt - 1);
+    memmove(items + pos_del, items + pos_del + 1, (size - 1 - pos_del) * sizeof(items));
+    __set_size(table, size - 1);
     return OK;
 }
 
@@ -133,7 +133,7 @@ table_insert(Table* table, void* key, void* data) {
     if (__table_valid(table) == BAD_DATA) {
         return BAD_DATA;
     }
-    if (__table_cnt(table) == __table_size(table)) {
+    if (__table_size(table) == __table_size(table)) {
         return OVERFLOW;
     }
     switch (__item_make(&item, key, data)) {
@@ -146,7 +146,7 @@ table_insert(Table* table, void* key, void* data) {
 
 int
 __table_insert(Table* table, Item* item) {
-    size_t cnt = __table_cnt(table);
+    size_t size = __table_size(table);
     size_t i;
     void* key = item->key;
     Item** items = table->items;
@@ -157,11 +157,11 @@ __table_insert(Table* table, Item* item) {
         case BAD_COMP: item_dealloc(table->info, item); return BAD_COMP;
         case OK: item_dealloc(table->info, item); return BAD_KEY;
     }
-    for (i = cnt; i > 0 && (*compare)(items[i - 1]->key, key) == 1; --i)
+    for (i = size; i > 0 && (*compare)(items[i - 1]->key, key) == 1; --i)
         ;
-    memmove(items + i + 1, items + i, (cnt - i) * sizeof(items));
+    memmove(items + i + 1, items + i, (size - i) * sizeof(items));
     items[i] = item;
-    __set_cnt(table, cnt + 1);
+    __set_size(table, size + 1);
     return OK;
 }
 
@@ -170,9 +170,9 @@ table_dealloc(Table* table) {
     if (__table_valid(table) == BAD_DATA) {
         return BAD_DATA;
     }
-    size_t cnt = __table_cnt(table);
+    size_t size = __table_size(table);
     Item** items = table->items;
-    for (size_t i = 0; i < cnt; ++i) {
+    for (size_t i = 0; i < size; ++i) {
         item_dealloc(table->info, items[i]);
     }
     free(items);

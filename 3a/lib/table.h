@@ -8,7 +8,7 @@
 typedef struct _table {
     Item** items;
     size_t capacity;
-    size_t cnt;
+    size_t size;
     Info* info;
 } Table;
 
