@@ -4,6 +4,7 @@
 typedef int (*fptr_compare)(void* left, void* right);
 typedef void (*fptr_default)(void* data);
 #include <stddef.h>
+#include "code_status.h"
 
 typedef struct _info {
     fptr_compare compare;

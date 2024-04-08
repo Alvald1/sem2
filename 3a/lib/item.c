@@ -1,7 +1,6 @@
 #include "item.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "code_status.h"
 #include "item_lib.h"
 
 Foo

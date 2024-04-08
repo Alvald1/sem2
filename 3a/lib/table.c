@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "code_status.h"
 #include "item_lib.h"
 #include "table_lib.h"
 
@@ -54,6 +53,7 @@ table_search(Table* table, void* key, Item** result) {
     switch (__table_search(table, key, &pos_res)) {
         case BAD_COMP: return BAD_COMP;
         case NOT_FOUND: return NOT_FOUND;
+        default: break;
     }
     void* new_data = NULL;
     new_data = malloc(table->info->data_size);
@@ -120,6 +120,7 @@ table_remove(Table* table, void* key) {
         case BAD_DATA: return BAD_DATA;
         case BAD_COMP: return BAD_COMP;
         case NOT_FOUND: return BAD_KEY;
+        default: break;
     }
     item_dealloc(table->info, items[pos_del]);
     memmove(items + pos_del, items + pos_del + 1, (size - 1 - pos_del) * sizeof(Item**));
@@ -133,13 +134,14 @@ table_insert(Table* table, void* key, void* data) {
     if (__table_valid(table) == BAD_DATA) {
         return BAD_DATA;
     }
-    if (__table_size(table) == __table_size(table)) {
+    if (__table_size(table) == __table_capacity(table)) {
         return OVERFLOW;
     }
     switch (__item_make(&item, key, data)) {
         case BAD_DATA: return BAD_DATA;
         case BAD_KEY: return BAD_KEY;
         case BAD_ALLOC: return BAD_ALLOC;
+        default: break;
     }
     return __table_insert(table, item);
 }
@@ -156,6 +158,7 @@ __table_insert(Table* table, Item* item) {
         case BAD_DATA: item_dealloc(table->info, item); return BAD_DATA;
         case BAD_COMP: item_dealloc(table->info, item); return BAD_COMP;
         case OK: item_dealloc(table->info, item); return BAD_KEY;
+        default: break;
     }
     for (i = size; i > 0 && (*compare)(items[i - 1]->key, key) == 1; --i)
         ;

@@ -6,6 +6,7 @@ typedef struct _item {
     void* data;
 } Item;
 
+#include "code_status.h"
 #include "info.h"
 
 Foo item_dealloc(Info* info, Item* item);

@@ -1,7 +1,6 @@
 #include "fstream.h"
 #include <stdio.h>
 #include <stdlib.h>
-#include "code_status.h"
 #include "info.h"
 
 Foo
@@ -22,6 +21,7 @@ read_from_file(char* f_name, Table* table, Info* info) {
     switch (table_init(table, capacity, info)) {
         case BAD_ALLOC: fclose(file); return BAD_ALLOC;
         case BAD_DATA: fclose(file); return BAD_DATA;
+        default: break;
     }
     size_t *key = NULL, *data = NULL;
     for (size_t i = 0; i < capacity; ++i) {

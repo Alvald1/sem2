@@ -1,6 +1,5 @@
 #include "info.h"
 #include <stddef.h>
-#include "code_status.h"
 
 Foo
 __info_valid(Info* info) {
