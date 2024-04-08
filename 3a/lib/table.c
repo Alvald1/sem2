@@ -122,7 +122,7 @@ table_remove(Table* table, void* key) {
         case NOT_FOUND: return BAD_KEY;
     }
     item_dealloc(table->info, items[pos_del]);
-    memmove(items + pos_del, items + pos_del + 1, (size - 1 - pos_del) * sizeof(items));
+    memmove(items + pos_del, items + pos_del + 1, (size - 1 - pos_del) * sizeof(Item**));
     __set_size(table, size - 1);
     return OK;
 }
@@ -159,7 +159,7 @@ __table_insert(Table* table, Item* item) {
     }
     for (i = size; i > 0 && (*compare)(items[i - 1]->key, key) == 1; --i)
         ;
-    memmove(items + i + 1, items + i, (size - i) * sizeof(items));
+    memmove(items + i + 1, items + i, (size - i) * sizeof(Item**));
     items[i] = item;
     __set_size(table, size + 1);
     return OK;
