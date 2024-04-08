@@ -7,7 +7,7 @@ int __table_valid(Table* table);
 
 size_t __table_cnt(Table* table);
 
-size_t __table_size(Table* table);
+size_t __table_capacity(Table* table);
 
 int __table_search(Table* table, void* key, size_t* result);
 
