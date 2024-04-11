@@ -184,7 +184,7 @@ __table_insert(Table* table, Item* item) {
         default: break;
     }
     memmove(items + result + 1, items + result, (size - result) * sizeof(Item**));
-    items[result] = item;
+    memcpy(items + result, &item, sizeof(Item**));
     __set_size(table, size + 1);
     return OK;
 }
