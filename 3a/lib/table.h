@@ -13,6 +13,8 @@ typedef struct _table {
     Info* info;
 } Table;
 
+Foo table_remove_by_range(Table* table, void* left, void* right);
+
 Foo table_init(Table* table, size_t capacity, Info* info);
 
 Foo table_search(Table* table, void* key, Item** result);

@@ -76,7 +76,7 @@ main() {
                     table_dealloc(&table);
                     return 0;
                 }
-                task(&table, num, num2);
+                table_remove_by_range(&table, &num, &num2);
                 break;
             default: printf("Incorrect input_2\n"); break;
         }
@@ -86,13 +86,6 @@ main() {
     }
     table_dealloc(&table);
     return 0;
-}
-
-void
-task(Table* table, size_t left, size_t right) {
-    for (; left <= right; ++left) {
-        table_remove(table, &left);
-    }
 }
 
 void

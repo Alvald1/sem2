@@ -45,6 +45,31 @@ __table_data(Table* table, size_t pos) {
 }
 
 Foo
+table_remove_by_range(Table* table, void* left, void* right) {
+    size_t left_ind = 0, right_ind = 0;
+    switch (__table_search(table, left, &left_ind)) {
+        case BAD_COMP: return BAD_COMP;
+        default: break;
+    }
+    switch (__table_search(table, right, &right_ind)) {
+        case BAD_COMP: return BAD_COMP;
+        case NOT_FOUND: --right_ind;
+        default: break;
+    }
+    if (left_ind > right_ind) {
+        return BAD_KEY;
+    }
+    Item** items = table->items;
+    size_t size = __table_size(table);
+    for (size_t i = left_ind; i <= right_ind; ++i) {
+        item_dealloc(table->info, items[i]);
+    }
+    memmove(items + left_ind, items + right_ind + 1, (size - right_ind - 1) * sizeof(Item**));
+    __set_size(table, size - (right_ind - left_ind + 1));
+    return OK;
+}
+
+Foo
 table_search(Table* table, void* key, Item** result) {
     size_t pos_res = 0;
     if (__table_valid(table) == BAD_DATA || key == NULL || result == NULL) {
@@ -55,8 +80,7 @@ table_search(Table* table, void* key, Item** result) {
         case NOT_FOUND: return NOT_FOUND;
         default: break;
     }
-    void* new_data = NULL;
-    new_data = malloc(table->info->data_size);
+    void* new_data = malloc(table->info->data_size);
     if (new_data == NULL) {
         return BAD_ALLOC;
     }
@@ -84,6 +108,7 @@ __table_search(Table* table, void* key, size_t* result) {
             default: return BAD_COMP;
         }
     }
+    *result = right;
     return NOT_FOUND;
 }
 
@@ -149,10 +174,8 @@ table_insert(Table* table, void* key, void* data) {
 Foo
 __table_insert(Table* table, Item* item) {
     size_t size = __table_size(table);
-    size_t i;
     void* key = item->key;
     Item** items = table->items;
-    fptr_compare compare = table->info->compare;
     size_t result = 0;
     switch (__table_search(table, key, &result)) {
         case BAD_DATA: item_dealloc(table->info, item); return BAD_DATA;
@@ -160,10 +183,8 @@ __table_insert(Table* table, Item* item) {
         case OK: item_dealloc(table->info, item); return BAD_KEY;
         default: break;
     }
-    for (i = size; i > 0 && (*compare)(items[i - 1]->key, key) == 1; --i)
-        ;
-    memmove(items + i + 1, items + i, (size - i) * sizeof(Item**));
-    items[i] = item;
+    memmove(items + result + 1, items + result, (size - result) * sizeof(Item**));
+    items[result] = item;
     __set_size(table, size + 1);
     return OK;
 }
