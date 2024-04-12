@@ -8,99 +8,6 @@
 #include "lib/item.h"
 
 int
-insert(Table* table) {
-    size_t* key_ptr = malloc(sizeof(size_t));
-    size_t* data = malloc(sizeof(size_t));
-    if (key_ptr == NULL || data == NULL) {
-        free(key_ptr);
-        free(data);
-        fprintf(stderr, "%s", errors_my[BAD_ALLOC]);
-        return BAD_ALLOC;
-    }
-    if (read_num(key_ptr, "Key: ") == EOF || read_num(data, "Data: ") == EOF) {
-        free(key_ptr);
-        free(data);
-        table_dealloc(table);
-        return EOF;
-    }
-    Foo call_back = table_insert(table, key_ptr, data);
-    if (call_back == OVERFLOW) {
-        free(key_ptr);
-        free(data);
-    }
-    fprintf(stderr, "%s", errors_my[call_back]);
-    return OK;
-}
-
-int
-rem(Table* table) {
-    size_t num;
-    if (read_num(&num, "Key: ") == EOF) {
-        table_dealloc(table);
-        return EOF;
-    }
-    Foo call_back = table_remove(table, &num);
-    fprintf(stderr, "%s", errors_my[call_back]);
-    return OK;
-}
-
-int
-search(Table* table) {
-    Item* item = NULL;
-    size_t* key_ptr = malloc(sizeof(size_t));
-    if (key_ptr == NULL) {
-        fprintf(stderr, "%s", errors_my[BAD_ALLOC]);
-        return BAD_ALLOC;
-    }
-    if (read_num(key_ptr, "Key: ") == EOF) {
-        free(key_ptr);
-        table_dealloc(table);
-        return EOF;
-    }
-    Foo call_back = table_search(table, key_ptr, &item);
-    fprintf(stderr, "%s", errors_my[call_back]);
-    printf("\n");
-    if (item) {
-        item_print(table->info, item);
-        item_dealloc(table->info, item);
-    } else {
-        free(key_ptr);
-    }
-    return OK;
-}
-
-void
-print(Table* table) {
-    Foo call_back = table_print(table);
-    fprintf(stderr, "%s", errors_my[call_back]);
-}
-
-int
-file(Table* table) {
-    char* name = readline("File name: ");
-    Foo call_back;
-    if ((call_back = read_from_file(name, table, table->info)) == BAD_NAME) {
-        table_dealloc(table);
-        return EOF;
-    }
-    free(name);
-    fprintf(stderr, "%s", errors_my[call_back]);
-    return OK;
-}
-
-int
-task(Table* table) {
-    size_t num, num2;
-    if (read_num(&num, "Left: ") == EOF || read_num(&num2, "Right: ") == EOF) {
-        table_dealloc(table);
-        return EOF;
-    }
-    Foo call_back = table_remove_by_range(table, &num, &num2);
-    fprintf(stderr, "%s", errors_my[call_back]);
-    return OK;
-}
-
-int
 main() {
     Table table;
     Info info;
@@ -150,6 +57,99 @@ main() {
     }
     table_dealloc(&table);
     return 0;
+}
+
+Foo
+insert(Table* table) {
+    size_t* key_ptr = malloc(sizeof(size_t));
+    size_t* data = malloc(sizeof(size_t));
+    if (key_ptr == NULL || data == NULL) {
+        free(key_ptr);
+        free(data);
+        fprintf(stderr, "%s", errors_my[BAD_ALLOC]);
+        return BAD_ALLOC;
+    }
+    if (read_num(key_ptr, "Key: ") == EOF || read_num(data, "Data: ") == EOF) {
+        free(key_ptr);
+        free(data);
+        table_dealloc(table);
+        return EOF;
+    }
+    Foo call_back = table_insert(table, key_ptr, data);
+    if (call_back == OVERFLOW) {
+        free(key_ptr);
+        free(data);
+    }
+    fprintf(stderr, "%s", errors_my[call_back]);
+    return OK;
+}
+
+Foo
+rem(Table* table) {
+    size_t num;
+    if (read_num(&num, "Key: ") == EOF) {
+        table_dealloc(table);
+        return EOF;
+    }
+    Foo call_back = table_remove(table, &num);
+    fprintf(stderr, "%s", errors_my[call_back]);
+    return OK;
+}
+
+Foo
+search(Table* table) {
+    Item* item = NULL;
+    size_t* key_ptr = malloc(sizeof(size_t));
+    if (key_ptr == NULL) {
+        fprintf(stderr, "%s", errors_my[BAD_ALLOC]);
+        return BAD_ALLOC;
+    }
+    if (read_num(key_ptr, "Key: ") == EOF) {
+        free(key_ptr);
+        table_dealloc(table);
+        return EOF;
+    }
+    Foo call_back = table_search(table, key_ptr, &item);
+    fprintf(stderr, "%s", errors_my[call_back]);
+    printf("\n");
+    if (item) {
+        item_print(table->info, item);
+        item_dealloc(table->info, item);
+    } else {
+        free(key_ptr);
+    }
+    return OK;
+}
+
+void
+print(Table* table) {
+    Foo call_back = table_print(table);
+    fprintf(stderr, "%s", errors_my[call_back]);
+}
+
+Foo
+file(Table* table) {
+    char* name = readline("File name: ");
+    Foo call_back;
+    if ((call_back = read_from_file(name, table, table->info)) == BAD_NAME) {
+        table_dealloc(table);
+        return EOF;
+    }
+    free(name);
+    fprintf(stderr, "%s", errors_my[call_back]);
+    return OK;
+}
+
+Foo
+task(Table* table) {
+    size_t num, num2;
+    if (read_num(&num, "Left: ") == EOF || read_num(&num2, "Right: ") == EOF) {
+        table_dealloc(table);
+        return EOF;
+    }
+    Foo call_back = table_remove_by_range(table, &num, &num2);
+    fprintf(stderr, "%s", errors_my[call_back]);
+    return OK;
 }
 
 void
