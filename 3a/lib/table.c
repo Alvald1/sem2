@@ -53,7 +53,7 @@ table_remove_by_range(Table* table, void* left, void* right) {
     }
     switch (__table_search(table, right, &right_ind)) {
         case BAD_COMP: return BAD_COMP;
-        case NOT_FOUND: --right_ind;
+        case NOT_FOUND: right_ind == 0 ? 0 : --right_ind;
         default: break;
     }
     if (left_ind > right_ind) {
@@ -61,6 +61,9 @@ table_remove_by_range(Table* table, void* left, void* right) {
     }
     Item** items = table->items;
     size_t size = __table_size(table);
+    if (size == 0) {
+        return EMPTY;
+    }
     for (size_t i = left_ind; i <= right_ind; ++i) {
         item_dealloc(table->info, items[i]);
     }
