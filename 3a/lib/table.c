@@ -1,7 +1,9 @@
 #include "table.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 #include "item_lib.h"
 #include "table_lib.h"
 
@@ -14,18 +16,21 @@ __table_valid(Table* table) {
 }
 
 Foo
-table_init(Table* table, size_t capacity, Info* info) {
-    if (table == NULL || __info_valid(info) == BAD_DATA) {
+table_init(Table** table, size_t capacity, Info* info) {
+    if (__info_valid(info) == BAD_DATA) {
         return BAD_DATA;
     }
+    *table = (Table*)malloc(sizeof(Table));
     Item** items = (Item**)malloc(capacity * sizeof(Item*));
-    if (items == NULL) {
+    if (items == NULL || table == NULL) {
+        free(table);
+        free(items);
         return BAD_ALLOC;
     }
-    table->capacity = capacity;
-    table->items = items;
-    table->size = 0;
-    table->info = info;
+    (*table)->capacity = capacity;
+    (*table)->items = items;
+    (*table)->size = 0;
+    (*table)->info = info;
     return OK;
 }
 
@@ -203,5 +208,6 @@ table_dealloc(Table* table) {
         item_dealloc(table->info, items[i]);
     }
     free(items);
+    free(table);
     return OK;
 }

@@ -3,6 +3,13 @@
 
 #include "table.h"
 
+struct _table {
+    Item** items;
+    size_t capacity;
+    size_t size;
+    Info* info;
+};
+
 Foo __table_valid(Table* table);
 
 size_t __table_size(Table* table);

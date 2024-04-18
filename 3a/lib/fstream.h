@@ -4,6 +4,6 @@
 #include "code_status.h"
 #include "table.h"
 
-Foo read_from_file(char* f_name, Table* table, Info* info);
+Foo read_from_file(char* f_name, Table** table, Info* info);
 
 #endif

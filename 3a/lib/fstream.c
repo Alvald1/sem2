@@ -1,10 +1,12 @@
 #include "fstream.h"
+
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "info.h"
 
 Foo
-read_from_file(char* f_name, Table* table, Info* info) {
+read_from_file(char* f_name, Table** table, Info* info) {
     if (f_name == NULL) {
         return BAD_NAME;
     }
@@ -17,7 +19,7 @@ read_from_file(char* f_name, Table* table, Info* info) {
         fclose(file);
         return BAD_FILE;
     }
-    table_dealloc(table);
+    table_dealloc(*table);
     switch (table_init(table, capacity, info)) {
         case BAD_ALLOC: fclose(file); return BAD_ALLOC;
         case BAD_DATA: fclose(file); return BAD_DATA;
@@ -30,7 +32,7 @@ read_from_file(char* f_name, Table* table, Info* info) {
         if (key == NULL || data == NULL) {
             free(key);
             free(data);
-            table_dealloc(table);
+            table_dealloc(*table);
             fclose(file);
             return BAD_ALLOC;
         }
@@ -46,7 +48,7 @@ read_from_file(char* f_name, Table* table, Info* info) {
                 fscanf(file, "%*[^;]");
                 fscanf(file, "%*c");
                 break;
-            default: table_insert(table, key, data);
+            default: table_insert(*table, key, data);
         }
     }
     fclose(file);

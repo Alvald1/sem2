@@ -1,7 +1,10 @@
 #include "main.h"
-#include <readline/readline.h>
+
 #include <stdio.h>
 #include <stdlib.h>
+
+#include <readline/readline.h>
+
 #include "lib/code_status.h"
 #include "lib/fstream.h"
 #include "lib/info.h"
@@ -9,7 +12,7 @@
 
 int
 main() {
-    Table table;
+    Table* table = NULL;
     Info info;
     info.compare = cmp;
     info.data_print = print_item;
@@ -24,28 +27,28 @@ main() {
     while (scanf("%c", &status) != EOF) {
         switch (status) {
             case 'i':
-                if (insert(&table) == EOF) {
+                if (insert(table) == EOF) {
                     return 0;
                 }
                 break;
             case 'r':
-                if (rem(&table) == EOF) {
+                if (rem(table) == EOF) {
                     return 0;
                 }
                 break;
             case 's':
-                if (search(&table) == EOF) {
+                if (search(table, &info) == EOF) {
                     return 0;
                 }
                 break;
-            case 'p': print(&table); break;
+            case 'p': print(table); break;
             case 'f':
-                if (file(&table) == EOF) {
+                if (file(&table, &info) == EOF) {
                     return 0;
                 }
                 break;
             case 't':
-                if (task(&table) == EOF) {
+                if (task(table) == EOF) {
                     return 0;
                 }
                 break;
@@ -55,7 +58,7 @@ main() {
         scanf("%*c");
         printf("(i) - insert\n(r) - remove\n(s) - search\n(p) - print\n(f) - file\n(t) - task\n");
     }
-    table_dealloc(&table);
+    table_dealloc(table);
     return 0;
 }
 
@@ -97,7 +100,7 @@ rem(Table* table) {
 }
 
 Foo
-search(Table* table) {
+search(Table* table, Info* info) {
     Item* item = NULL;
     size_t* key_ptr = malloc(sizeof(size_t));
     if (key_ptr == NULL) {
@@ -113,8 +116,8 @@ search(Table* table) {
     fprintf(stderr, "%s", errors_my[call_back]);
     printf("\n");
     if (item) {
-        item_print(table->info, item);
-        item_dealloc(table->info, item);
+        item_print(info, item);
+        item_dealloc(info, item);
     } else {
         free(key_ptr);
     }
@@ -128,11 +131,11 @@ print(Table* table) {
 }
 
 Foo
-file(Table* table) {
+file(Table** table, Info* info) {
     char* name = readline("File name: ");
     Foo call_back;
-    if ((call_back = read_from_file(name, table, table->info)) == BAD_NAME) {
-        table_dealloc(table);
+    if ((call_back = read_from_file(name, table, info)) == BAD_NAME) {
+        table_dealloc(*table);
         return EOF;
     }
     free(name);

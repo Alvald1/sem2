@@ -2,20 +2,16 @@
 #define __TABLE__
 
 #include <stddef.h>
+
 #include "code_status.h"
 #include "info.h"
 #include "item.h"
 
-typedef struct _table {
-    Item** items;
-    size_t capacity;
-    size_t size;
-    Info* info;
-} Table;
+typedef struct _table Table;
 
 Foo table_remove_by_range(Table* table, void* left, void* right);
 
-Foo table_init(Table* table, size_t capacity, Info* info);
+Foo table_init(Table** table, size_t capacity, Info* info);
 
 Foo table_search(Table* table, void* key, Item** result);
 
