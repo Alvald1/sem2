@@ -1,5 +1,7 @@
 CFLAGS = -Wall -Wextra -Werror 
 
+CC_AFL = $(AFL_PATH)afl-clang
+
 SAN = -g -fsanitize=undefined
 
 LIB_DIR = lib
@@ -34,6 +36,9 @@ asan: compile
 msan: SAN := $(SAN),memory
 msan: EXECUTABLE := $(EXECUTABLE)_msan
 msan: compile
+
+afl: CC = $(CC_AFL)
+afl: asan
 
 coverage: SAN =
 coverage: COV_FLAG = -fprofile-instr-generate -fcoverage-mapping
