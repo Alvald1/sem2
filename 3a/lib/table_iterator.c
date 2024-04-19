@@ -25,7 +25,7 @@ __iterator_init(Iterator** iterator, Info* info) {
 }
 
 Foo
-get_iterator(Table* table, Iterator** iterator) {
+iterator_first(Table* table, Iterator** iterator) {
     if (__table_valid(table) == BAD_DATA || iterator == NULL || __iterator_valid(*iterator) == BAD_DATA) {
         return BAD_DATA;
     }

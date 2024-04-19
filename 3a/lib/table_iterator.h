@@ -10,6 +10,6 @@ typedef struct _iterator {
     Info* info;
 } Iterator;
 
-Foo get_iterator(Table* table, Iterator** iterator);
+Foo iterator_first(Table* table, Iterator** iterator);
 
 #endif
