@@ -3,13 +3,20 @@ import json
 import sys, os
 
 def write_to_file(file_path, text):
-    output = f'/home/farguss/.dev/bin/multimetric --maintindex=microsoft {text} > res'
+    output = f'/home/farguss/.dev/bin/multimetric --maintindex=microsoft {text} > quality_res'
     try:
         with open(file_path, 'w') as file:
             file.write(output)
     except IOError:
         print("Ошибка при записи в файл.")
-        
+
+
+def delete_file(file_path):
+    try:
+        os.remove(file_path)
+    except OSError as e:
+        print(f"Ошибка при удалении файла {file_path}: {e}")
+
 
 def run_bash_script(script_path):
     try:
@@ -35,6 +42,7 @@ if __name__ == "__main__":
     text = " ".join(sys.argv[1:])  # Объединяем все параметры после пути к файлу в одну строку
     write_to_file(script_path, text)
     run_bash_script(script_path)
+    delete_file(script_path)
     file_path = "quality_res"  # Укажите путь к вашему текстовому файлу с JSON
     json_data = read_json_from_file(file_path)
     if json_data:
