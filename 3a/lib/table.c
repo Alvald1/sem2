@@ -44,9 +44,14 @@ __table_capacity(Table* table) {
     return table->capacity;
 }
 
+Item*
+__table_item(Table* table, size_t pos) {
+    return (table->items)[pos];
+}
+
 void*
 __table_data(Table* table, size_t pos) {
-    return (table->items)[pos]->data;
+    return __table_item(table, pos)->data;
 }
 
 Foo
