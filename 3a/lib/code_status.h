@@ -1,5 +1,5 @@
-#ifndef __CODE_STATUS__
-#define __CODE_STATUS__
+#ifndef LAB3A_3A_LIB_CODE_STATUS_H_
+#define LAB3A_3A_LIB_CODE_STATUS_H_
 
 typedef enum _foo {
     EOF = -1,

@@ -1,5 +1,5 @@
-#ifndef __INFO__
-#define __INFO__
+#ifndef LAB3A_3A_LIB_INFO_H_
+#define LAB3A_3A_LIB_INFO_H_
 
 typedef int (*fptr_compare)(void* left, void* right);
 typedef void (*fptr_default)(void* data);

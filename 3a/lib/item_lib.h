@@ -1,5 +1,5 @@
-#ifndef __ITEM_LIB__
-#define __ITEM_LIB__
+#ifndef LAB3A_3A_LIB_ITEM_LIB_H_
+#define LAB3A_3A_LIB_ITEM_LIB_H_
 
 #include "item.h"
 

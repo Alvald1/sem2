@@ -1,5 +1,5 @@
-#ifndef __TABLE__
-#define __TABLE__
+#ifndef LAB3A_3A_LIB_TABLE_H_
+#define LAB3A_3A_LIB_TABLE_H_
 
 #include <stddef.h>
 

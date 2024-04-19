@@ -1,5 +1,5 @@
-#ifndef __MAIN__
-#define __MAIN__
+#ifndef LAB3A_3A_MAIN_H_
+#define LAB3A_3A_MAIN_H_
 
 #include <stddef.h>
 

@@ -1,5 +1,5 @@
-#ifndef __FSTREAM__
-#define __FSTREAM__
+#ifndef LAB3A_3A_LIB_FSTREAM_H_
+#define LAB3A_3A_LIB_FSTREAM_H_
 
 #include "code_status.h"
 #include "table.h"
