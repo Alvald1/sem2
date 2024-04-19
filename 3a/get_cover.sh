@@ -1,6 +1,6 @@
 #!/bin/bash
 for file in out/*/queue/*
 do
-    ./bin_asan < $file
+    ./bin_* < $file
     echo $file
 done
