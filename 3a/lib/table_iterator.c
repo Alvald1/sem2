@@ -1,5 +1,6 @@
 #include "table_iterator.h"
 
+#include <stddef.h>
 #include <stdlib.h>
 
 #include "table_iterator_lib.h"
@@ -81,4 +82,18 @@ iterator_next(Table* table, Iterator* iterator, Iterator** next) {
 void
 iterator_dealloc(Iterator* iterator) {
     free(iterator);
+}
+
+Foo
+iterator_insert(Table* table, void* key, void* data, Iterator** iterator) {
+    size_t result = 0;
+    switch (__table_insert_(table, key, data, &result)) {
+        case BAD_DATA: return BAD_DATA;
+        case BAD_KEY: return BAD_KEY;
+        case BAD_ALLOC: return BAD_ALLOC;
+        case OVERFLOW: return OVERFLOW;
+        case BAD_COMP: return BAD_COMP;
+        default: break;
+    }
+    return __iterator_get(table, iterator, result);
 }

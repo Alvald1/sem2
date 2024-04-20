@@ -167,7 +167,7 @@ table_remove(Table* table, void* key) {
 }
 
 Foo
-table_insert(Table* table, void* key, void* data) {
+__table_insert_(Table* table, void* key, void* data, size_t* result) {
     Item* item = NULL;
     if (__table_valid(table) == BAD_DATA) {
         return BAD_DATA;
@@ -181,23 +181,28 @@ table_insert(Table* table, void* key, void* data) {
         case BAD_ALLOC: return BAD_ALLOC;
         default: break;
     }
-    return __table_insert(table, item);
+    return __table_insert(table, item, result);
 }
 
 Foo
-__table_insert(Table* table, Item* item) {
+table_insert(Table* table, void* key, void* data) {
+    size_t _;
+    return __table_insert_(table, key, data, _);
+}
+
+Foo
+__table_insert(Table* table, Item* item, size_t* result) {
     size_t size = __table_size(table);
     void* key = item->key;
     Item** items = table->items;
-    size_t result = 0;
-    switch (__table_search(table, key, &result)) {
+    switch (__table_search(table, key, result)) {
         case BAD_DATA: item_dealloc(table->info, item); return BAD_DATA;
         case BAD_COMP: item_dealloc(table->info, item); return BAD_COMP;
         case OK: item_dealloc(table->info, item); return BAD_KEY;
         default: break;
     }
-    memmove(items + result + 1, items + result, (size - result) * sizeof(Item**));
-    memcpy(items + result, &item, sizeof(Item**));
+    memmove(items + *result + 1, items + *result, (size - *result) * sizeof(Item**));
+    memcpy(items + *result, &item, sizeof(Item**));
     __set_size(table, size + 1);
     return OK;
 }
