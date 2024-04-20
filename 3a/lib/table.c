@@ -165,7 +165,7 @@ __table_remove(Table* table, void* key, size_t* pos) {
 Foo
 table_remove(Table* table, void* key) {
     size_t _;
-    return __table_remove(table, key, _);
+    return __table_remove(table, key, &_);
 }
 
 Foo
@@ -187,7 +187,7 @@ __table_insert_(Table* table, void* key, void* data, size_t* pos) {
 Foo
 table_insert(Table* table, void* key, void* data) {
     size_t _;
-    return __table_insert_(table, key, data, _);
+    return __table_insert_(table, key, data, &_);
 }
 
 Foo
@@ -198,7 +198,7 @@ __table_insert(Table* table, Item* item, size_t* pos) {
     Foo call_back = OK;
     if ((call_back = __table_search(table, key, pos)) != NOT_FOUND) {
         item_dealloc(table->info, item);
-        return call_back;
+        return (call_back == OK ? BAD_KEY : call_back);
     }
     memmove(items + *pos + 1, items + *pos, (size - *pos) * sizeof(Item**));
     memcpy(items + *pos, &item, sizeof(Item**));
