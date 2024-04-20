@@ -88,10 +88,9 @@ table_search(Table* table, void* key, Item** result) {
     if (__table_valid(table) == BAD_DATA || key == NULL || result == NULL) {
         return BAD_DATA;
     }
-    switch (__table_search(table, key, &pos)) {
-        case BAD_COMP: return BAD_COMP;
-        case NOT_FOUND: return NOT_FOUND;
-        default: break;
+    Foo call_back = OK;
+    if ((call_back = __table_search(table, key, &pos)) != OK) {
+        return call_back;
     }
     void* new_data = malloc(table->info->data_size);
     if (new_data == NULL) {
@@ -153,11 +152,9 @@ __table_remove(Table* table, void* key, size_t* pos) {
     }
     size_t size = table->size;
     Item** items = table->items;
-    switch (__table_search(table, key, pos)) {
-        case BAD_DATA: return BAD_DATA;
-        case BAD_COMP: return BAD_COMP;
-        case NOT_FOUND: return BAD_KEY;
-        default: break;
+    Foo call_back = OK;
+    if ((call_back = __table_search(table, key, pos)) != OK) {
+        return (call_back == NOT_FOUND ? BAD_KEY : call_back);
     }
     item_dealloc(table->info, items[*pos]);
     memmove(items + *pos, items + *pos + 1, (size - 1 - *pos) * sizeof(Item**));
@@ -180,11 +177,9 @@ __table_insert_(Table* table, void* key, void* data, size_t* pos) {
     if (__table_size(table) == __table_capacity(table)) {
         return OVERFLOW;
     }
-    switch (__item_make(&item, key, data)) {
-        case BAD_DATA: return BAD_DATA;
-        case BAD_KEY: return BAD_KEY;
-        case BAD_ALLOC: return BAD_ALLOC;
-        default: break;
+    Foo call_back = OK;
+    if ((call_back = __item_make(&item, key, data)) != OK) {
+        return call_back;
     }
     return __table_insert(table, item, pos);
 }
@@ -200,11 +195,10 @@ __table_insert(Table* table, Item* item, size_t* pos) {
     size_t size = __table_size(table);
     void* key = item->key;
     Item** items = table->items;
-    switch (__table_search(table, key, pos)) {
-        case BAD_DATA: item_dealloc(table->info, item); return BAD_DATA;
-        case BAD_COMP: item_dealloc(table->info, item); return BAD_COMP;
-        case OK: item_dealloc(table->info, item); return BAD_KEY;
-        default: break;
+    Foo call_back = OK;
+    if ((call_back = __table_search(table, key, pos)) != NOT_FOUND) {
+        item_dealloc(table->info, item);
+        return call_back;
     }
     memmove(items + *pos + 1, items + *pos, (size - *pos) * sizeof(Item**));
     memcpy(items + *pos, &item, sizeof(Item**));
