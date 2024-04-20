@@ -13,7 +13,8 @@ typedef enum _foo {
     BAD_FILE,
     BAD_NAME,
     EMPTY,
-    BAD_ITER
+    BAD_ITER,
+    DIFFERENT
 } Foo;
 
 extern const char* errors_my[];

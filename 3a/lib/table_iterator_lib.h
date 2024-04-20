@@ -6,5 +6,6 @@
 
 Foo __iterator_valid(Iterator* iterator);
 Foo __iterator_init(Iterator** iterator, Info* info);
+Foo __iterator_get(Table* table, Iterator** iterator, size_t pos);
 
 #endif

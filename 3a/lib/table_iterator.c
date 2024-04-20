@@ -25,7 +25,7 @@ __iterator_init(Iterator** iterator, Info* info) {
 }
 
 Foo
-iterator_first(Table* table, Iterator** iterator) {
+__iterator_get(Table* table, Iterator** iterator, size_t pos) {
     if (__table_valid(table) == BAD_DATA || iterator == NULL) {
         return BAD_DATA;
     }
@@ -35,8 +35,26 @@ iterator_first(Table* table, Iterator** iterator) {
     if (__iterator_init(iterator, table->info) == BAD_ALLOC) {
         return BAD_ALLOC;
     }
-    (*iterator)->item = __table_item(table, 0);
+    (*iterator)->item = __table_item(table, pos);
     return OK;
+}
+
+Foo
+iterator_front(Table* table, Iterator** iterator) {
+    return __iterator_get(table, iterator, 0);
+}
+
+Foo
+iterator_back(Table* table, Iterator** iterator) {
+    return __iterator_get(table, iterator, __table_size(table) - 1);
+}
+
+Foo
+iterator_compare(Iterator* left, Iterator* right) {
+    if (left->info == right->info && left->item == right->item) {
+        return OK;
+    }
+    return DIFFERENT;
 }
 
 Foo
@@ -58,4 +76,9 @@ iterator_next(Table* table, Iterator* iterator, Iterator** next) {
     }
     (*next)->item = __table_item(table, 0);
     return OK;
+}
+
+void
+iterator_dealloc(Iterator* iterator) {
+    free(iterator);
 }

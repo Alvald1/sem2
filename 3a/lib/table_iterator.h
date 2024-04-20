@@ -10,7 +10,9 @@ typedef struct _iterator {
     Info* info;
 } Iterator;
 
-Foo iterator_first(Table* table, Iterator** iterator);
+Foo iterator_front(Table* table, Iterator** iterator);
+Foo iterator_back(Table* table, Iterator** iterator);
 Foo iterator_next(Table* table, Iterator* iterator, Iterator** next);
+void iterator_dealloc(Iterator* iterator);
 
 #endif
