@@ -14,5 +14,6 @@ Foo iterator_front(Table* table, Iterator** iterator);
 Foo iterator_back(Table* table, Iterator** iterator);
 Foo iterator_next(Table* table, Iterator* iterator, Iterator** next);
 void iterator_dealloc(Iterator* iterator);
+Foo iterator_compare(Iterator* left, Iterator* right);
 
 #endif
