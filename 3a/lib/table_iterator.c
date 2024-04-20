@@ -97,3 +97,6 @@ iterator_insert(Table* table, void* key, void* data, Iterator** iterator) {
     }
     return __iterator_get(table, iterator, result);
 }
+
+Foo
+iterator_remove(Table, Iterator* iterator, Iterator** next) {}
