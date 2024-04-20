@@ -63,13 +63,13 @@ iterator_next(Table* table, Iterator* iterator, Iterator** next) {
     if (__table_valid(table) == BAD_DATA || next == NULL || __iterator_valid(iterator) == BAD_DATA) {
         return BAD_DATA;
     }
-    size_t pos_res = 0;
-    switch (__table_search(table, iterator->item->key, &pos_res)) {
+    size_t pos = 0;
+    switch (__table_search(table, iterator->item->key, &pos)) {
         case BAD_COMP: return BAD_COMP;
         case NOT_FOUND: return BAD_ITER;
         default: break;
     }
-    if (__table_size(table) == pos_res + 1) {
+    if (__table_size(table) == pos + 1) {
         return OVERFLOW;
     }
     if (__iterator_init(next, table->info) == BAD_ALLOC) {
@@ -86,23 +86,33 @@ iterator_dealloc(Iterator* iterator) {
 
 Foo
 iterator_insert(Table* table, void* key, void* data, Iterator** iterator) {
-    size_t result = 0;
+    size_t pos = 0;
     Foo call_back = OK;
-    if ((call_back = __table_insert_(table, key, data, &result)) != OK) {
+    if ((call_back = __table_insert_(table, key, data, &pos)) != OK) {
         return call_back;
     }
-    return __iterator_get(table, iterator, result);
+    return __iterator_get(table, iterator, pos);
 }
 
 Foo
 iterator_remove(Table* table, Iterator* iterator, Iterator** next) {
     Foo call_back = OK;
-    size_t pos_del = 0;
-    if ((call_back = __table_remove(table, iterator->item->key, &pos_del)) != OK) {
+    size_t pos = 0;
+    if ((call_back = __table_remove(table, iterator->item->key, &pos)) != OK) {
         return call_back;
     }
-    if (pos_del + 1 == __table_size(table)) {
+    if (pos + 1 == __table_size(table)) {
         return OVERFLOW;
     }
-    return __iterator_get(table, next, pos_del + 1);
+    return __iterator_get(table, next, pos + 1);
+}
+
+Foo
+iterator_search(Table* table, void* key, Iterator** iterator) {
+    Foo call_back = OK;
+    size_t pos = 0;
+    if ((call_back = __table_search(table, key, &pos)) != OK) {
+        return call_back;
+    }
+    return __iterator_get(table, iterator, pos);
 }

@@ -84,11 +84,11 @@ table_remove_by_range(Table* table, void* left, void* right) {
 
 Foo
 table_search(Table* table, void* key, Item** result) {
-    size_t pos_res = 0;
+    size_t pos = 0;
     if (__table_valid(table) == BAD_DATA || key == NULL || result == NULL) {
         return BAD_DATA;
     }
-    switch (__table_search(table, key, &pos_res)) {
+    switch (__table_search(table, key, &pos)) {
         case BAD_COMP: return BAD_COMP;
         case NOT_FOUND: return NOT_FOUND;
         default: break;
@@ -97,7 +97,7 @@ table_search(Table* table, void* key, Item** result) {
     if (new_data == NULL) {
         return BAD_ALLOC;
     }
-    memcpy(new_data, __table_data(table, pos_res), table->info->data_size);
+    memcpy(new_data, __table_data(table, pos), table->info->data_size);
     if (__item_make(result, key, new_data) == BAD_ALLOC) {
         return BAD_ALLOC;
     }
@@ -105,8 +105,8 @@ table_search(Table* table, void* key, Item** result) {
 }
 
 Foo
-__table_search(Table* table, void* key, size_t* result) {
-    if (result == NULL) {
+__table_search(Table* table, void* key, size_t* pos) {
+    if (pos == NULL) {
         return BAD_DATA;
     }
     Item** items = table->items;
@@ -115,13 +115,13 @@ __table_search(Table* table, void* key, size_t* result) {
     while (right > left) {
         middle = left + (right - left) / 2;
         switch ((*compare)(items[middle]->key, key)) {
-            case 0: *result = middle; return OK;
+            case 0: *pos = middle; return OK;
             case 1: right = middle; break;
             case -1: left = middle + 1; break;
             default: return BAD_COMP;
         }
     }
-    *result = right;
+    *pos = right;
     return NOT_FOUND;
 }
 
@@ -147,20 +147,20 @@ __set_size(Table* table, size_t size) {
 }
 
 Foo
-__table_remove(Table* table, void* key, size_t* pos_del) {
+__table_remove(Table* table, void* key, size_t* pos) {
     if (__table_valid(table) || key == NULL) {
         return BAD_DATA;
     }
     size_t size = table->size;
     Item** items = table->items;
-    switch (__table_search(table, key, pos_del)) {
+    switch (__table_search(table, key, pos)) {
         case BAD_DATA: return BAD_DATA;
         case BAD_COMP: return BAD_COMP;
         case NOT_FOUND: return BAD_KEY;
         default: break;
     }
-    item_dealloc(table->info, items[*pos_del]);
-    memmove(items + *pos_del, items + *pos_del + 1, (size - 1 - *pos_del) * sizeof(Item**));
+    item_dealloc(table->info, items[*pos]);
+    memmove(items + *pos, items + *pos + 1, (size - 1 - *pos) * sizeof(Item**));
     __set_size(table, size - 1);
     return OK;
 }
@@ -172,7 +172,7 @@ table_remove(Table* table, void* key) {
 }
 
 Foo
-__table_insert_(Table* table, void* key, void* data, size_t* result) {
+__table_insert_(Table* table, void* key, void* data, size_t* pos) {
     Item* item = NULL;
     if (__table_valid(table) == BAD_DATA) {
         return BAD_DATA;
@@ -186,7 +186,7 @@ __table_insert_(Table* table, void* key, void* data, size_t* result) {
         case BAD_ALLOC: return BAD_ALLOC;
         default: break;
     }
-    return __table_insert(table, item, result);
+    return __table_insert(table, item, pos);
 }
 
 Foo
@@ -196,18 +196,18 @@ table_insert(Table* table, void* key, void* data) {
 }
 
 Foo
-__table_insert(Table* table, Item* item, size_t* result) {
+__table_insert(Table* table, Item* item, size_t* pos) {
     size_t size = __table_size(table);
     void* key = item->key;
     Item** items = table->items;
-    switch (__table_search(table, key, result)) {
+    switch (__table_search(table, key, pos)) {
         case BAD_DATA: item_dealloc(table->info, item); return BAD_DATA;
         case BAD_COMP: item_dealloc(table->info, item); return BAD_COMP;
         case OK: item_dealloc(table->info, item); return BAD_KEY;
         default: break;
     }
-    memmove(items + *result + 1, items + *result, (size - *result) * sizeof(Item**));
-    memcpy(items + *result, &item, sizeof(Item**));
+    memmove(items + *pos + 1, items + *pos, (size - *pos) * sizeof(Item**));
+    memcpy(items + *pos, &item, sizeof(Item**));
     __set_size(table, size + 1);
     return OK;
 }
