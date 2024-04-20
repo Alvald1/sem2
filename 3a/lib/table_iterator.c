@@ -26,7 +26,7 @@ __iterator_init(Iterator** iterator, Info* info) {
 
 Foo
 iterator_first(Table* table, Iterator** iterator) {
-    if (__table_valid(table) == BAD_DATA || iterator == NULL || __iterator_valid(*iterator) == BAD_DATA) {
+    if (__table_valid(table) == BAD_DATA || iterator == NULL) {
         return BAD_DATA;
     }
     if (__table_size(table) == 0) {
@@ -36,5 +36,26 @@ iterator_first(Table* table, Iterator** iterator) {
         return BAD_ALLOC;
     }
     (*iterator)->item = __table_item(table, 0);
+    return OK;
+}
+
+Foo
+iterator_next(Table* table, Iterator* iterator, Iterator** next) {
+    if (__table_valid(table) == BAD_DATA || next == NULL || __iterator_valid(iterator) == BAD_DATA) {
+        return BAD_DATA;
+    }
+    size_t pos_res = 0;
+    switch (__table_search(table, iterator->item->key, &pos_res)) {
+        case BAD_COMP: return BAD_COMP;
+        case NOT_FOUND: return BAD_ITER;
+        default: break;
+    }
+    if (__table_size(table) == pos_res + 1) {
+        return OVERFLOW;
+    }
+    if (__iterator_init(next, table->info) == BAD_ALLOC) {
+        return BAD_ALLOC;
+    }
+    (*next)->item = __table_item(table, 0);
     return OK;
 }

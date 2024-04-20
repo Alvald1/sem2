@@ -12,7 +12,8 @@ typedef enum _foo {
     NOT_FOUND,
     BAD_FILE,
     BAD_NAME,
-    EMPTY
+    EMPTY,
+    BAD_ITER
 } Foo;
 
 extern const char* errors_my[];

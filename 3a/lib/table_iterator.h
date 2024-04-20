@@ -11,5 +11,6 @@ typedef struct _iterator {
 } Iterator;
 
 Foo iterator_first(Table* table, Iterator** iterator);
+Foo iterator_next(Table* table, Iterator* iterator, Iterator** next);
 
 #endif
