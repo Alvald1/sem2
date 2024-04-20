@@ -69,7 +69,7 @@ insert(Table* table) {
     if (key_ptr == NULL || data == NULL) {
         free(key_ptr);
         free(data);
-        fprintf(stderr, "%s", errors_my[BAD_ALLOC]);
+        fprintf(stderr, "%s", errors[BAD_ALLOC]);
         return BAD_ALLOC;
     }
     if (read_num(key_ptr, "Key: ") == EOF || read_num(data, "Data: ") == EOF) {
@@ -83,7 +83,7 @@ insert(Table* table) {
         free(key_ptr);
         free(data);
     }
-    fprintf(stderr, "%s", errors_my[call_back]);
+    fprintf(stderr, "%s", errors[call_back]);
     return OK;
 }
 
@@ -95,7 +95,7 @@ rem(Table* table) {
         return EOF;
     }
     Foo call_back = table_remove(table, &num);
-    fprintf(stderr, "%s", errors_my[call_back]);
+    fprintf(stderr, "%s", errors[call_back]);
     return OK;
 }
 
@@ -104,7 +104,7 @@ search(Table* table, Info* info) {
     Item* item = NULL;
     size_t* key_ptr = malloc(sizeof(size_t));
     if (key_ptr == NULL) {
-        fprintf(stderr, "%s", errors_my[BAD_ALLOC]);
+        fprintf(stderr, "%s", errors[BAD_ALLOC]);
         return BAD_ALLOC;
     }
     if (read_num(key_ptr, "Key: ") == EOF) {
@@ -113,7 +113,7 @@ search(Table* table, Info* info) {
         return EOF;
     }
     Foo call_back = table_search(table, key_ptr, &item);
-    fprintf(stderr, "%s", errors_my[call_back]);
+    fprintf(stderr, "%s", errors[call_back]);
     printf("\n");
     if (item) {
         item_print(info, item);
@@ -127,7 +127,7 @@ search(Table* table, Info* info) {
 void
 print(Table* table) {
     Foo call_back = table_print(table);
-    fprintf(stderr, "%s", errors_my[call_back]);
+    fprintf(stderr, "%s", errors[call_back]);
 }
 
 Foo
@@ -139,7 +139,7 @@ file(Table** table, Info* info) {
         return EOF;
     }
     free(name);
-    fprintf(stderr, "%s", errors_my[call_back]);
+    fprintf(stderr, "%s", errors[call_back]);
     return OK;
 }
 
@@ -151,7 +151,7 @@ task(Table* table) {
         return EOF;
     }
     Foo call_back = table_remove_by_range(table, &num, &num2);
-    fprintf(stderr, "%s", errors_my[call_back]);
+    fprintf(stderr, "%s", errors[call_back]);
     return OK;
 }
 

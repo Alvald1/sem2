@@ -17,6 +17,6 @@ typedef enum _foo {
     DIFFERENT
 } Foo;
 
-extern const char* errors_my[];
+extern const char* errors[];
 
 #endif
