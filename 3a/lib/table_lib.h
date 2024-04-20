@@ -18,6 +18,7 @@ void __set_size(Table* table, size_t size);
 Foo __table_insert(Table* table, Item* item, size_t* result);
 Foo __table_insert_(Table* table, void* key, void* data, size_t* result);
 void* __table_data(Table* table, size_t pos);
+Foo __table_remove(Table* table, void* key, size_t* pos_del);
 Item* __table_item(Table* table, size_t pos);
 
 #endif

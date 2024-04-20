@@ -147,23 +147,28 @@ __set_size(Table* table, size_t size) {
 }
 
 Foo
-table_remove(Table* table, void* key) {
+__table_remove(Table* table, void* key, size_t* pos_del) {
     if (__table_valid(table) || key == NULL) {
         return BAD_DATA;
     }
     size_t size = table->size;
     Item** items = table->items;
-    size_t pos_del = 0;
-    switch (__table_search(table, key, &pos_del)) {
+    switch (__table_search(table, key, pos_del)) {
         case BAD_DATA: return BAD_DATA;
         case BAD_COMP: return BAD_COMP;
         case NOT_FOUND: return BAD_KEY;
         default: break;
     }
-    item_dealloc(table->info, items[pos_del]);
-    memmove(items + pos_del, items + pos_del + 1, (size - 1 - pos_del) * sizeof(Item**));
+    item_dealloc(table->info, items[*pos_del]);
+    memmove(items + *pos_del, items + *pos_del + 1, (size - 1 - *pos_del) * sizeof(Item**));
     __set_size(table, size - 1);
     return OK;
+}
+
+Foo
+table_remove(Table* table, void* key) {
+    size_t _;
+    return __table_remove(table, key, _);
 }
 
 Foo

@@ -87,16 +87,22 @@ iterator_dealloc(Iterator* iterator) {
 Foo
 iterator_insert(Table* table, void* key, void* data, Iterator** iterator) {
     size_t result = 0;
-    switch (__table_insert_(table, key, data, &result)) {
-        case BAD_DATA: return BAD_DATA;
-        case BAD_KEY: return BAD_KEY;
-        case BAD_ALLOC: return BAD_ALLOC;
-        case OVERFLOW: return OVERFLOW;
-        case BAD_COMP: return BAD_COMP;
-        default: break;
+    Foo call_back = OK;
+    if ((call_back = __table_insert_(table, key, data, &result)) != OK) {
+        return call_back;
     }
     return __iterator_get(table, iterator, result);
 }
 
 Foo
-iterator_remove(Table, Iterator* iterator, Iterator** next) {}
+iterator_remove(Table* table, Iterator* iterator, Iterator** next) {
+    Foo call_back = OK;
+    size_t pos_del = 0;
+    if ((call_back = __table_remove(table, iterator->item->key, &pos_del)) != OK) {
+        return call_back;
+    }
+    if (pos_del + 1 == __table_size(table)) {
+        return OVERFLOW;
+    }
+    return __iterator_get(table, next, pos_del + 1);
+}
