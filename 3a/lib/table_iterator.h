@@ -16,5 +16,6 @@ Foo iterator_next(Table* table, Iterator* iterator, Iterator** next);
 void iterator_dealloc(Iterator* iterator);
 Foo iterator_compare(Iterator* left, Iterator* right);
 Foo iterator_insert(Table* table, void* key, void* data, Iterator** iterator);
+Foo iterator_remove(Table* table, Iterator* iterator, Iterator** next);
 
 #endif
