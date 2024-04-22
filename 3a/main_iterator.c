@@ -5,7 +5,6 @@
 
 #include <readline/readline.h>
 
-#include "general.h"
 #include "lib/code_status.h"
 #include "lib/fstream.h"
 #include "lib/info.h"
