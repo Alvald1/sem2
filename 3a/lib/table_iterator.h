@@ -4,7 +4,8 @@
 #include "info.h"
 #include "item.h"
 #include "iterator.h"
-#include "table.h"
+
+typedef struct _table Table;
 
 Foo table_iterator_insert(Table* table, void* key, void* data, Iterator** iterator);
 Foo table_iterator_remove(Table* table, Iterator* iterator, Iterator** next);

@@ -18,7 +18,7 @@ CC = clang
 
 COV_FLAG = 
 
-.PHONY: compile preparation linker debug asan msan static clean formatting help 
+.PHONY: compile preparation linker afl debug asan msan coverage static clean formatting help 
 
 all: SAN = 
 all: EXECUTABLE := $(EXECUTABLE)_clean 
@@ -56,7 +56,7 @@ preparation:
 	mkdir -p $(LIB_DIR)
 	mkdir -p $(OBJECT_DIR)
 
-linker: $(OBJECT_DIR)/main.o $(OBJECT_DIR)/info.o $(OBJECT_DIR)/item.o $(OBJECT_DIR)/table.o $(OBJECT_DIR)/fstream.o $(OBJECT_DIR)/code_status.o
+linker: $(OBJECT_DIR)/main.o $(OBJECT_DIR)/info.o $(OBJECT_DIR)/item.o $(OBJECT_DIR)/table.o $(OBJECT_DIR)/fstream.o $(OBJECT_DIR)/code_status.o $(OBJECT_DIR)/iterator.o $(OBJECT_DIR)/table_iterator.o
 	$(CC) $? -o $(EXECUTABLE) $(SAN) $(LDFLAGS) $(OPTIM) $(COV_FLAG)
 
 $(OBJECT_DIR)/main.o: main.c main.h $(LIB_DIR)/code_status.h 
@@ -75,6 +75,12 @@ $(OBJECT_DIR)/item.o: $(LIB_DIR)/item.c $(LIB_DIR)/code_status.h $(LIB_DIR)/item
 	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(COV_FLAG)
 
 $(OBJECT_DIR)/table.o: $(LIB_DIR)/table.c $(LIB_DIR)/code_status.h $(LIB_DIR)/table.h $(LIB_DIR)/table_lib.h
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(COV_FLAG)
+	
+$(OBJECT_DIR)/iterator.o: $(LIB_DIR)/iterator.c $(LIB_DIR)/code_status.h $(LIB_DIR)/iterator.h $(LIB_DIR)/iterator_lib.h
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(COV_FLAG)
+	
+$(OBJECT_DIR)/table_iterator.o: $(LIB_DIR)/table_iterator.c $(LIB_DIR)/code_status.h $(LIB_DIR)/table_iterator.h
 	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(COV_FLAG)
 
 static: 

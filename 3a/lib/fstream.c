@@ -4,6 +4,7 @@
 #include <stdlib.h>
 
 #include "info.h"
+#include "table.h"
 
 Foo
 read_from_file(char* f_name, Table** table, Info* info) {

@@ -3,7 +3,8 @@
 
 #include "info.h"
 #include "item.h"
-#include "table.h"
+
+typedef struct _table Table;
 
 typedef struct _iterator {
     Item* item;

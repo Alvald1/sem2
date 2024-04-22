@@ -1,5 +1,5 @@
-#ifndef __ITEM__
-#define __ITEM__
+#ifndef LAB3A_3A_LIB_ITEM_H_
+#define LAB3A_3A_LIB_ITEM_H_
 
 typedef struct _item {
     void* key;

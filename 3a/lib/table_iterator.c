@@ -3,6 +3,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 
+#include "iterator_lib.h"
 #include "table_lib.h"
 
 Foo
