@@ -10,17 +10,11 @@
 typedef struct _table Table;
 
 Foo table_remove_by_range(Table* table, void* left, void* right);
-
 Foo table_init(Table** table, size_t capacity, Info* info);
-
 Foo table_search(Table* table, void* key, Item** result);
-
 Foo table_print(Table* table);
-
 Foo table_insert(Table* table, void* key, void* data);
-
 Foo table_dealloc(Table* table);
-
 Foo table_remove(Table* table, void* key);
 
 #endif

@@ -145,6 +145,11 @@ __set_size(Table* table, size_t size) {
     table->size = size;
 }
 
+Info*
+__table_info(Table* table) {
+    return table->info;
+}
+
 Foo
 __table_remove(Table* table, void* key, size_t* pos) {
     if (__table_valid(table) || key == NULL) {

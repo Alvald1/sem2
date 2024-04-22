@@ -10,6 +10,7 @@ struct _table {
     Info* info;
 };
 
+Info* __table_info(Table* table);
 Foo __table_valid(Table* table);
 size_t __table_size(Table* table);
 size_t __table_capacity(Table* table);
