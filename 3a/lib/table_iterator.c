@@ -6,6 +6,26 @@
 #include "table_lib.h"
 
 Foo
+table_iterator_remove_by_range(Table* table, void* left, void* right) {
+    return table_remove_by_range(table, left, right);
+}
+
+Foo
+table_iterator_init(Table** table, size_t capacity, Info* info) {
+    return table_init(table, capacity, info);
+}
+
+Foo
+table_iterator_print(Table* table) {
+    return table_print(table);
+}
+
+Foo
+table_iterator_dealloc(Table* table) {
+    return table_dealloc(table);
+}
+
+Foo
 table_iterator_insert(Table* table, void* key, void* data, Iterator** iterator) {
     size_t pos = 0;
     Foo call_back = OK;
