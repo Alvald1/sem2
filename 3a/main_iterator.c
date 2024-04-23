@@ -112,7 +112,6 @@ rem(Table* table, Info* info) {
 
 Foo
 search(Table* table, Info* info) {
-    Item* item = NULL;
     size_t* key_ptr = malloc(sizeof(size_t));
     if (key_ptr == NULL) {
         fprintf(stderr, "%s", errors[BAD_ALLOC]);
@@ -125,15 +124,13 @@ search(Table* table, Info* info) {
     }
     Iterator* iterator = NULL;
     Foo call_back = table_iterator_search(table, key_ptr, &iterator);
-    iterator_dealloc(iterator);
     fprintf(stderr, "%s", errors[call_back]);
     printf("\n");
-    if (item) {
-        item_print(info, item);
-        item_dealloc(info, item);
-    } else {
-        free(key_ptr);
+    if (call_back == OK) {
+        item_print(info, iterator->item);
     }
+    free(key_ptr);
+    iterator_dealloc(iterator);
     return OK;
 }
 
