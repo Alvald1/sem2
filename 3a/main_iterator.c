@@ -5,6 +5,7 @@
 
 #include <readline/readline.h>
 
+#include "general.h"
 #include "lib/code_status.h"
 #include "lib/fstream.h"
 #include "lib/info.h"
@@ -22,7 +23,7 @@ main() {
     info.key_size = sizeof(size_t);
     info.data_size = sizeof(size_t);
     char status = 0;
-    table_init(&table, 10, &info);
+    table_iterator_init(&table, 10, &info);
     printf("(i) - insert\n(r) - remove\n(s) - search\n(p) - print\n(f) - file\n(t) - task\n");
     while (scanf("%c", &status) != EOF) {
         switch (status) {
@@ -32,7 +33,7 @@ main() {
                 }
                 break;
             case 'r':
-                if (rem(table) == EOF) {
+                if (rem(table, &info) == EOF) {
                     return 0;
                 }
                 break;
@@ -58,7 +59,7 @@ main() {
         scanf("%*c");
         printf("(i) - insert\n(r) - remove\n(s) - search\n(p) - print\n(f) - file\n(t) - task\n");
     }
-    table_dealloc(table);
+    table_iterator_dealloc(table);
     return 0;
 }
 
@@ -75,10 +76,12 @@ insert(Table* table) {
     if (read_num(key_ptr, "Key: ") == EOF || read_num(data, "Data: ") == EOF) {
         free(key_ptr);
         free(data);
-        table_dealloc(table);
+        table_iterator_dealloc(table);
         return EOF;
     }
-    Foo call_back = table_insert(table, key_ptr, data);
+    Iterator* iterator = NULL;
+    Foo call_back = table_iterator_insert(table, key_ptr, data, &iterator);
+    iterator_dealloc(iterator);
     if (call_back == OVERFLOW) {
         free(key_ptr);
         free(data);
@@ -88,13 +91,21 @@ insert(Table* table) {
 }
 
 Foo
-rem(Table* table) {
+rem(Table* table, Info* info) {
     size_t num;
     if (read_num(&num, "Key: ") == EOF) {
-        table_dealloc(table);
+        table_iterator_dealloc(table);
         return EOF;
     }
-    Foo call_back = table_remove(table, &num);
+    Iterator *iterator = NULL, *next = NULL;
+    Foo call_back = OK;
+    if ((call_back = iterator_make(&iterator, info, &num, &num)) != OK) {
+        return call_back;
+    }
+    call_back = table_iterator_remove(table, iterator, &next);
+    free(iterator->item);
+    iterator_dealloc(iterator);
+    iterator_dealloc(next);
     fprintf(stderr, "%s", errors[call_back]);
     return OK;
 }
@@ -109,10 +120,12 @@ search(Table* table, Info* info) {
     }
     if (read_num(key_ptr, "Key: ") == EOF) {
         free(key_ptr);
-        table_dealloc(table);
+        table_iterator_dealloc(table);
         return EOF;
     }
-    Foo call_back = table_search(table, key_ptr, &item);
+    Iterator* iterator = NULL;
+    Foo call_back = table_iterator_search(table, key_ptr, &iterator);
+    iterator_dealloc(iterator);
     fprintf(stderr, "%s", errors[call_back]);
     printf("\n");
     if (item) {
@@ -126,7 +139,7 @@ search(Table* table, Info* info) {
 
 void
 print(Table* table) {
-    Foo call_back = table_print(table);
+    Foo call_back = table_iterator_print(table);
     fprintf(stderr, "%s", errors[call_back]);
 }
 
@@ -135,7 +148,7 @@ file(Table** table, Info* info) {
     char* name = readline("File name: ");
     Foo call_back;
     if ((call_back = read_from_file(name, table, info)) == BAD_NAME) {
-        table_dealloc(*table);
+        table_iterator_dealloc(*table);
         return EOF;
     }
     free(name);
@@ -147,10 +160,10 @@ Foo
 task(Table* table) {
     size_t num, num2;
     if (read_num(&num, "Left: ") == EOF || read_num(&num2, "Right: ") == EOF) {
-        table_dealloc(table);
+        table_iterator_dealloc(table);
         return EOF;
     }
-    Foo call_back = table_remove_by_range(table, &num, &num2);
+    Foo call_back = table_iterator_remove_by_range(table, &num, &num2);
     fprintf(stderr, "%s", errors[call_back]);
     return OK;
 }

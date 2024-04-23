@@ -11,6 +11,7 @@ typedef struct _iterator {
     Info* info;
 } Iterator;
 
+Foo iterator_make(Iterator** iterator, Info* info, void* key, void* data);
 Foo iterator_compare(Iterator* left, Iterator* right);
 Foo iterator_front(Table* table, Iterator** iterator);
 Foo iterator_back(Table* table, Iterator** iterator);

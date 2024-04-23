@@ -43,7 +43,7 @@ table_iterator_remove(Table* table, Iterator* iterator, Iterator** next) {
     if ((call_back = __table_remove(table, iterator->item->key, &pos)) != OK) {
         return call_back;
     }
-    if (pos + 1 == __table_size(table)) {
+    if (pos == __table_size(table)) {
         return OVERFLOW;
     }
     return __iterator_get(table, next, pos + 1);

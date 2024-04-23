@@ -33,7 +33,7 @@ main() {
                 }
                 break;
             case 'r':
-                if (rem(table) == EOF) {
+                if (rem(table, NULL) == EOF) {
                     return 0;
                 }
                 break;
@@ -89,8 +89,9 @@ insert(Table* table) {
 }
 
 Foo
-rem(Table* table) {
+rem(Table* table, Info* _) {
     size_t num;
+    (void)_;
     if (read_num(&num, "Key: ") == EOF) {
         table_dealloc(table);
         return EOF;

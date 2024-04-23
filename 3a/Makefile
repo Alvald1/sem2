@@ -8,7 +8,7 @@ LIB_DIR = lib
 OBJECT_DIR = object
 EXECUTABLE = bin
 
-TARGET = without_iter
+TARGET = 
 
 OPTIM = -O0
 
@@ -56,11 +56,14 @@ preparation:
 	mkdir -p $(LIB_DIR)
 	mkdir -p $(OBJECT_DIR)
 
-linker: $(OBJECT_DIR)/main.o $(OBJECT_DIR)/general.o $(OBJECT_DIR)/info.o $(OBJECT_DIR)/item.o $(OBJECT_DIR)/table.o $(OBJECT_DIR)/fstream.o $(OBJECT_DIR)/code_status.o $(OBJECT_DIR)/iterator.o $(OBJECT_DIR)/table_iterator.o
+linker: $(OBJECT_DIR)/main$(TARGET).o $(OBJECT_DIR)/general.o $(OBJECT_DIR)/info.o $(OBJECT_DIR)/item.o $(OBJECT_DIR)/table.o $(OBJECT_DIR)/fstream.o $(OBJECT_DIR)/code_status.o $(OBJECT_DIR)/iterator.o $(OBJECT_DIR)/table_iterator.o
 	$(CC) $? -o $(EXECUTABLE) $(SAN) $(LDFLAGS) $(OPTIM) $(COV_FLAG)
 
 $(OBJECT_DIR)/main.o: main.c main.h $(LIB_DIR)/code_status.h 
-	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(COV_FLAG)
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(COV_FLAG) -DCOMMON
+
+$(OBJECT_DIR)/main_iterator.o: main_iterator.c main.h $(LIB_DIR)/code_status.h 
+	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(COV_FLAG) -DITERATOR
 
 $(OBJECT_DIR)/general.o: general.c general.h
 	$(CC) -c $< -o $@ $(SAN) $(CFLAGS) $(OPTIM) $(COV_FLAG)

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 
 #include "code_status.h"
+#include "item_lib.h"
 #include "iterator_lib.h"
 #include "table_lib.h"
 
@@ -22,6 +23,19 @@ __iterator_init(Iterator** iterator, Info* info) {
     }
     (*iterator)->info = info;
     (*iterator)->item = NULL;
+    return OK;
+}
+
+Foo
+iterator_make(Iterator** iterator, Info* info, void* key, void* data) {
+    if (__iterator_init(iterator, info) == BAD_ALLOC) {
+        return BAD_ALLOC;
+    }
+    Foo call_back = OK;
+    if ((call_back = __item_make(&((*iterator)->item), key, data)) != OK) {
+        iterator_dealloc(*iterator);
+        return call_back;
+    }
     return OK;
 }
 
@@ -69,7 +83,7 @@ iterator_next(Table* table, Iterator* iterator, Iterator** next) {
         case NOT_FOUND: return BAD_ITER;
         default: break;
     }
-    if (__table_size(table) == pos + 1) {
+    if (__table_size(table) == pos) {
         return OVERFLOW;
     }
     if (__iterator_init(next, table->info) == BAD_ALLOC) {
