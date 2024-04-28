@@ -9,9 +9,9 @@
 #include "lib/table.h"
 #endif
 
-//#ifdef ITERATOR
+#ifdef ITERATOR
 #include "lib/table_iterator.h"
-//#endif
+#endif
 
 Foo insert(Table* table);
 Foo rem(Table* table, Info* info);
