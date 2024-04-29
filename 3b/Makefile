@@ -37,7 +37,7 @@ $(OBJECT_DIR)/%.o: %.c
 	$(CC) $(CFLAGS) $(OPTIM) $(SAN) $(COV_FLAG) $(DEP_FLAGS) -c $< -o $@
 
 static: 
-	clang --analyze -Xanalyzer -analyzer-output=html *.c
+	clang --analyze -Xanalyzer -analyzer-output=html *.c $(LIB_DIR)/*.c
 
 clean:
 	rm -rf $(EXECUTABLE)* $(OBJECT_DIR)
