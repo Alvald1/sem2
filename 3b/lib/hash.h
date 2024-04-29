@@ -3,6 +3,6 @@
 
 #include <stddef.h>
 
-size_t hash(char* number);
+size_t hash(void* data, size_t size, size_t capacity);
 
 #endif
