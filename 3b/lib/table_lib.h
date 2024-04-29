@@ -12,6 +12,6 @@ struct _table {
     Info* info;
 };
 
-Foo __tale_valid(Table* table);
+Foo __table_valid(Table* table);
 
 #endif
