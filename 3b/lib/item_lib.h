@@ -4,7 +4,7 @@
 #include "code_status.h"
 #include "item.h"
 
-Foo __items_valid(Item* items);
+Foo __item_valid(Item* item);
 Foo __item_fill(void* key, void* data, Item* items);
 
 #endif

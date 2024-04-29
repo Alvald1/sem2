@@ -3,8 +3,9 @@
 
 #include <stddef.h>
 
-typedef struct _info {
-    size_t key_size;
-} Info;
+typedef int (*fptr_compare)(void* left, void* right);
+typedef void (*fptr_default)(void*);
+
+typedef struct _info Info;
 
 #endif
