@@ -83,6 +83,9 @@ table_remove(Table* table, void* key) {
             ++i;
         }
     } while (i != size && items[j].busy == 1);
-    item_dealloc(items + j, table->info);
-    return OK;
+    if (flag == 1) {
+        item_dealloc(items + j, table->info);
+        return OK;
+    }
+    return NOT_FOUNDED;
 }
