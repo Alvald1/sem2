@@ -18,12 +18,12 @@ compare(void* left, void* right) {
 
 void
 print(void* data) {
-    printf("%zu ", *((size_t*)data));
+    printf("%zu\t", *((size_t*)data));
 }
 
 void
 dealloc(void* data) {
-    (void)data;
+    free(data);
 }
 
 size_t*
@@ -40,8 +40,13 @@ main() {
     info_init(&info, compare, dealloc, dealloc, print, print, sizeof(size_t));
     table_init(&table, 10, info);
     table_insert(table, gen_number(10), gen_number(10));
+    table_print(table);
     table_insert(table, gen_number(15), gen_number(15));
+    table_print(table);
     table_insert(table, gen_number(16), gen_number(16));
+    table_print(table);
     table_insert(table, gen_number(1), gen_number(1));
+    table_print(table);
+    table_remove(table, gen_number(1));
     table_print(table);
 }

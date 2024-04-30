@@ -58,7 +58,7 @@ table_insert(Table* table, void* key, void* data) {
         } else {
             ++i;
         }
-    } while (i != size);
+    } while (i <= size);
     if (__item_fill(key, data, items + j) == BAD_DATA) {
         return BAD_DATA;
     }
@@ -97,7 +97,7 @@ __table_search(Table* table, void* key, size_t* result) {
         } else {
             ++i;
         }
-    } while (i != size && items[j].busy == 1);
+    } while (i <= size && items[j].busy == 1);
     if (flag) {
         *result = j;
         return OK;
@@ -107,12 +107,15 @@ __table_search(Table* table, void* key, size_t* result) {
 
 void
 table_print(Table* table) {
-    size_t size = table->size;
+    size_t capacity = table->capacity;
     Item* items = table->items;
     fptr_default key_print = table->info->key_print, data_print = table->info->data_print;
     char busy = 0;
-    for (size_t i = 0; i < size; ++i) {
-        printf("busy: %d\t", (busy = items[i].busy));
+    if (table->size) {
+        printf("ind\tbusy\tkey\tdata\n");
+    }
+    for (size_t i = 0; i < capacity; ++i) {
+        printf("%zu\t%d\t", i, (busy = items[i].busy));
         if (busy) {
             (*key_print)(items[i].key);
             (*data_print)(items[i].data);
