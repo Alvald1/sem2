@@ -1,5 +1,6 @@
 #include "table.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "hash.h"
@@ -44,22 +45,24 @@ table_insert(Table* table, void* key, void* data) {
     size_t i = 0;
     size_t size = table->size, capacity = table->capacity;
     Item* items = table->items;
-    char flag = 0;
+    fptr_compare compare = table->info->compare;
+    if (table->capacity == table->size) {
+        return OVERFLOW;
+    }
     do {
         j = (j + i) % capacity;
-        if ((items[j]).busy == 0) {
-            flag = 1;
+        if (items[j].busy == 0) {
             break;
+        } else if (compare((items[j]).key, key) == 0) {
+            return BAD_KEY;
         } else {
             ++i;
         }
     } while (i != size);
-    if (flag == 0) {
-        return OVERFLOW;
-    }
     if (__item_fill(key, data, items + j) == BAD_DATA) {
         return BAD_DATA;
     }
+    ++(table->size);
     return OK;
 }
 
@@ -68,6 +71,18 @@ table_remove(Table* table, void* key) {
     if (__table_valid(table) == BAD_DATA || key == NULL) {
         return BAD_DATA;
     }
+    Item* items = table->items;
+    size_t result = 0;
+    if (__table_search(table, key, &result) == OK) {
+        item_dealloc(items + result, table->info);
+        items[result].busy = 0;
+        return OK;
+    }
+    return NOT_FOUNDED;
+}
+
+Foo
+__table_search(Table* table, void* key, size_t* result) {
     size_t j = hash(key, table->info->key_size, table->capacity);
     size_t i = 0;
     size_t size = table->size, capacity = table->capacity;
@@ -76,16 +91,32 @@ table_remove(Table* table, void* key) {
     char flag = 0;
     do {
         j = (j + i) % capacity;
-        if (compare((items[j]).key, key) == 0) {
+        if (compare((items[j]).key, key) == 0 && items[j].busy == 1) {
             flag = 1;
             break;
         } else {
             ++i;
         }
     } while (i != size && items[j].busy == 1);
-    if (flag == 1) {
-        item_dealloc(items + j, table->info);
+    if (flag) {
+        *result = j;
         return OK;
     }
     return NOT_FOUNDED;
+}
+
+void
+table_print(Table* table) {
+    size_t size = table->size;
+    Item* items = table->items;
+    fptr_default key_print = table->info->key_print, data_print = table->info->data_print;
+    char busy = 0;
+    for (size_t i = 0; i < size; ++i) {
+        printf("busy: %d\t", (busy = items[i].busy));
+        if (busy) {
+            (*key_print)(items[i].key);
+            (*data_print)(items[i].data);
+        }
+        printf("\n");
+    }
 }
