@@ -32,3 +32,8 @@ info_init(Info** info, fptr_compare compare, fptr_default key_dealloc, fptr_defa
     (*info)->key_size = key_size;
     return OK;
 }
+
+void
+info_dealloc(Info* info) {
+    free(info);
+}

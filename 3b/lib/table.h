@@ -16,5 +16,6 @@ Foo table_search(Table* table, void* key, Item** result);
 void table_print(Table* table);
 Foo table_import(Table** table, const char* file_name);
 Foo table_export(Table* table, const char* file_name);
+void table_dealloc(Table* table);
 
 #endif

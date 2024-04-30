@@ -123,3 +123,17 @@ table_print(Table* table) {
         printf("\n");
     }
 }
+
+void
+table_dealloc(Table* table) {
+    Item* items = table->items;
+    Info* info = table->info;
+    size_t capacity = table->capacity;
+    for (size_t i = 0; i < capacity; ++i) {
+        if (items[i].busy) {
+            item_dealloc(items + i, info);
+        }
+    }
+    free(items);
+    free(table);
+}
