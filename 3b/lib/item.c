@@ -59,3 +59,13 @@ __item_dealloc(Item* item, Info* info) {
     info->key_dealloc(item->key);
     return OK;
 }
+
+Foo
+item_dealloc(Item* item, Info* info) {
+    Foo call_back = OK;
+    if ((call_back = __item_dealloc(item, info)) != OK) {
+        return call_back;
+    }
+    free(item);
+    return OK;
+}

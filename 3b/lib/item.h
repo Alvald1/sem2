@@ -6,5 +6,6 @@
 typedef struct _item Item;
 
 void item_print(Item* item, Info* info);
+Foo item_dealloc(Item* item, Info* info);
 
 #endif
