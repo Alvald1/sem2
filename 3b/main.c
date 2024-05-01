@@ -41,6 +41,7 @@ main() {
     void* tmp = NULL;
     info_init(&info, compare, dealloc, dealloc, print, print, sizeof(size_t), sizeof(size_t));
     table_init(&table, 1, info);
+    table_export(table, "test.bin");
     table_insert(&table, gen_number(10), gen_number(10));
     table_print(table);
     table_insert(&table, gen_number(15), gen_number(15));
@@ -58,6 +59,7 @@ main() {
     table_remove(table, (tmp = gen_number(1)));
     free(tmp);
     table_print(table);
+    table_export(table, "test.bin");
     table_dealloc(table);
     info_dealloc(info);
     return 0;

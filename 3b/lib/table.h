@@ -14,7 +14,7 @@ Foo table_insert(Table** table, void* key, void* data);
 Foo table_remove(Table* table, void* key);
 Foo table_search(Table* table, void* key, Item** result);
 void table_print(Table* table);
-Foo table_import(Table** table, const char* file_name);
+Foo table_import(Table** table, Info* info, const char* file_name);
 Foo table_export(Table* table, const char* file_name);
 void table_dealloc(Table* table);
 

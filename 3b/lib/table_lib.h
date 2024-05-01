@@ -12,6 +12,7 @@ struct _table {
     Info* info;
 };
 
+Foo __valid_file(const char* str, FILE* file);
 Foo __table_expand(Table** table);
 Foo __table_valid(Table* table);
 Foo __table_search(Table* table, void* key, size_t* result);
