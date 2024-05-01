@@ -20,7 +20,7 @@ info_init(Info** info, fptr_compare compare, fptr_default key_dealloc, fptr_defa
     if (info == NULL) {
         return BAD_DATA;
     }
-    (*info) = (Info*)malloc(sizeof(Info));
+    *info = (Info*)malloc(sizeof(Info));
     if (*info == NULL) {
         return BAD_ALLOC;
     }

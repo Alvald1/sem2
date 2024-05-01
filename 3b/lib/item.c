@@ -55,7 +55,7 @@ __item_dealloc(Item* item, Info* info) {
     if (__item_valid(item) == BAD_DATA || __info_valid(info) == BAD_DATA) {
         return BAD_DATA;
     }
-    (*info).data_dealloc(item->data);
-    (*info).key_dealloc(item->key);
+    info->data_dealloc(item->data);
+    info->key_dealloc(item->key);
     return OK;
 }

@@ -12,12 +12,12 @@ hash(void* key, size_t size, size_t capacity) {
     if (number == NULL) {
         return 0;
     }
-    size_t hash = INT_MAX;
+    size_t hash_num = INT_MAX;
     for (size_t i = 0; i < size; ++i) {
-        hash = (127 * hash + number[i]) % capacity;
+        hash_num = (127 * hash_num + number[i]) % capacity;
     }
     free(number);
-    return hash;
+    return hash_num;
 }
 
 char*
