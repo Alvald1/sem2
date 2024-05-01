@@ -20,6 +20,7 @@ table_init(Table** table, size_t capacity, Info* info) {
     }
     (*table)->items = (Item*)calloc(capacity, sizeof(Item));
     if ((*table)->items == NULL) {
+        free(*table);
         return BAD_ALLOC;
     }
     (*table)->capacity = capacity;
