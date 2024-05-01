@@ -83,6 +83,7 @@ table_remove(Table* table, void* key) {
     if (__table_search(table, key, &pos) == OK) {
         __item_dealloc(table->items + pos, table->info);
         (table->items)[pos].busy = 0;
+        --(table->size);
         return OK;
     }
     return NOT_FOUNDED;
@@ -229,6 +230,7 @@ table_import(Table** table, Info* info, const char* file_name) {
             return call_back;
         }
     }
+    fclose(file);
     return OK;
 }
 

@@ -40,6 +40,13 @@ main() {
     Item* item = NULL;
     void* tmp = NULL;
     info_init(&info, compare, dealloc, dealloc, print, print, sizeof(size_t), sizeof(size_t));
+
+    table_import(&table, info, "test.bin");
+    table_print(table);
+    table_dealloc(table);
+    info_dealloc(info);
+    return 0;
+
     table_init(&table, 1, info);
     table_export(table, "test.bin");
     table_insert(&table, gen_number(10), gen_number(10));
