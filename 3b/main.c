@@ -38,7 +38,7 @@ main() {
     Table* table = NULL;
     Info* info = NULL;
     void* tmp = NULL;
-    info_init(&info, compare, dealloc, dealloc, print, print, sizeof(size_t));
+    info_init(&info, compare, dealloc, dealloc, print, print, sizeof(size_t), sizeof(size_t));
     table_init(&table, 10, info);
     table_insert(table, gen_number(10), gen_number(10));
     table_print(table);

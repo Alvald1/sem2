@@ -74,11 +74,28 @@ table_remove(Table* table, void* key) {
     Item* items = table->items;
     size_t result = 0;
     if (__table_search(table, key, &result) == OK) {
-        item_dealloc(items + result, table->info);
+        __item_dealloc(items + result, table->info);
         items[result].busy = 0;
         return OK;
     }
     return NOT_FOUNDED;
+}
+
+Foo
+table_search(Table* table, void* key, Item** result) {
+    if (__table_valid(table) == BAD_DATA || key == NULL) {
+        return BAD_DATA;
+    }
+    size_t pos = 0;
+    Foo call_back = OK;
+    if ((call_back = __table_search(table, key, &pos)) != OK) {
+        return call_back;
+    }
+    *result = (Item*)malloc(sizeof(Item));
+    if (*result == NULL) {
+        return BAD_ALLOC;
+    }
+    return __item_copy(*result, table->items + pos, table->info);
 }
 
 Foo
@@ -109,18 +126,13 @@ void
 table_print(Table* table) {
     size_t capacity = table->capacity;
     Item* items = table->items;
-    fptr_default key_print = table->info->key_print, data_print = table->info->data_print;
     char busy = 0;
     if (table->size) {
         printf("ind\tbusy\tkey\tdata\n");
     }
     for (size_t i = 0; i < capacity; ++i) {
         printf("%zu\t%d\t", i, (busy = items[i].busy));
-        if (busy) {
-            (*key_print)(items[i].key);
-            (*data_print)(items[i].data);
-        }
-        printf("\n");
+        item_print(items + i, table->info);
     }
 }
 
@@ -131,7 +143,7 @@ table_dealloc(Table* table) {
     size_t capacity = table->capacity;
     for (size_t i = 0; i < capacity; ++i) {
         if (items[i].busy) {
-            item_dealloc(items + i, info);
+            __item_dealloc(items + i, info);
         }
     }
     free(items);

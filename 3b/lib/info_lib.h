@@ -8,7 +8,7 @@ struct _info {
     fptr_compare compare;
     fptr_default key_dealloc, data_dealloc;
     fptr_default key_print, data_print;
-    size_t key_size;
+    size_t key_size, data_size;
 };
 
 Foo __info_valid(Info* info);
