@@ -6,6 +6,7 @@
 #include "hash.h"
 #include "info_lib.h"
 #include "item_lib.h"
+#include "prime.h"
 #include "table_lib.h"
 
 Foo
@@ -36,16 +37,16 @@ __table_valid(Table* table) {
 }
 
 Foo
-table_insert(Table* table, void* key, void* data) {
-    if (__table_valid(table) == BAD_DATA || key == NULL) {
+table_insert(Table** table, void* key, void* data) {
+    if (__table_valid(*table) == BAD_DATA || key == NULL) {
         return BAD_DATA;
     }
-    size_t hash_num = hash(key, table->info->key_size, table->capacity);
     size_t ind = 0;
-    size_t size = table->size, capacity = table->capacity;
-    Item* items = table->items;
-    fptr_compare compare = table->info->compare;
-    if (table->capacity == table->size) {
+    size_t size = (*table)->size, capacity = (*table)->capacity;
+    size_t hash_num = hash(key, (*table)->info->key_size, capacity);
+    Item* items = (*table)->items;
+    fptr_compare compare = (*table)->info->compare;
+    if ((*table)->capacity == (*table)->size) {
         return OVERFLOW;
     }
     do {
@@ -61,7 +62,12 @@ table_insert(Table* table, void* key, void* data) {
     if (__item_fill(key, data, items + hash_num) == BAD_DATA) {
         return BAD_DATA;
     }
-    ++(table->size);
+    Foo call_back = OK;
+    if (++((*table)->size) == capacity) {
+        if ((call_back = __table_expand(table)) != OK) {
+            return call_back;
+        }
+    }
     return OK;
 }
 
@@ -145,4 +151,24 @@ table_dealloc(Table* table) {
     }
     free(items);
     free(table);
+}
+
+Foo
+__table_expand(Table** table) {
+    Table* tmp = NULL;
+    Foo call_back = OK;
+    size_t capacity = (*table)->capacity;
+    if ((call_back = table_init(&tmp, next_prime((capacity * 2)), (*table)->info)) != OK) {
+        return call_back;
+    }
+    Item* items = (*table)->items;
+    for (size_t i = 0; i < capacity; ++i) {
+        if (items[i].busy) {
+            table_insert(&tmp, items[i].key, items[i].data);
+        }
+    }
+    free(items);
+    free(*table);
+    *table = tmp;
+    return OK;
 }
