@@ -40,4 +40,4 @@ static:
 	clang --analyze -Xanalyzer -analyzer-output=html *.c $(LIB_DIR)/*.c
 
 clean:
-	rm -rf $(EXECUTABLE)* $(OBJECT_DIR)
+	rm -rf $(EXECUTABLE)* $(OBJECT_DIR) *.plist

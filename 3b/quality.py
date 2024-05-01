@@ -52,4 +52,4 @@ if __name__ == "__main__":
                 if key in arr:
                     print(f'{key} - {value}')
             print()
-        
+    delete_file(file_path)
