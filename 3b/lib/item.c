@@ -69,3 +69,13 @@ item_dealloc(Item* item, Info* info) {
     free(item);
     return OK;
 }
+
+void*
+get_key(Item* item) {
+    return item->key;
+}
+
+void*
+get_data(Item* item) {
+    return item->data;
+}

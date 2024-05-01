@@ -7,5 +7,7 @@ typedef struct _item Item;
 
 void item_print(Item* item, Info* info);
 Foo item_dealloc(Item* item, Info* info);
+void* get_key(Item* item);
+void* get_data(Item* item);
 
 #endif
