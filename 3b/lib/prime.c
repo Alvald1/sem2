@@ -4,7 +4,7 @@
 
 char
 __is_prime(size_t num) {
-    if (num <= 1) {
+    if (num == 1) {
         return 0;
     }
     if (num <= 3) {
@@ -28,9 +28,13 @@ next_prime(size_t num) {
     if (num == 1) {
         return 2;
     }
-    size_t prime = (num & 1) ? num + 2 : num + 1;
-    while (!__is_prime(prime)) {
-        prime += 2;
+    if (num & 1) {
+        num += 2;
+    } else {
+        ++num;
     }
-    return prime;
+    while (!__is_prime(num)) {
+        num += 2;
+    }
+    return num;
 }

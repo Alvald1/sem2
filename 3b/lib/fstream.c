@@ -6,7 +6,6 @@
 
 #include "info_lib.h"
 #include "item_lib.h"
-#include "table.h"
 #include "table_lib.h"
 
 Foo
@@ -23,6 +22,14 @@ __valid_file(const char* str, FILE* file) {
     }
     free(tmp);
     return OK;
+}
+
+void
+__exit(void* key, void* data, Table* table, FILE* file) {
+    free(key);
+    free(data);
+    table_dealloc(table);
+    fclose(file);
 }
 
 Foo
@@ -42,23 +49,20 @@ table_import(Table** table, Info* info, const char* file_name) {
     Foo call_back = OK;
     void *key = NULL, *data = NULL;
     if ((call_back = table_init(table, capacity, info)) != OK) {
+        fclose(file);
         return call_back;
     }
     for (size_t i = 0; i < size; ++i) {
         key = malloc(key_size);
         data = malloc(data_size);
         if (key == NULL || data == NULL) {
-            free(key);
-            free(data);
-            table_dealloc(*table);
+            __exit(key, data, *table, file);
             return BAD_ALLOC;
         }
         fread(key, key_size, 1, file);
         fread(data, data_size, 1, file);
         if ((call_back = table_insert(table, key, data)) != OK) {
-            free(key);
-            free(data);
-            table_dealloc(*table);
+            __exit(key, data, *table, file);
             return call_back;
         }
     }
@@ -72,7 +76,7 @@ table_export(Table* table, const char* file_name) {
     char* text = "hash_table";
     if (access(file_name, F_OK) == 0) {
         file = fopen(file_name, "rb");
-        if (__valid_file("hash_table", file) != OK) {
+        if (__valid_file(text, file) != OK) {
             fclose(file);
             return BAD_FILE;
         }
@@ -82,13 +86,13 @@ table_export(Table* table, const char* file_name) {
     if (file == NULL) {
         return BAD_FILE;
     }
-    size_t capacity = table->capacity, size = table->size;
+    size_t capacity = table->capacity;
     Item* items = table->items;
     size_t key_size = table->info->key_size;
     size_t data_size = table->info->data_size;
     fwrite(text, strlen(text) + 1, 1, file);
     fwrite(&capacity, sizeof(size_t), 1, file);
-    fwrite(&size, sizeof(size_t), 1, file);
+    fwrite(&(table->size), sizeof(size_t), 1, file);
     for (size_t i = 0; i < capacity; ++i) {
         if (items[i].busy) {
             fwrite(items[i].key, key_size, 1, file);

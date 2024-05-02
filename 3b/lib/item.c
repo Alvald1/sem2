@@ -40,13 +40,13 @@ __item_copy(Item* dest, Item* src, Info* info) {
 }
 
 Foo
-__item_fill(void* key, void* data, Item* items) {
+__item_fill(void* key, void* data, Item* item) {
     if (data == NULL) {
         return BAD_DATA;
     }
-    items->key = key;
-    items->data = data;
-    items->busy = 1;
+    item->key = key;
+    item->data = data;
+    item->busy = 1;
     return OK;
 }
 

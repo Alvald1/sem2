@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 
+#include "code_status.h"
 #include "info.h"
 #include "item.h"
 
