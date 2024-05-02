@@ -34,6 +34,12 @@ __exit(void* key, void* data, Table* table, FILE* file) {
 
 Foo
 table_import(Table** table, Info* info, const char* file_name) {
+    if (table == NULL) {
+        return BAD_DATA;
+    }
+    if (*table != NULL) {
+        table_dealloc(*table);
+    }
     FILE* file = fopen(file_name, "rb");
     if (file == NULL) {
         return BAD_FILE;

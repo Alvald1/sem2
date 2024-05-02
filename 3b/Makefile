@@ -4,7 +4,7 @@ SAN = -g -fsanitize=undefined
 LIB_DIR = lib
 OBJECT_DIR = object
 EXECUTABLE = bin
-LDFLAGS =
+LDFLAGS = -lreadline
 OPTIM = -O0
 SOURCES = $(wildcard *.c $(LIB_DIR)/*.c)
 OBJECTS = $(SOURCES:%.c=$(OBJECT_DIR)/%.o)
