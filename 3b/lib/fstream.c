@@ -37,9 +37,6 @@ table_import(Table** table, Info* info, const char* file_name) {
     if (table == NULL) {
         return BAD_DATA;
     }
-    if (*table != NULL) {
-        table_dealloc(*table);
-    }
     FILE* file = fopen(file_name, "rb");
     if (file == NULL) {
         return BAD_FILE;
@@ -47,6 +44,9 @@ table_import(Table** table, Info* info, const char* file_name) {
     if (__valid_file("hash_table", file) != OK) {
         fclose(file);
         return BAD_FILE;
+    }
+    if (*table != NULL) {
+        table_dealloc(*table);
     }
     size_t key_size = info->key_size, data_size = info->data_size;
     size_t capacity = 0, size = 0;

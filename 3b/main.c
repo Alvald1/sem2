@@ -133,6 +133,7 @@ Foo
 import(Table** table, Info* info) {
     char* file_name = readline("File name: ");
     if (file_name == NULL) {
+        table_dealloc(*table);
         return _EOF;
     }
     Foo call_back = table_import(table, info, file_name);
