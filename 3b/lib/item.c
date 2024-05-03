@@ -32,8 +32,10 @@ __item_copy(Item* dest, Item* src, Info* info) {
     if (dest->key == NULL || dest->data == NULL) {
         free(dest->data);
         free(dest->key);
+        free(dest);
         return BAD_ALLOC;
     }
+    dest->busy = src->busy;
     memcpy(dest->key, src->key, info->key_size);
     memcpy(dest->data, src->data, info->data_size);
     return OK;
