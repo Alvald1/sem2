@@ -32,8 +32,8 @@ coverage:
 	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_cov" SAN="" COV_FLAG="-fprofile-instr-generate -fcoverage-mapping"
 	./get_cover.sh
 	llvm-profdata merge -sparse default.profraw -o foo.profdata
-	llvm-cov show  $(EXECUTABLE) -instr-profile=foo.profdata
-	llvm-cov report $(EXECUTABLE) -instr-profile=foo.profdata
+	llvm-cov show  $(EXECUTABLE)_cov -instr-profile=foo.profdata
+	llvm-cov report $(EXECUTABLE)_cov -instr-profile=foo.profdata
 	rm foo.profdata default.profraw 
 
 compile: $(EXECUTABLE)
