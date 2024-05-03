@@ -9,6 +9,7 @@ OPTIM = -O0
 SOURCES = $(wildcard *.c $(LIB_DIR)/*.c)
 OBJECTS = $(SOURCES:%.c=$(OBJECT_DIR)/%.o)
 DEP_FLAGS = -MMD -MP
+COV_FLAG =
 
 .PHONY: all debug asan msan afl static clean
 
@@ -26,6 +27,14 @@ msan:
 
 afl:
 	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_afl" CC="$(AFL_PATH)afl-clang" SAN="$(SAN),address"
+
+coverage: 
+	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_cov" SAN="" COV_FLAG="-fprofile-instr-generate -fcoverage-mapping"
+	./get_cover.sh
+	llvm-profdata merge -sparse default.profraw -o foo.profdata
+	llvm-cov show  $(EXECUTABLE) -instr-profile=foo.profdata
+	llvm-cov report $(EXECUTABLE) -instr-profile=foo.profdata
+	rm foo.profdata default.profraw 
 
 compile: $(EXECUTABLE)
 
