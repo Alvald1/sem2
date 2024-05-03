@@ -5,7 +5,7 @@ LIB_DIR = lib
 OBJECT_DIR = object
 EXECUTABLE = bin
 LDFLAGS = -lreadline
-OPTIM = -O0
+OPTIM = -Og
 SOURCES = $(wildcard *.c $(LIB_DIR)/*.c)
 OBJECTS = $(SOURCES:%.c=$(OBJECT_DIR)/%.o)
 DEP_FLAGS = -MMD -MP
@@ -28,13 +28,20 @@ msan:
 afl:
 	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_afl" CC="$(AFL_PATH)afl-clang" SAN="$(SAN),address"
 
-coverage: 
+cov: 
 	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_cov" SAN="" COV_FLAG="-fprofile-instr-generate -fcoverage-mapping"
 	./get_cover.sh
 	llvm-profdata merge -sparse default.profraw -o foo.profdata
 	llvm-cov show  $(EXECUTABLE)_cov -instr-profile=foo.profdata
 	llvm-cov report $(EXECUTABLE)_cov -instr-profile=foo.profdata
 	rm foo.profdata default.profraw 
+
+valgrind: debug
+	valgrind --leak-check=full \
+         --show-leak-kinds=all \
+         --track-origins=yes \
+         --verbose \
+		./bin_debug
 
 compile: $(EXECUTABLE)
 
