@@ -44,14 +44,14 @@ table_insert(Table** table, void* key, void* data) {
     }
     size_t ind = 0;
     size_t size = (*table)->size, capacity = (*table)->capacity;
-    size_t hash_num = 0;
+    size_t hash_num = hash(key, (*table)->info->key_size, capacity);
     Item* items = (*table)->items;
     fptr_compare compare = (*table)->info->compare;
     if (capacity == size) {
         return OVERFLOW;
     }
     do {
-        hash_num = (hash(key, (*table)->info->key_size, capacity) + ind) % capacity;
+        hash_num = (hash_num + ind) % capacity;
         if (items[hash_num].busy == 0) {
             break;
         } else if (compare((items[hash_num]).key, key) == 0) {
@@ -108,7 +108,7 @@ Foo
 __table_search(Table* table, void* key, size_t* pos) {
     size_t ind = 0;
     size_t size = table->size, capacity = table->capacity;
-    size_t hash_num = 0;
+    size_t hash_num = hash(key, table->info->key_size, capacity);
     Item* items = table->items;
     fptr_compare compare = table->info->compare;
     char flag = 0;
@@ -116,7 +116,7 @@ __table_search(Table* table, void* key, size_t* pos) {
         return EMPTY;
     }
     do {
-        hash_num = (hash(key, table->info->key_size, capacity) + ind) % capacity;
+        hash_num = (hash_num + ind) % capacity;
         if (items[hash_num].busy && compare((items[hash_num]).key, key) == 0) {
             flag = 1;
             break;
