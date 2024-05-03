@@ -4,9 +4,6 @@
 
 char
 __is_prime(size_t num) {
-    if (num == 1) {
-        return 0;
-    }
     if (num <= 3) {
         return 1;
     }
