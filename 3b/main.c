@@ -21,7 +21,7 @@ main() {
     while (scanf("%c", &status) != _EOF) {
         switch (status) {
             case 'i':
-                if (insert(&table) == _EOF) {
+                if (insert(table) == _EOF) {
                     info_dealloc(info);
                     return 0;
                 }
@@ -63,10 +63,10 @@ main() {
 }
 
 Foo
-insert(Table** table) {
+insert(Table* table) {
     size_t key = 0, data = 0;
     if (read_num(&key, "Key: ") == EOF || read_num(&data, "Data: ") == EOF) {
-        table_dealloc(*table);
+        table_dealloc(table);
         return _EOF;
     }
     size_t *key_ptr = gen_number(key), *data_ptr = gen_number(data);

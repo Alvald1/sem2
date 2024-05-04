@@ -34,14 +34,24 @@ cov:
 	llvm-profdata merge -sparse default.profraw -o foo.profdata
 	llvm-cov show  $(EXECUTABLE)_cov -instr-profile=foo.profdata
 	llvm-cov report $(EXECUTABLE)_cov -instr-profile=foo.profdata
+	llvm-cov show $(EXECUTABLE)_cov -instr-profile=foo.profdata -format=html -output-dir=report_coverage
 	rm foo.profdata default.profraw 
 
 valgrind: debug
-	valgrind --leak-check=full \
-         --show-leak-kinds=all \
-         --track-origins=yes \
-         --verbose \
-		./bin_debug
+	valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --verbose ./bin_debug
+
+fuzz: afl
+	rm -rf in out
+	mkdir in out
+	echo 1 >> in/1
+	echo "l" >> in/2
+	echo "ф" >> in/3
+	tmux new-session -d -s my_session -n Window1 '$(AFL_PATH)afl-fuzz -i in -o out -M master -x utf8.dict -- ./$(BIN)_afl'
+	tmux new-window -t my_session:1 -n Window2 '$(AFL_PATH)afl-fuzz -i in -o out -S slave1 -x utf8.dict -- ./$(BIN)_afl'
+	tmux new-window -t my_session:2 -n Window3 '$(AFL_PATH)afl-fuzz -i in -o out -S slave2 -x utf8.dict -- ./$(BIN)_afl'
+	tmux new-window -t my_session:3 -n Window4 '$(AFL_PATH)afl-fuzz -i in -o out -S slave3 -x utf8.dict -- ./$(BIN)_afl'
+	tmux select-window -t my_session:0
+	tmux attach-session -t my_session
 
 compile: $(EXECUTABLE)
 
@@ -56,4 +66,4 @@ static:
 	clang --analyze -Xanalyzer -analyzer-output=html *.c $(LIB_DIR)/*.c
 
 clean:
-	rm -rf $(EXECUTABLE)* $(OBJECT_DIR) *.plist
+	rm -rf $(EXECUTABLE)* $(OBJECT_DIR) *.plist in

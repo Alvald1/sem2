@@ -67,7 +67,7 @@ table_import(Table** table, Info* info, const char* file_name) {
         }
         fread(key, key_size, 1, file);
         fread(data, data_size, 1, file);
-        if ((call_back = table_insert(table, key, data)) != OK) {
+        if ((call_back = table_insert(*table, key, data)) != OK) {
             __exit(key, data, *table, file);
             return call_back;
         }
@@ -100,7 +100,7 @@ table_export(Table* table, const char* file_name) {
     fwrite(&capacity, sizeof(size_t), 1, file);
     fwrite(&(table->size), sizeof(size_t), 1, file);
     for (size_t i = 0; i < capacity; ++i) {
-        if (items[i].busy) {
+        if (items[i].status == BUSY) {
             fwrite(items[i].key, key_size, 1, file);
             fwrite(items[i].data, data_size, 1, file);
         }

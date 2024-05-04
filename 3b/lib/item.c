@@ -10,7 +10,7 @@
 
 void
 item_print(Item* item, Info* info) {
-    if (item->busy) {
+    if (item->status == BUSY) {
         (*info->key_print)(item->key);
         (*info->data_print)(item->data);
     }
@@ -35,7 +35,7 @@ __item_copy(Item* dest, Item* src, Info* info) {
         free(dest);
         return BAD_ALLOC;
     }
-    dest->busy = src->busy;
+    dest->status = src->status;
     memcpy(dest->key, src->key, info->key_size);
     memcpy(dest->data, src->data, info->data_size);
     return OK;
@@ -48,7 +48,7 @@ __item_fill(void* key, void* data, Item* item) {
     }
     item->key = key;
     item->data = data;
-    item->busy = 1;
+    item->status = BUSY;
     return OK;
 }
 

@@ -10,7 +10,7 @@ size_t* gen_number(size_t value);
 void dealloc(void* data);
 void print(void* data);
 int compare(void* left, void* right);
-Foo insert(Table** table);
+Foo insert(Table* table);
 Foo _remove(Table* table);
 Foo search(Table* table, Info* info);
 Foo _export(Table* table);

@@ -6,7 +6,7 @@
 #include "item.h"
 
 struct _item {
-    char busy;
+    Status status;
     void* key;
     void* data;
 };

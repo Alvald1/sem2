@@ -9,6 +9,15 @@
 #include "prime.h"
 #include "table_lib.h"
 
+void
+__table_fill(Table* table, size_t capacity, size_t size, Info* info, Item* items) {
+    table->items = items;
+    table->capacity = capacity;
+    table->info = info;
+    table->size = size;
+    table->step = capacity + 1;
+}
+
 Foo
 table_init(Table** table, size_t capacity, Info* info) {
     if (table == NULL || __info_valid(info) == BAD_DATA) {
@@ -18,14 +27,12 @@ table_init(Table** table, size_t capacity, Info* info) {
     if (*table == NULL) {
         return BAD_ALLOC;
     }
-    (*table)->items = (Item*)calloc(capacity, sizeof(Item));
-    if ((*table)->items == NULL) {
+    Item* items = (Item*)calloc(capacity, sizeof(Item));
+    if (items == NULL) {
         free(*table);
         return BAD_ALLOC;
     }
-    (*table)->capacity = capacity;
-    (*table)->info = info;
-    (*table)->size = 0;
+    __table_fill(*table, capacity, 0, info, items);
     return OK;
 }
 
@@ -38,24 +45,22 @@ __table_valid(Table* table) {
 }
 
 Foo
-table_insert(Table** table, void* key, void* data) {
-    if (__table_valid(*table) == BAD_DATA || key == NULL) {
+table_insert(Table* table, void* key, void* data) {
+    if (__table_valid(table) == BAD_DATA || key == NULL) {
         return BAD_DATA;
     }
     size_t ind = 0;
-    size_t size = (*table)->size, capacity = (*table)->capacity;
-    size_t hash_num = hash(key, (*table)->info->key_size, capacity);
-    Item* items = (*table)->items;
-    fptr_compare compare = (*table)->info->compare;
-    if (capacity == size) {
-        return OVERFLOW;
+    size_t size = table->size, capacity = table->capacity, step = table->step;
+    size_t hash_num = hash(key, table->info->key_size, capacity);
+    Item* items = table->items;
+    Foo call_back = OK;
+    if ((call_back = __table_search(table, key, &ind)) == OK) {
+        return BAD_KEY;
     }
     do {
-        hash_num = (hash_num + ind) % capacity;
-        if (items[hash_num].busy == 0) {
+        hash_num = (hash_num + step) % capacity;
+        if (items[hash_num].status != BUSY) {
             break;
-        } else if (compare((items[hash_num]).key, key) == 0) {
-            return BAD_KEY;
         } else {
             ++ind;
         }
@@ -63,8 +68,8 @@ table_insert(Table** table, void* key, void* data) {
     if (__item_fill(key, data, items + hash_num) == BAD_DATA) {
         return BAD_DATA;
     }
-    Foo call_back = OK;
-    if (++((*table)->size) == capacity) {
+    call_back = OK;
+    if (++(table->size) == capacity) {
         if ((call_back = __table_expand(table)) != OK) {
             return call_back;
         }
@@ -80,11 +85,11 @@ table_remove(Table* table, void* key) {
     size_t pos = 0;
     if (__table_search(table, key, &pos) == OK) {
         __item_dealloc(table->items + pos, table->info);
-        (table->items)[pos].busy = 0;
+        (table->items)[pos].status = DELETED;
         --(table->size);
         return OK;
     }
-    return NOT_FOUNDED;
+    return NOT_FOUND;
 }
 
 Foo
@@ -107,7 +112,7 @@ table_search(Table* table, void* key, Item** result) {
 Foo
 __table_search(Table* table, void* key, size_t* pos) {
     size_t ind = 0;
-    size_t size = table->size, capacity = table->capacity;
+    size_t size = table->size, capacity = table->capacity, step = table->step;
     size_t hash_num = hash(key, table->info->key_size, capacity);
     Item* items = table->items;
     fptr_compare compare = table->info->compare;
@@ -116,19 +121,19 @@ __table_search(Table* table, void* key, size_t* pos) {
         return EMPTY;
     }
     do {
-        hash_num = (hash_num + ind) % capacity;
-        if (items[hash_num].busy && compare((items[hash_num]).key, key) == 0) {
+        hash_num = (hash_num + step) % capacity;
+        if (items[hash_num].status == BUSY && compare((items[hash_num]).key, key) == 0) {
             flag = 1;
             break;
         } else {
             ++ind;
         }
-    } while (ind <= size && items[hash_num].busy);
+    } while (ind <= size && items[hash_num].status != NIL);
     if (flag) {
         *pos = hash_num;
         return OK;
     }
-    return NOT_FOUNDED;
+    return NOT_FOUND;
 }
 
 Foo
@@ -138,9 +143,9 @@ table_print(Table* table) {
     }
     size_t capacity = table->capacity;
     Item* items = table->items;
-    printf("ind\tbusy\tkey\tdata\n");
+    printf("ind\tstatus\tkey\tdata\n");
     for (size_t i = 0; i < capacity; ++i) {
-        printf("%zu\t%d\t", i, items[i].busy);
+        printf("%zu\t%s\t", i, statuses[items[i].status]);
         item_print(items + i, table->info);
     }
     return OK;
@@ -155,7 +160,7 @@ table_dealloc(Table* table) {
     Info* info = table->info;
     size_t capacity = table->capacity;
     for (size_t i = 0; i < capacity; ++i) {
-        if (items[i].busy) {
+        if (items[i].status == BUSY) {
             __item_dealloc(items + i, info);
         }
     }
@@ -165,21 +170,21 @@ table_dealloc(Table* table) {
 }
 
 Foo
-__table_expand(Table** table) {
-    Table* tmp = NULL;
+__table_expand(Table* table) {
     Foo call_back = OK;
-    size_t capacity = (*table)->capacity;
-    if ((call_back = table_init(&tmp, next_prime((capacity * 2)), (*table)->info)) != OK) {
+    Table* tmp = NULL;
+    size_t capacity = table->capacity;
+    if ((call_back = table_init(&tmp, next_prime((capacity * 2)), table->info)) != OK) {
         return call_back;
     }
-    Item* items = (*table)->items;
+    Item* items = table->items;
     for (size_t i = 0; i < capacity; ++i) {
-        if (items[i].busy) {
-            table_insert(&tmp, items[i].key, items[i].data);
+        if (items[i].status == BUSY) {
+            table_insert(tmp, items[i].key, items[i].data);
         }
     }
+    __table_fill(table, tmp->capacity, tmp->size, tmp->info, tmp->items);
     free(items);
-    free(*table);
-    *table = tmp;
+    free(tmp);
     return OK;
 }
