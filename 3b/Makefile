@@ -44,12 +44,16 @@ fuzz: afl
 	rm -rf in out
 	mkdir in out
 	echo 1 >> in/1
-	echo "l" >> in/2
-	echo "ф" >> in/3
-	tmux new-session -d -s my_session -n Window1 '$(AFL_PATH)afl-fuzz -i in -o out -M master -x utf8.dict -- ./$(BIN)_afl'
-	tmux new-window -t my_session:1 -n Window2 '$(AFL_PATH)afl-fuzz -i in -o out -S slave1 -x utf8.dict -- ./$(BIN)_afl'
-	tmux new-window -t my_session:2 -n Window3 '$(AFL_PATH)afl-fuzz -i in -o out -S slave2 -x utf8.dict -- ./$(BIN)_afl'
-	tmux new-window -t my_session:3 -n Window4 '$(AFL_PATH)afl-fuzz -i in -o out -S slave3 -x utf8.dict -- ./$(BIN)_afl'
+	echo "i" >> in/i
+	echo "e" >> in/e
+	echo "f" >> in/f
+	echo "s" >> in/2
+	echo "r" >> in/r
+	echo "p" >> in/p
+	tmux new-session -d -s my_session -n Window1 '$(AFL_PATH)afl-fuzz -i in -o out -M master -x utf8.dict -- ./$(EXECUTABLE)_afl'
+	tmux new-window -t my_session:1 -n Window2 '$(AFL_PATH)afl-fuzz -i in -o out -S slave1 -x utf8.dict -- ./$(EXECUTABLE)_afl'
+	tmux new-window -t my_session:2 -n Window3 '$(AFL_PATH)afl-fuzz -i in -o out -S slave2 -x utf8.dict -- ./$(EXECUTABLE)_afl'
+	tmux new-window -t my_session:3 -n Window4 '$(AFL_PATH)afl-fuzz -i in -o out -S slave3 -x utf8.dict -- ./$(EXECUTABLE)_afl'
 	tmux select-window -t my_session:0
 	tmux attach-session -t my_session
 
