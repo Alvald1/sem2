@@ -25,10 +25,9 @@ __valid_file(const char* str, FILE* file) {
 }
 
 void
-__exit(void* key, void* data, Table* table, FILE* file) {
+__exit(void* key, void* data, FILE* file) {
     free(key);
     free(data);
-    table_dealloc(table);
     fclose(file);
 }
 
@@ -62,13 +61,13 @@ table_import(Table** table, Info* info, const char* file_name) {
         key = malloc(key_size);
         data = malloc(data_size);
         if (key == NULL || data == NULL) {
-            __exit(key, data, *table, file);
+            __exit(key, data, file);
             return BAD_ALLOC;
         }
         fread(key, key_size, 1, file);
         fread(data, data_size, 1, file);
         if ((call_back = table_insert(*table, key, data)) != OK) {
-            __exit(key, data, *table, file);
+            __exit(key, data, file);
             return call_back;
         }
     }

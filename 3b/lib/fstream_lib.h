@@ -7,6 +7,5 @@
 #include "table.h"
 
 Foo __valid_file(const char* str, FILE* file);
-void __exit(void* key, void* data, Table* table, FILE* file);
 
 #endif
