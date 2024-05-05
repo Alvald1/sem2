@@ -15,7 +15,7 @@ __table_fill(Table* table, size_t capacity, size_t size, Info* info, Item* items
     table->capacity = capacity;
     table->info = info;
     table->size = size;
-    table->step = capacity + 1;
+    table->step = capacity / 2 + 1;
 }
 
 Foo
@@ -54,7 +54,7 @@ table_insert(Table* table, void* key, void* data) {
     size_t hash_num = hash(key, table->info->key_size, capacity);
     Item* items = table->items;
     Foo call_back = OK;
-    if ((call_back = __table_search(table, key, &ind)) == OK) {
+    if (__table_search(table, key, &ind) == OK) {
         return BAD_KEY;
     }
     do {
@@ -68,7 +68,6 @@ table_insert(Table* table, void* key, void* data) {
     if (__item_fill(key, data, items + hash_num) == BAD_DATA) {
         return BAD_DATA;
     }
-    call_back = OK;
     if (++(table->size) == capacity) {
         if ((call_back = __table_expand(table)) != OK) {
             return call_back;
