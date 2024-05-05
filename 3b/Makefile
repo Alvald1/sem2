@@ -26,7 +26,7 @@ msan:
 	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_msan" SAN="$(SAN),memory"
 
 afl:
-	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_afl" CC="$(AFL_PATH)afl-clang" SAN="$(SAN),address"
+	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_afl" CC="$(AFL_PATH)afl-clang-fast" SAN="$(SAN),address"
 
 cov: 
 	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_cov" SAN="" COV_FLAG="-fprofile-instr-generate -fcoverage-mapping"
