@@ -14,7 +14,7 @@ hash(void* key, size_t size, size_t capacity) {
     }
     size_t hash_num = INT_MAX;
     size_t a = 31415, b = 27183;
-    for (size_t i = 0; i < size; ++i, a = a * b % (capacity - 1)) {
+    for (size_t i = 0; i < size; ++i, a = a * b % (capacity - 1 + (capacity == 1))) {
         hash_num = (a * hash_num + number[i]) % capacity;
     }
     free(number);
