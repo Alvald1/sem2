@@ -22,14 +22,7 @@ __is_prime(size_t num) {
 
 size_t
 next_prime(size_t num) {
-    if (num == 1) {
-        return 2;
-    }
-    if (num & 1) {
-        num += 2;
-    } else {
-        ++num;
-    }
+    ++num;
     while (!__is_prime(num)) {
         num += 2;
     }
