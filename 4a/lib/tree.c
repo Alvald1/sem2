@@ -80,7 +80,21 @@ tree_delete(Tree* root, void* key) {
 }
 
 Foo
-__tree_successor(Tree* root, Tree** result) {}
+__tree_minimum(Tree* root, Tree** result) {}
+
+Foo
+__tree_successor(Tree* root, Tree** result) {
+    if (root->right != NULL) {
+        return __tree_minimum(root->right, result);
+    }
+    Tree* parent = root->parent;
+    while (parent != NULL && root == parent->right) {
+        root = parent;
+        parent = parent->parent;
+    }
+    *result = parent;
+    return OK;
+}
 
 Foo
 tree_search(Tree* root, void* key, Tree** result) {
