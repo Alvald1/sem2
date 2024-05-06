@@ -11,7 +11,7 @@ Foo tree_insert(Tree* root, void* key, void* data, void** result);
 Foo tree_delete(Tree* root, void* key);
 Foo tree_postorder(Tree* root);
 Foo tree_search(Tree* root, void* key, Tree** result);
-Foo tree_maximum(Tree* root);
+Foo tree_maximum(Tree* root, Tree** result);
 Foo tree_dealloc(Tree* root);
 
 #endif

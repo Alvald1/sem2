@@ -80,6 +80,15 @@ tree_delete(Tree* root, void* key) {
 }
 
 Foo
+tree_maximum(Tree* root, Tree** result) {
+    while (root->right != NULL) {
+        root = root->right;
+    }
+    *result = root;
+    return OK;
+}
+
+Foo
 __tree_minimum(Tree* root, Tree** result) {
     while (root->left != NULL) {
         root = root->left;
