@@ -41,10 +41,15 @@ tree_insert(Tree* root, void* key, void* data, void** result) {
     Tree* parent = NULL;
     Tree* node = NULL;
     Tree* current = root;
-    Foo call_back = OK;
+    Foo foo_call_back = OK;
+    Compare compare_call_back = EQUAL;
     while (current != NULL) {
         parent = current;
-        if ((*compare)(key, current->key) == LESS) {
+        if ((compare_call_back = (*compare)(key, current->key)) == EQUAL) {
+            *result = current->data;
+            current->data = data;
+            return DUPLICATE;
+        } else if (compare_call_back == LESS) {
             current = current->left;
         } else {
             current = current->right;
@@ -53,8 +58,8 @@ tree_insert(Tree* root, void* key, void* data, void** result) {
     if (parent == NULL) {
         __tree_fill(root, key, data);
     } else {
-        if ((call_back = tree_init(&node, root->info)) != OK) {
-            return call_back;
+        if ((foo_call_back = tree_init(&node, root->info)) != OK) {
+            return foo_call_back;
         }
         __tree_fill(node, key, data);
         node->parent = parent;
@@ -64,5 +69,33 @@ tree_insert(Tree* root, void* key, void* data, void** result) {
             parent->right = node;
         }
     }
+    return OK;
+}
+
+Foo
+tree_delete(Tree* root, void* key) {
+    if (__tree_valid(root) == BAD_DATA || key == NULL) {
+        return BAD_DATA;
+    }
+}
+
+Foo
+__tree_successor(Tree* root, Tree** result) {}
+
+Foo
+tree_search(Tree* root, void* key, Tree** result) {
+    if (__tree_valid(root) == BAD_DATA || key == NULL || result == NULL) {
+        return BAD_DATA;
+    }
+    fptr_compare compare = root->info->compare;
+    Compare call_back = EQUAL;
+    while (root != NULL && (call_back = (*compare)(key, root->key)) != EQUAL) {
+        if (call_back == LESS) {
+            root = root->left;
+        } else {
+            root = root->right;
+        }
+    }
+    *result = root;
     return OK;
 }
