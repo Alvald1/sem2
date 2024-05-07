@@ -72,43 +72,59 @@ tree_insert(Tree* root, void* key, void* data, void** result) {
     return OK;
 }
 
-Foo
-tree_delete(Tree* root, void* key) {
-    if (__tree_valid(root) == BAD_DATA || key == NULL) {
-        return BAD_DATA;
+void
+__tree_transplant(Tree** root, Tree* u, Tree* v) {
+    if (u->parent == NULL) {
+        *root = v;
+    } else if (u == u->parent->left) {
+        u->parent->left = v;
+    } else {
+        u->parent->right = v;
+    }
+    if (v != NULL) {
+        v->parent = u->parent;
     }
 }
 
 Foo
-tree_maximum(Tree* root, Tree** result) {
+tree_delete(Tree* root, void* key, Tree** result) {
+    if (__tree_valid(root) == BAD_DATA || key == NULL || result == NULL) {
+        return BAD_DATA;
+    }
+    Tree* successor = NULL;
+    tree_search(root, key, result);
+    if ((*result)->left == NULL) {
+        __tree_transplant(&root, *result, (*result)->right);
+    } else if ((*result)->right == NULL) {
+        __tree_transplant(&root, *result, (*result)->left);
+    } else {
+        successor = __tree_minimum((*result)->right);
+        if (successor->parent != *result) {
+            __tree_transplant(&root, successor, successor->right);
+            successor->right = (*result)->right;
+            successor->right->parent = successor;
+        }
+        __tree_transplant(&root, *result, successor);
+        successor->left = (*result)->left;
+        successor->left->parent = successor;
+    }
+    return OK;
+}
+
+Tree*
+tree_maximum(Tree* root) {
     while (root->right != NULL) {
         root = root->right;
     }
-    *result = root;
-    return OK;
+    return root;
 }
 
-Foo
-__tree_minimum(Tree* root, Tree** result) {
+Tree*
+__tree_minimum(Tree* root) {
     while (root->left != NULL) {
         root = root->left;
     }
-    *result = root;
-    return OK;
-}
-
-Foo
-__tree_successor(Tree* root, Tree** result) {
-    if (root->right != NULL) {
-        return __tree_minimum(root->right, result);
-    }
-    Tree* parent = root->parent;
-    while (parent != NULL && root == parent->right) {
-        root = parent;
-        parent = parent->parent;
-    }
-    *result = parent;
-    return OK;
+    return root;
 }
 
 Foo

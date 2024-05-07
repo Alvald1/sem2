@@ -11,8 +11,8 @@ struct _tree {
     Info* info;
 };
 
-Foo __tree_minimum(Tree* root, Tree** result);
-Foo __tree_successor(Tree* root, Tree** result);
+void __tree_transplant(Tree** root, Tree* u, Tree* v);
+Tree* __tree_minimum(Tree* root);
 Foo __tree_valid(Tree* root);
 void __tree_fill(Tree* root, void* key, void* data);
 
