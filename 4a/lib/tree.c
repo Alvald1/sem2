@@ -99,7 +99,7 @@ tree_delete(Tree* root, void* key, Tree** result) {
         __tree_transplant(&root, *result, (*result)->left);
     } else {
         successor = __tree_minimum((*result)->right);
-        if (successor->parent != *result) {
+        if (successor != (*result)->right) {
             __tree_transplant(&root, successor, successor->right);
             successor->right = (*result)->right;
             successor->right->parent = successor;
