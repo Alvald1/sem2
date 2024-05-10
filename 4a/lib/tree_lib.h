@@ -16,7 +16,6 @@ typedef void (*fptr_action)(Tree* root, void* save_ptr);
 void __print(Tree* root, void* _);
 Foo __tree_postorder(Tree* root, fptr_action action);
 void __tree_transplant(Tree** root, Tree* u, Tree* v);
-Tree* __tree_maximum(Tree* root);
 Tree* __tree_minimum(Tree* root);
 Foo __tree_valid(Tree* root);
 void __tree_fill(Tree* root, void* key, void* data);

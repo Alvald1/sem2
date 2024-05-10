@@ -151,14 +151,6 @@ tree_search(Tree* root, void* key, Tree** result) {
     return OK;
 }
 
-Tree*
-__tree_maximum(Tree* root) {
-    while (root->right != NULL) {
-        root = root->right;
-    }
-    return root;
-}
-
 void
 __print(Tree* root, void* _) {
     (void)_;
@@ -184,52 +176,29 @@ __tree_postorder(Tree* root, fptr_action action) {
     Tree* previous = NULL;
     Tree* successor = NULL;
     Tree* temp = NULL;
-
     current->left = root;
-
     while (current) {
-
-        // If left child is null.
-        // Move to right child.
         if (current->left == NULL) {
             current = current->right;
         } else {
             predecessor = current->left;
-
-            // Inorder predecessor
             while (predecessor->right && predecessor->right != current) {
                 predecessor = predecessor->right;
             }
-
-            // The connection between current and
-            // predecessor is made
             if (predecessor->right == NULL) {
-
-                // Make current as the right
-                // child of the right most node
                 predecessor->right = current;
-
-                // Traverse the left child
                 current = current->left;
             } else {
                 predecessor->right = NULL;
                 successor = current;
                 current = current->left;
                 previous = NULL;
-
-                // Traverse along the right
-                // subtree to the
-                // right-most child
                 while (current != NULL) {
                     temp = current->right;
                     current->right = previous;
                     previous = current;
                     current = temp;
                 }
-
-                // Traverse back
-                // to current's left child
-                // node
                 while (previous != NULL) {
                     (*action)(previous, NULL);
                     temp = previous->right;
@@ -237,11 +206,11 @@ __tree_postorder(Tree* root, fptr_action action) {
                     current = previous;
                     previous = temp;
                 }
-
                 current = successor;
                 current = current->right;
             }
         }
     }
+    __tree_dealloc(successor);
     return OK;
 }
