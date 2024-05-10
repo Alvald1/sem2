@@ -180,31 +180,67 @@ __tree_postorder(Tree* root, fptr_action action) {
     if ((call_back = tree_init(&current, root->info)) != OK) {
         return call_back;
     }
-    Tree *predecessor = NULL, *successor = NULL;
+    Tree* predecessor = NULL;
+    Tree* previous = NULL;
+    Tree* successor = NULL;
+    Tree* temp = NULL;
+
     current->left = root;
-    root->parent = current;
+
     while (current) {
+
+        // If left child is null.
+        // Move to right child.
         if (current->left == NULL) {
             current = current->right;
         } else {
-            predecessor = __tree_maximum(current->left);
+            predecessor = current->left;
+
+            // Inorder predecessor
+            while (predecessor->right && predecessor->right != current) {
+                predecessor = predecessor->right;
+            }
+
+            // The connection between current and
+            // predecessor is made
             if (predecessor->right == NULL) {
-                __tree_transplant(&root, current, predecessor->right);
+
+                // Make current as the right
+                // child of the right most node
+                predecessor->right = current;
+
+                // Traverse the left child
                 current = current->left;
             } else {
                 predecessor->right = NULL;
                 successor = current;
                 current = current->left;
-            }
-            while (current->right) {
+                previous = NULL;
+
+                // Traverse along the right
+                // subtree to the
+                // right-most child
+                while (current != NULL) {
+                    temp = current->right;
+                    current->right = previous;
+                    previous = current;
+                    current = temp;
+                }
+
+                // Traverse back
+                // to current's left child
+                // node
+                while (previous != NULL) {
+                    (*action)(previous, NULL);
+                    temp = previous->right;
+                    previous->right = current;
+                    current = previous;
+                    previous = temp;
+                }
+
+                current = successor;
                 current = current->right;
             }
-            while (current->parent) {
-                (*action)(current, NULL);
-                current = current->parent;
-            }
-            current = successor;
-            current = current->right;
         }
     }
     return OK;
