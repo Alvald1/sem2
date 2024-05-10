@@ -37,7 +37,11 @@ tree_insert(Tree* root, void* key, void* data, void** result) {
     if (__tree_valid(root) == BAD_DATA || key == NULL || data == NULL || result == NULL) {
         return BAD_DATA;
     }
-    fptr_compare* compare = root->info->compare;
+    if (root->key == NULL) {
+        __tree_fill(root, key, data);
+        return OK;
+    }
+    fptr_compare compare = root->info->compare;
     Tree* parent = NULL;
     Tree* node = NULL;
     Tree* current = root;
@@ -55,19 +59,15 @@ tree_insert(Tree* root, void* key, void* data, void** result) {
             current = current->right;
         }
     }
-    if (parent == NULL) {
-        __tree_fill(root, key, data);
+    if ((foo_call_back = tree_init(&node, root->info)) != OK) {
+        return foo_call_back;
+    }
+    __tree_fill(node, key, data);
+    node->parent = parent;
+    if ((*compare)(key, parent->key) == LESS) {
+        parent->left = node;
     } else {
-        if ((foo_call_back = tree_init(&node, root->info)) != OK) {
-            return foo_call_back;
-        }
-        __tree_fill(node, key, data);
-        node->parent = parent;
-        if ((*compare)(key, parent->key) == LESS) {
-            parent->left == node;
-        } else {
-            parent->right = node;
-        }
+        parent->right = node;
     }
     return OK;
 }
@@ -87,28 +87,34 @@ __tree_transplant(Tree** root, Tree* u, Tree* v) {
 }
 
 Foo
-tree_delete(Tree* root, void* key, Tree** result) {
-    if (__tree_valid(root) == BAD_DATA || key == NULL || result == NULL) {
+tree_delete(Tree* root, void* key) {
+    if (__tree_valid(root) == BAD_DATA || key == NULL) {
         return BAD_DATA;
     }
-    Tree* successor = NULL;
-    tree_search(root, key, result);
-    if ((*result)->left == NULL) {
-        __tree_transplant(&root, *result, (*result)->right);
-    } else if ((*result)->right == NULL) {
-        __tree_transplant(&root, *result, (*result)->left);
+    Tree *successor = NULL, *result = NULL;
+    tree_search(root, key, &result);
+    if (result->left == NULL) {
+        __tree_transplant(&root, result, result->right);
+    } else if (result->right == NULL) {
+        __tree_transplant(&root, result, result->left);
     } else {
-        successor = __tree_minimum((*result)->right);
-        if (successor != (*result)->right) {
+        successor = __tree_minimum(result->right);
+        if (successor != result->right) {
             __tree_transplant(&root, successor, successor->right);
-            successor->right = (*result)->right;
+            successor->right = result->right;
             successor->right->parent = successor;
         }
-        __tree_transplant(&root, *result, successor);
-        successor->left = (*result)->left;
+        __tree_transplant(&root, result, successor);
+        successor->left = result->left;
         successor->left->parent = successor;
     }
+    __tree_dealloc(result);
     return OK;
+}
+
+void
+__tree_dealloc(Tree* root) {
+    (void)root;
 }
 
 Tree*
@@ -142,5 +148,64 @@ tree_search(Tree* root, void* key, Tree** result) {
         }
     }
     *result = root;
+    return OK;
+}
+
+Tree*
+__tree_maximum(Tree* root) {
+    while (root->right != NULL) {
+        root = root->right;
+    }
+    return root;
+}
+
+void
+__print(Tree* root, void* _) {
+    (void)_;
+    root->info->print(root->data);
+}
+
+Foo
+tree_print(Tree* root) {
+    return __tree_postorder(root, __print);
+}
+
+Foo
+__tree_postorder(Tree* root, fptr_action action) {
+    if (root == NULL) {
+        return OK;
+    }
+    Foo call_back = OK;
+    Tree* current = NULL;
+    if ((call_back = tree_init(&current, root->info)) != OK) {
+        return call_back;
+    }
+    Tree *predecessor = NULL, *successor = NULL;
+    current->left = root;
+    root->parent = current;
+    while (current) {
+        if (current->left == NULL) {
+            current = current->right;
+        } else {
+            predecessor = __tree_maximum(current->left);
+            if (predecessor->right == NULL) {
+                __tree_transplant(&root, current, predecessor->right);
+                current = current->left;
+            } else {
+                predecessor->right = NULL;
+                successor = current;
+                current = current->left;
+            }
+            while (current->right) {
+                current = current->right;
+            }
+            while (current->parent) {
+                (*action)(current, NULL);
+                current = current->parent;
+            }
+            current = successor;
+            current = current->right;
+        }
+    }
     return OK;
 }

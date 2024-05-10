@@ -6,6 +6,7 @@
 
 struct _info {
     fptr_compare compare;
+    fptr_default print;
 };
 
 Foo __info_valid(Info* info);
