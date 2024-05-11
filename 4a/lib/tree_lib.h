@@ -11,9 +11,9 @@ struct _tree {
     Info* info;
 };
 
-typedef void (*fptr_action)(Tree* root, void* save_ptr);
+typedef void (*fptr_action)(Tree* root);
 
-void __print(Tree* root, void* _);
+void __print(Tree* root);
 Foo __tree_postorder(Tree* root, fptr_action action);
 void __tree_transplant(Tree** root, Tree* u, Tree* v);
 Tree* __tree_minimum(Tree* root);

@@ -8,5 +8,6 @@
 Compare compare(void* left, void* right);
 size_t* gen_number(size_t value);
 void print(void* data);
+void dealloc(void* data);
 
 #endif

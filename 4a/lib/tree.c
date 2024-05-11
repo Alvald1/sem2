@@ -1,5 +1,6 @@
 #include "tree.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "info_lib.h"
@@ -50,6 +51,10 @@ tree_insert(Tree* root, void* key, void* data, void** result) {
     while (current != NULL) {
         parent = current;
         if ((compare_call_back = (*compare)(key, current->key)) == EQUAL) {
+            *result = malloc(root->info->data_size);
+            if (*result == NULL) {
+                return BAD_ALLOC;
+            }
             *result = current->data;
             current->data = data;
             return DUPLICATE;
@@ -114,7 +119,9 @@ tree_delete(Tree* root, void* key) {
 
 void
 __tree_dealloc(Tree* root) {
-    (void)root;
+    root->info->key_dealloc(root->key);
+    root->info->data_dealloc(root->data);
+    free(root);
 }
 
 Tree*
@@ -152,9 +159,15 @@ tree_search(Tree* root, void* key, Tree** result) {
 }
 
 void
-__print(Tree* root, void* _) {
-    (void)_;
-    root->info->print(root->data);
+__print(Tree* root) {
+    root->info->key_print(root->key);
+    root->info->data_print(root->data);
+    printf("\n");
+}
+
+Foo
+tree_dealloc(Tree* root) {
+    return __tree_postorder(root, __tree_dealloc);
 }
 
 Foo
@@ -200,10 +213,10 @@ __tree_postorder(Tree* root, fptr_action action) {
                     current = temp;
                 }
                 while (previous != NULL) {
-                    (*action)(previous, NULL);
                     temp = previous->right;
                     previous->right = current;
                     current = previous;
+                    (*action)(previous);
                     previous = temp;
                 }
                 current = successor;

@@ -6,7 +6,8 @@
 
 struct _info {
     fptr_compare compare;
-    fptr_default print;
+    fptr_default key_print, data_print, key_dealloc, data_dealloc;
+    size_t data_size;
 };
 
 Foo __info_valid(Info* info);
