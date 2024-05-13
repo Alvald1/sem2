@@ -36,10 +36,6 @@ tree_insert(Tree* root, void* key, void* data, void** result) {
     while (current != NULL) {
         parent = current;
         if ((compare_call_back = (*compare)(key, current->key)) == EQUAL) {
-            *result = malloc(root->info->data_size);
-            if (*result == NULL) {
-                return BAD_ALLOC;
-            }
             *result = current->data;
             current->data = data;
             return DUPLICATE;
@@ -63,27 +59,27 @@ tree_insert(Tree* root, void* key, void* data, void** result) {
 }
 
 Foo
-tree_delete(Tree* root, void* key) {
-    if (__tree_valid(root) == BAD_DATA || key == NULL) {
+tree_delete(Tree** root, void* key) {
+    if (__tree_valid(*root) == BAD_DATA || key == NULL) {
         return BAD_DATA;
     }
     Foo call_back = OK;
     Tree *successor = NULL, *result = NULL;
-    if ((call_back = tree_search(root, key, &result)) != OK) {
+    if ((call_back = tree_search(*root, key, &result)) != OK) {
         return call_back;
     }
     if (result->left == NULL) {
-        __tree_transplant(&root, result, result->right);
+        __tree_transplant(root, result, result->right);
     } else if (result->right == NULL) {
-        __tree_transplant(&root, result, result->left);
+        __tree_transplant(root, result, result->left);
     } else {
         successor = __tree_minimum(result->right);
         if (successor != result->right) {
-            __tree_transplant(&root, successor, successor->right);
+            __tree_transplant(root, successor, successor->right);
             successor->right = result->right;
             successor->right->parent = successor;
         }
-        __tree_transplant(&root, result, successor);
+        __tree_transplant(root, result, successor);
         successor->left = result->left;
         successor->left->parent = successor;
     }
