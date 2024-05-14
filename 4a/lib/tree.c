@@ -31,22 +31,26 @@ tree_insert(Tree* root, void* key, void* data, void** result) {
     Tree* parent = NULL;
     Tree* node = NULL;
     Tree* current = root;
-    Foo foo_call_back = OK;
-    Compare compare_call_back = EQUAL;
+    Foo call_back = OK;
+    Tree* duplicate = NULL;
+    switch (tree_search(root, key, &duplicate)) {
+        case OK:
+            *result = duplicate->data;
+            duplicate->data = data;
+            return DUPLICATE;
+        case NOT_FOUND: break;
+        default: return BAD_DATA;
+    }
     while (current != NULL) {
         parent = current;
-        if ((compare_call_back = (*compare)(key, current->key)) == EQUAL) {
-            *result = current->data;
-            current->data = data;
-            return DUPLICATE;
-        } else if (compare_call_back == LESS) {
+        if ((*compare)(key, current->key) == LESS) {
             current = current->left;
         } else {
             current = current->right;
         }
     }
-    if ((foo_call_back = tree_init(&node, root->info)) != OK) {
-        return foo_call_back;
+    if ((call_back = tree_init(&node, root->info)) != OK) {
+        return call_back;
     }
     __tree_fill(node, key, data);
     node->parent = parent;
