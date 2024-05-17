@@ -62,25 +62,23 @@ __tree_transplant(Tree* tree, Node* u, Node* v) {
 
 Foo
 __tree_postorder(Tree* tree, fptr_action action) {
+    Foo return_code = OK;
+    Node* current = NULL;
+    Node *previous = NULL, *predecessor = NULL;
+    Node *successor = NULL, *temp = NULL;
     if (tree->root == NULL) {
         return OK;
     }
-    Foo call_back = OK;
-    Node* current = NULL;
-    if ((call_back = __node_init(&current, NULL, NULL)) != OK) {
-        return call_back;
+    if ((return_code = __node_init(&current, NULL, NULL)) != OK) {
+        return return_code;
     }
-    Node* predecessor = NULL;
-    Node* previous = NULL;
-    Node* successor = NULL;
-    Node* temp = NULL;
     current->left = tree->root;
-    while (current) {
+    while (current != NULL) {
         if (current->left == NULL) {
             current = current->right;
         } else {
             predecessor = current->left;
-            while (predecessor->right && predecessor->right != current) {
+            while (predecessor->right != NULL && predecessor->right != current) {
                 predecessor = predecessor->right;
             }
             if (predecessor->right == NULL) {

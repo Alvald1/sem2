@@ -23,22 +23,20 @@ tree_insert(Tree* tree, void* key, void* data, void** result) {
     if (__tree_valid(tree) == BAD_DATA || key == NULL || data == NULL || result == NULL) {
         return BAD_DATA;
     }
-    fptr_compare compare = tree->info->compare;
-    Node* node = NULL;
-    Foo call_back = OK;
-    Node* node_result = NULL;
+    Foo return_code = OK;
+    Node *node_result = NULL, *node = NULL;
     switch (tree_search(tree, key, &node_result)) {
         case OK:
             *result = node_result->data;
             node_result->data = data;
             return DUPLICATE;
         case NOT_FOUND:
-            if ((call_back = __node_init(&node, key, data)) != OK) {
-                return call_back;
+            if ((return_code = __node_init(&node, key, data)) != OK) {
+                return return_code;
             }
             if (node_result == NULL) {
                 tree->root = node;
-            } else if ((*compare)(key, node_result->key) == LESS) {
+            } else if ((*tree->info->compare)(key, node_result->key) == LESS) {
                 node_result->left = node;
             } else {
                 node_result->right = node;
@@ -54,10 +52,10 @@ tree_delete(Tree* tree, void* key) {
     if (__tree_valid(tree) == BAD_DATA || key == NULL) {
         return BAD_DATA;
     }
-    Foo call_back = OK;
+    Foo return_code = OK;
     Node *successor = NULL, *result = NULL;
-    if ((call_back = tree_search(tree, key, &result)) != OK) {
-        return call_back;
+    if ((return_code = tree_search(tree, key, &result)) != OK) {
+        return return_code;
     }
     if (result->left == NULL) {
         __tree_transplant(tree, result, result->right);
@@ -93,18 +91,17 @@ tree_search(Tree* tree, void* key, Node** result) {
         return BAD_DATA;
     }
     fptr_compare compare = tree->info->compare;
-    Compare call_back = EQUAL;
-    Node* root = tree->root;
-    Node* parent = NULL;
-    while (root != NULL && (call_back = (*compare)(key, root->key)) != EQUAL) {
+    Compare return_code = EQUAL;
+    Node *root = tree->root, *parent = NULL;
+    while (root != NULL && (return_code = (*compare)(key, root->key)) != EQUAL) {
         parent = root;
-        if (call_back == LESS) {
+        if (return_code == LESS) {
             root = root->left;
         } else {
             root = root->right;
         }
     }
-    if (root) {
+    if (root != NULL) {
         *result = root;
         return OK;
     }
@@ -113,16 +110,16 @@ tree_search(Tree* tree, void* key, Node** result) {
 }
 
 Foo
-tree_dealloc(Tree* root) {
-    Foo call_back = __tree_postorder(root, __node_dealloc);
-    if (call_back != OK) {
-        return call_back;
+tree_dealloc(Tree* tree) {
+    Foo return_code = __tree_postorder(tree, __node_dealloc);
+    if (return_code != OK) {
+        return return_code;
     }
-    free(root);
+    free(tree);
     return OK;
 }
 
 Foo
-tree_print(Tree* root) {
-    return __tree_postorder(root, __node_print);
+tree_print(Tree* tree) {
+    return __tree_postorder(tree, __node_print);
 }
