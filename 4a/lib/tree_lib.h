@@ -5,20 +5,24 @@
 #include "info.h"
 #include "tree.h"
 
-struct _tree {
+struct _node {
     void *key, *data;
-    struct _tree *left, *right, *parent;
+    Node *left, *right, *parent;
+};
+
+struct _tree {
+    Node* root;
     Info* info;
 };
 
-typedef void (*fptr_action)(Tree* root);
+typedef void (*fptr_action)(Tree* tree, Node* node);
 
-void __print(Tree* root);
-Foo __tree_postorder(Tree* root, fptr_action action);
-void __tree_transplant(Tree** root, Tree* u, Tree* v);
-Tree* __tree_minimum(Tree* root);
-Foo __tree_valid(Tree* root);
-void __tree_fill(Tree* root, void* key, void* data);
-void __tree_dealloc(Tree* root);
+Foo __tree_postorder(Tree* tree, fptr_action action);
+void __tree_transplant(Tree* tree, Node* u, Node* v);
+Foo __tree_valid(Tree* tree);
+void __node_dealloc(Tree* tree, Node* node);
+Node* __node_minimum(Node* root);
+void __node_print(Tree* tree, Node* node);
+Foo __node_init(Node** node, void* key, void* data);
 
 #endif

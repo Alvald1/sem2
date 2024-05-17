@@ -6,23 +6,50 @@
 #include "info_lib.h"
 
 void
-__tree_fill(Tree* root, void* key, void* data) {
-    root->key = key;
-    root->data = data;
+__node_dealloc(Tree* tree, Node* node) {
+    tree->info->key_dealloc(node->key);
+    tree->info->data_dealloc(node->data);
+    free(node);
+}
+
+Node*
+__node_minimum(Node* root) {
+    while (root->left != NULL) {
+        root = root->left;
+    }
+    return root;
+}
+
+void
+__node_print(Tree* tree, Node* node) {
+    tree->info->key_print(node->key);
+    tree->info->data_print(node->data);
+    printf("\n");
 }
 
 Foo
-__tree_valid(Tree* root) {
-    if (root == NULL || __info_valid(root->info) == BAD_DATA) {
+__node_init(Node** node, void* key, void* data) {
+    *node = (Node*)calloc(1, sizeof(Node));
+    if (*node == NULL) {
+        return BAD_ALLOC;
+    }
+    (*node)->key = key;
+    (*node)->data = data;
+    return OK;
+}
+
+Foo
+__tree_valid(Tree* tree) {
+    if (tree == NULL || __info_valid(tree->info) == BAD_DATA) {
         return BAD_DATA;
     }
     return OK;
 }
 
 void
-__tree_transplant(Tree** root, Tree* u, Tree* v) {
+__tree_transplant(Tree* tree, Node* u, Node* v) {
     if (u->parent == NULL) {
-        *root = v;
+        tree->root = v;
     } else if (u == u->parent->left) {
         u->parent->left = v;
     } else {
@@ -33,43 +60,21 @@ __tree_transplant(Tree** root, Tree* u, Tree* v) {
     }
 }
 
-void
-__tree_dealloc(Tree* root) {
-    root->info->key_dealloc(root->key);
-    root->info->data_dealloc(root->data);
-    free(root);
-}
-
-Tree*
-__tree_minimum(Tree* root) {
-    while (root->left != NULL) {
-        root = root->left;
-    }
-    return root;
-}
-
-void
-__print(Tree* root) {
-    root->info->key_print(root->key);
-    root->info->data_print(root->data);
-    printf("\n");
-}
-
 Foo
-__tree_postorder(Tree* root, fptr_action action) {
-    if (root == NULL) {
+__tree_postorder(Tree* tree, fptr_action action) {
+    if (tree->root == NULL) {
         return OK;
     }
     Foo call_back = OK;
-    Tree* current = NULL;
-    if ((call_back = tree_init(&current, root->info)) != OK) {
+    Node* current = NULL;
+    if ((call_back = __node_init(&current, NULL, NULL)) != OK) {
         return call_back;
     }
-    Tree* predecessor = NULL;
-    Tree* previous = NULL;
-    Tree* successor = NULL;
-    Tree* temp = NULL;
-    current->left = root;
+    Node* predecessor = NULL;
+    Node* previous = NULL;
+    Node* successor = NULL;
+    Node* temp = NULL;
+    current->left = tree->root;
     while (current) {
         if (current->left == NULL) {
             current = current->right;
@@ -96,7 +101,7 @@ __tree_postorder(Tree* root, fptr_action action) {
                     temp = previous->right;
                     previous->right = current;
                     current = previous;
-                    (*action)(previous);
+                    (*action)(tree, previous);
                     previous = temp;
                 }
                 current = successor;
@@ -104,6 +109,6 @@ __tree_postorder(Tree* root, fptr_action action) {
             }
         }
     }
-    __tree_dealloc(successor);
+    __node_dealloc(tree, successor);
     return OK;
 }
