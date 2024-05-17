@@ -16,5 +16,6 @@ Foo search(Tree* tree);
 void max(Tree* tree);
 void print_desc(Tree* tree);
 void print_postorder(Tree* tree);
+void print_2D(Tree* tree);
 
 #endif

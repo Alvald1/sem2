@@ -1,5 +1,6 @@
 #include "tree_lib.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "info_lib.h"
@@ -34,6 +35,21 @@ __tree_valid(Tree* tree) {
         return BAD_DATA;
     }
     return OK;
+}
+
+void
+__tree_2D(Tree* tree, Node* node, size_t space) {
+    if (node == NULL) {
+        return;
+    }
+    space += COUNT;
+    __tree_2D(tree, node->right, space);
+    printf("\n");
+    for (size_t i = COUNT; i < space; ++i) {
+        printf(" ");
+    }
+    tree->info->key_print(node->key);
+    __tree_2D(tree, node->left, space);
 }
 
 void

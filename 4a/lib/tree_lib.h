@@ -15,9 +15,12 @@ struct _tree {
     Info* info;
 };
 
+#define COUNT 10
+
 typedef void (*fptr_action)(Node* node, Tree* tree);
 
 Foo __tree_dealloc(Tree* tree);
+void __tree_2D(Tree* tree, Node* node, size_t space);
 void __tree_desc(Tree* tree, Node* node);
 Foo __tree_postorder(Tree* tree, fptr_action action);
 void __tree_transplant(Tree* tree, Node* u, Node* v);

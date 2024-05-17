@@ -134,6 +134,11 @@ tree_dealloc(Tree* tree) {
     return OK;
 }
 
+void
+tree_print_2D(Tree* tree) {
+    __tree_2D(tree, tree->root, 0);
+}
+
 Foo
 tree_print_postorder(Tree* tree) {
     printf("key\tdata\n");

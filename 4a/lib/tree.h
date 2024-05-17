@@ -12,9 +12,10 @@ Foo tree_insert(Tree* tree, void* key, void* data, void** result);
 Foo tree_delete(Tree* tree, void* key);
 Foo tree_search(Tree* tree, void* key, Node** result);
 Foo tree_print_postorder(Tree* tree);
+void tree_print_2D(Tree* tree);
+void tree_print_desc(Tree* tree);
 Foo tree_dealloc(Tree* tree);
 Node* tree_maximum(Tree* tree);
-void tree_print_desc(Tree* tree);
 void node_print(Node* node, Tree* tree);
 void node_dealloc(Node* node, Tree* tree);
 

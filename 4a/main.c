@@ -9,7 +9,8 @@
 #include "lib/readline.h"
 
 #define PROMPT                                                                                                         \
-    "(i) - insert\n(r) - remove\n(s) - search\n(m) - search max key\n(d) - print_desc\n(p) - print_postorder\n(f) - "  \
+    "\n(i) - insert\n(r) - remove\n(s) - search\n(m) - search max key\n(2) - print_2D\n(d) - print_desc\n(p) - "       \
+    "print_postorder\n(f) - "                                                                                          \
     "file\n"
 
 int
@@ -48,6 +49,7 @@ main() {
                 }
                 break;
             case 'm': max(tree); break;
+            case '2': print_2D(tree); break;
             case 'p': print_postorder(tree); break;
             case 'd': print_desc(tree); break;
             default: printf("Incorrect input_2\n"); break;
@@ -143,6 +145,12 @@ max(Tree* tree) {
 void
 print_desc(Tree* tree) {
     tree_print_desc(tree);
+    fprintf(stderr, "%s", errors[OK]);
+}
+
+void
+print_2D(Tree* tree) {
+    tree_print_2D(tree);
     fprintf(stderr, "%s", errors[OK]);
 }
 
