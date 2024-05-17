@@ -120,6 +120,11 @@ tree_dealloc(Tree* tree) {
 }
 
 Foo
-tree_print(Tree* tree) {
+tree_print_postorder(Tree* tree) {
     return __tree_postorder(tree, __node_print);
+}
+
+void
+tree_print_desc(Tree* tree) {
+    __tree_desc(tree, tree->root);
 }

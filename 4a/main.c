@@ -25,7 +25,7 @@ main() {
     free(tmp2);
     tree_insert(tree, gen_number(8), gen_number(8), &tmp);
     tree_insert(tree, gen_number(2), gen_number(2), &tmp);
-    tree_print(tree);
+    tree_print_desc(tree);
     printf("\n\n");
     tree_delete(tree, (tmp = gen_number(5)));
     free(tmp);
@@ -36,7 +36,7 @@ main() {
     tree_delete(tree, (tmp = gen_number(4)));
     free(tmp);
     tree_insert(tree, gen_number(5), gen_number(5), &tmp);
-    tree_print(tree);
+    tree_print_postorder(tree);
     tree_dealloc(tree);
     info_dealloc(info);
     return 0;

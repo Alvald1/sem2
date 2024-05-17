@@ -47,6 +47,16 @@ __tree_valid(Tree* tree) {
 }
 
 void
+__tree_desc(Tree* tree, Node* node) {
+    if (node == NULL) {
+        return;
+    }
+    __tree_desc(tree, node->right);
+    __node_print(tree, node);
+    __tree_desc(tree, node->left);
+}
+
+void
 __tree_transplant(Tree* tree, Node* u, Node* v) {
     if (u->parent == NULL) {
         tree->root = v;

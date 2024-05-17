@@ -17,6 +17,7 @@ struct _tree {
 
 typedef void (*fptr_action)(Tree* tree, Node* node);
 
+void __tree_desc(Tree* tree, Node* node);
 Foo __tree_postorder(Tree* tree, fptr_action action);
 void __tree_transplant(Tree* tree, Node* u, Node* v);
 Foo __tree_valid(Tree* tree);
