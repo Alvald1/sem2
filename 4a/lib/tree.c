@@ -136,10 +136,12 @@ tree_dealloc(Tree* tree) {
 
 Foo
 tree_print_postorder(Tree* tree) {
+    printf("key\tdata\n");
     return __tree_postorder(tree, node_print);
 }
 
 void
 tree_print_desc(Tree* tree) {
+    printf("key\tdata\n");
     __tree_desc(tree, tree->root);
 }

@@ -7,7 +7,8 @@
 
 Compare compare(void* left, void* right);
 size_t* gen_number(size_t value);
-void print(void* data);
+void key_print(void* key);
+void data_print(void* data);
 void dealloc(void* data);
 Foo insert(Tree* tree);
 Foo _delete(Tree* tree);

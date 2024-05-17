@@ -1,5 +1,6 @@
 #include "main.h"
 
+#include <readline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -14,7 +15,7 @@ main() {
     Tree* tree = NULL;
     Info* info = NULL;
     char status = 0;
-    info_init(&info, compare, print, print, dealloc, dealloc);
+    info_init(&info, compare, key_print, data_print, dealloc, dealloc);
     tree_init(&tree, info);
     printf(PROMPT);
     while (scanf("%c", &status) != EOF) {
@@ -53,23 +54,25 @@ main() {
 
 Foo
 insert(Tree* tree) {
-    size_t key = 0, data = 0;
-    if (read_num(&key, "Key: ") == EOF || read_num(&data, "Data: ") == EOF) {
+    size_t key = 0;
+    char* data = NULL;
+    if (read_num(&key, "Key: ") == EOF || (data = readline("Data: ")) == NULL) {
         tree_dealloc(tree);
         return _EOF;
     }
-    size_t *key_ptr = gen_number(key), *data_ptr = gen_number(data);
+    size_t* key_ptr = gen_number(key);
     Foo return_code = OK;
     void* tmp = NULL;
-    if (key_ptr == NULL || data_ptr == NULL) {
-        free(key_ptr);
-        free(data_ptr);
+    if (key_ptr == NULL) {
+        free(data);
         return_code = BAD_ALLOC;
-    } else if ((return_code = tree_insert(tree, key_ptr, data_ptr, &tmp)) != OK) {
+    } else if ((return_code = tree_insert(tree, key_ptr, data, &tmp)) != OK && return_code != DUPLICATE) {
         free(key_ptr);
-        free(data_ptr);
+        free(data);
+    } else if (return_code == DUPLICATE) {
+        dealloc(key_ptr);
+        dealloc(tmp);
     }
-    dealloc(tmp);
     fprintf(stderr, "%s", errors[return_code]);
     return OK;
 }
@@ -133,8 +136,13 @@ dealloc(void* data) {
 }
 
 void
-print(void* data) {
-    printf("%zu ", *((size_t*)data));
+key_print(void* key) {
+    printf("%zu\t", *((size_t*)key));
+}
+
+void
+data_print(void* data) {
+    printf("%s\t", (char*)data);
 }
 
 Compare
