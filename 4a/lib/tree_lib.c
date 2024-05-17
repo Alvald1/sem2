@@ -24,6 +24,11 @@ __node_init(Node** node, void* key, void* data) {
 }
 
 Foo
+__tree_dealloc(Tree* tree) {
+    return __tree_postorder(tree, node_dealloc);
+}
+
+Foo
 __tree_valid(Tree* tree) {
     if (tree == NULL || __info_valid(tree->info) == BAD_DATA) {
         return BAD_DATA;

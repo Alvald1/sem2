@@ -1,10 +1,12 @@
 #include "main.h"
 
-#include <readline/readline.h>
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "lib/fstream.h"
 #include "lib/info.h"
+#include "lib/numbers.h"
+#include "lib/readline.h"
 
 #define PROMPT                                                                                                         \
     "(i) - insert\n(r) - remove\n(s) - search\n(m) - search max key\n(d) - print_desc\n(p) - print_postorder\n(f) - "  \
@@ -38,6 +40,12 @@ main() {
                     return 0;
                 }
                 break;
+            case 'f':
+                if (file(tree) == _EOF) {
+                    info_dealloc(info);
+                    return 0;
+                }
+                break;
             case 'm': max(tree); break;
             case 'p': print_postorder(tree); break;
             case 'd': print_desc(tree); break;
@@ -53,10 +61,22 @@ main() {
 }
 
 Foo
+file(Tree* tree) {
+    Foo return_code = OK;
+    char* file_name = readline(stdin, "File name: ");
+    if (file_name == NULL) {
+        return _EOF;
+        tree_dealloc(tree);
+    }
+    return_code = import(tree, file_name);
+    fprintf(stderr, "%s", errors[return_code]);
+}
+
+Foo
 insert(Tree* tree) {
     size_t key = 0;
     char* data = NULL;
-    if (read_num(&key, "Key: ") == EOF || (data = readline("Data: ")) == NULL) {
+    if (read_num(&key, "Key: ") == EOF || (data = readline(stdin, "Data: ")) == NULL) {
         tree_dealloc(tree);
         return _EOF;
     }
@@ -70,8 +90,8 @@ insert(Tree* tree) {
         free(key_ptr);
         free(data);
     } else if (return_code == DUPLICATE) {
-        dealloc(key_ptr);
-        dealloc(tmp);
+        free(key_ptr);
+        free(tmp);
     }
     fprintf(stderr, "%s", errors[return_code]);
     return OK;
@@ -154,31 +174,4 @@ compare(void* left, void* right) {
     } else {
         return LESS;
     }
-}
-
-size_t*
-gen_number(size_t value) {
-    size_t* number = malloc(sizeof(size_t));
-    if (number == NULL) {
-        return NULL;
-    }
-    *number = value;
-    return number;
-}
-
-int
-get_number(const char* format, void* number) {
-    int call_back = scanf(format, number);
-    while (!call_back) {
-        scanf("%*[^\n]");
-        printf("Incorrect input\n");
-        call_back = scanf(format, number);
-    }
-    return call_back;
-}
-
-int
-read_num(size_t* num, const char* prompt) {
-    printf("%s", prompt);
-    return get_number("%zu", num);
 }

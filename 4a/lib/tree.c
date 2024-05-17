@@ -126,7 +126,7 @@ tree_search(Tree* tree, void* key, Node** result) {
 
 Foo
 tree_dealloc(Tree* tree) {
-    Foo return_code = __tree_postorder(tree, node_dealloc);
+    Foo return_code = __tree_dealloc(tree);
     if (return_code != OK) {
         return return_code;
     }
