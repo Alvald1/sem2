@@ -5,7 +5,9 @@
 
 #include "lib/info.h"
 
-#define PROMPT "(i) - insert\n(r) - remove\n(s) - search\n(d) - print_desc\n(p) - print_postorder\n(f) - file\n"
+#define PROMPT                                                                                                         \
+    "(i) - insert\n(r) - remove\n(s) - search\n(m) - search max key\n(d) - print_desc\n(p) - print_postorder\n(f) - "  \
+    "file\n"
 
 int
 main() {
@@ -35,6 +37,7 @@ main() {
                     return 0;
                 }
                 break;
+            case 'm': max(tree); break;
             case 'p': print_postorder(tree); break;
             case 'd': print_desc(tree); break;
             default: printf("Incorrect input_2\n"); break;
@@ -100,6 +103,16 @@ search(Tree* tree) {
         node_dealloc(node, tree);
     }
     return OK;
+}
+
+void
+max(Tree* tree) {
+    Node* node = tree_maximum(tree);
+    if (node != NULL) {
+        printf("key\tdata\n");
+        node_print(node, tree);
+    }
+    fprintf(stderr, "%s", errors[OK]);
 }
 
 void

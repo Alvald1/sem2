@@ -12,6 +12,7 @@ void dealloc(void* data);
 Foo insert(Tree* tree);
 Foo _delete(Tree* tree);
 Foo search(Tree* tree);
+void max(Tree* tree);
 void print_desc(Tree* tree);
 void print_postorder(Tree* tree);
 int get_number(const char* format, void* number);

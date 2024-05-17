@@ -94,7 +94,7 @@ tree_delete(Tree* tree, void* key) {
 Node*
 tree_maximum(Tree* tree) {
     Node* root = tree->root;
-    while (root->right != NULL) {
+    while (root != NULL && root->right != NULL) {
         root = root->right;
     }
     return root;
