@@ -30,6 +30,7 @@ import(Tree* tree, const char* file_name) {
             fclose(file);
             return BAD_ALLOC;
         }
+        fscanf(file, "%*c");
         data = readline(file, "");
         if (data == NULL) {
             free(key_ptr);

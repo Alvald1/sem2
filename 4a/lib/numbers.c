@@ -21,6 +21,7 @@ get_number(const char* format, void* number) {
         printf("Incorrect input\n");
         call_back = scanf(format, number);
     }
+    scanf("%*c");
     return call_back;
 }
 

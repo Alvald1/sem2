@@ -36,6 +36,5 @@ readline(FILE* file, const char* prompt) {
             break;
         }
     }
-    fscanf(file, "%*c");
     return buffer;
 }

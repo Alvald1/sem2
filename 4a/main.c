@@ -41,6 +41,7 @@ main() {
                 }
                 break;
             case 'f':
+                scanf("%*c");
                 if (file(tree) == _EOF) {
                     info_dealloc(info);
                     return 0;
@@ -69,7 +70,9 @@ file(Tree* tree) {
         tree_dealloc(tree);
     }
     return_code = import(tree, file_name);
+    free(file_name);
     fprintf(stderr, "%s", errors[return_code]);
+    return OK;
 }
 
 Foo
