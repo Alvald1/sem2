@@ -15,5 +15,7 @@ Foo tree_print_postorder(Tree* tree);
 Foo tree_dealloc(Tree* tree);
 Node* tree_maximum(Tree* tree);
 void tree_print_desc(Tree* tree);
+void node_print(Node* node, Tree* tree);
+void node_dealloc(Node* node, Tree* tree);
 
 #endif

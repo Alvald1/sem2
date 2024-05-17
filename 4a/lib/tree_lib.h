@@ -15,15 +15,13 @@ struct _tree {
     Info* info;
 };
 
-typedef void (*fptr_action)(Tree* tree, Node* node);
+typedef void (*fptr_action)(Node* node, Tree* tree);
 
 void __tree_desc(Tree* tree, Node* node);
 Foo __tree_postorder(Tree* tree, fptr_action action);
 void __tree_transplant(Tree* tree, Node* u, Node* v);
 Foo __tree_valid(Tree* tree);
-void __node_dealloc(Tree* tree, Node* node);
 Node* __node_minimum(Node* root);
-void __node_print(Tree* tree, Node* node);
 Foo __node_init(Node** node, void* key, void* data);
 
 #endif

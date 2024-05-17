@@ -13,7 +13,7 @@ typedef void (*fptr_default)(void* data);
 typedef struct _info Info;
 
 Foo info_init(Info** info, fptr_compare compare, fptr_default key_print, fptr_default data_print,
-              fptr_default key_dealloc, fptr_default data_dealloc, size_t data_size);
+              fptr_default key_dealloc, fptr_default data_dealloc);
 void info_dealloc(Info* info);
 
 #endif

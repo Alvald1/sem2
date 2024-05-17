@@ -1,9 +1,24 @@
 #include "tree.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "info_lib.h"
 #include "tree_lib.h"
+
+void
+node_print(Node* node, Tree* tree) {
+    tree->info->key_print(node->key);
+    tree->info->data_print(node->data);
+    printf("\n");
+}
+
+void
+node_dealloc(Node* node, Tree* tree) {
+    tree->info->key_dealloc(node->key);
+    tree->info->data_dealloc(node->data);
+    free(node);
+}
 
 Foo
 tree_init(Tree** tree, Info* info) {
@@ -72,7 +87,7 @@ tree_delete(Tree* tree, void* key) {
         successor->left = result->left;
         successor->left->parent = successor;
     }
-    __node_dealloc(tree, result);
+    node_dealloc(result, tree);
     return OK;
 }
 
@@ -111,7 +126,7 @@ tree_search(Tree* tree, void* key, Node** result) {
 
 Foo
 tree_dealloc(Tree* tree) {
-    Foo return_code = __tree_postorder(tree, __node_dealloc);
+    Foo return_code = __tree_postorder(tree, node_dealloc);
     if (return_code != OK) {
         return return_code;
     }
@@ -121,7 +136,7 @@ tree_dealloc(Tree* tree) {
 
 Foo
 tree_print_postorder(Tree* tree) {
-    return __tree_postorder(tree, __node_print);
+    return __tree_postorder(tree, node_print);
 }
 
 void

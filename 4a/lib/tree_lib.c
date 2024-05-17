@@ -1,16 +1,8 @@
 #include "tree_lib.h"
 
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "info_lib.h"
-
-void
-__node_dealloc(Tree* tree, Node* node) {
-    tree->info->key_dealloc(node->key);
-    tree->info->data_dealloc(node->data);
-    free(node);
-}
 
 Node*
 __node_minimum(Node* root) {
@@ -18,13 +10,6 @@ __node_minimum(Node* root) {
         root = root->left;
     }
     return root;
-}
-
-void
-__node_print(Tree* tree, Node* node) {
-    tree->info->key_print(node->key);
-    tree->info->data_print(node->data);
-    printf("\n");
 }
 
 Foo
@@ -52,7 +37,7 @@ __tree_desc(Tree* tree, Node* node) {
         return;
     }
     __tree_desc(tree, node->right);
-    __node_print(tree, node);
+    node_print(node, tree);
     __tree_desc(tree, node->left);
 }
 
@@ -109,7 +94,7 @@ __tree_postorder(Tree* tree, fptr_action action) {
                     temp = previous->right;
                     previous->right = current;
                     current = previous;
-                    (*action)(tree, previous);
+                    (*action)(previous, tree);
                     previous = temp;
                 }
                 current = successor;
@@ -117,6 +102,6 @@ __tree_postorder(Tree* tree, fptr_action action) {
             }
         }
     }
-    __node_dealloc(tree, successor);
+    node_dealloc(successor, tree);
     return OK;
 }

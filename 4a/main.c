@@ -4,42 +4,114 @@
 #include <stdlib.h>
 
 #include "lib/info.h"
-#include "lib/tree.h"
+
+#define PROMPT "(i) - insert\n(r) - remove\n(s) - search\n(d) - print_desc\n(p) - print_postorder\n(f) - file\n"
 
 int
 main() {
     Tree* tree = NULL;
     Info* info = NULL;
-    void *tmp = NULL, *tmp2 = NULL;
-    info_init(&info, compare, print, print, dealloc, dealloc, sizeof(size_t));
+    char status = 0;
+    info_init(&info, compare, print, print, dealloc, dealloc);
     tree_init(&tree, info);
-    tree_insert(tree, gen_number(5), gen_number(5), &tmp);
-    tree_insert(tree, gen_number(3), gen_number(3), &tmp);
-    tree_insert(tree, gen_number(7), gen_number(7), &tmp);
-    tree_insert(tree, gen_number(4), gen_number(4), &tmp);
-    tree_insert(tree, gen_number(11), gen_number(11), &tmp);
-    tree_insert(tree, gen_number(13), gen_number(13), &tmp);
-    tree_insert(tree, gen_number(19), gen_number(19), &tmp);
-    tree_insert(tree, (tmp2 = gen_number(19)), gen_number(120), &tmp);
-    free(tmp);
-    free(tmp2);
-    tree_insert(tree, gen_number(8), gen_number(8), &tmp);
-    tree_insert(tree, gen_number(2), gen_number(2), &tmp);
-    tree_print_desc(tree);
-    printf("\n\n");
-    tree_delete(tree, (tmp = gen_number(5)));
-    free(tmp);
-    tree_delete(tree, (tmp = gen_number(11)));
-    free(tmp);
-    tree_delete(tree, (tmp = gen_number(7)));
-    free(tmp);
-    tree_delete(tree, (tmp = gen_number(4)));
-    free(tmp);
-    tree_insert(tree, gen_number(5), gen_number(5), &tmp);
-    tree_print_postorder(tree);
+    printf(PROMPT);
+    while (scanf("%c", &status) != EOF) {
+        switch (status) {
+            case 'i':
+                if (insert(tree) == _EOF) {
+                    info_dealloc(info);
+                    return 0;
+                }
+                break;
+            case 'r':
+                if (_delete(tree) == _EOF) {
+                    info_dealloc(info);
+                    return 0;
+                }
+                break;
+            case 's':
+                if (search(tree) == _EOF) {
+                    info_dealloc(info);
+                    return 0;
+                }
+                break;
+            case 'p': print_postorder(tree); break;
+            case 'd': print_desc(tree); break;
+            default: printf("Incorrect input_2\n"); break;
+        }
+        scanf("%*[^\n]");
+        scanf("%*c");
+        printf(PROMPT);
+    }
     tree_dealloc(tree);
     info_dealloc(info);
     return 0;
+}
+
+Foo
+insert(Tree* tree) {
+    size_t key = 0, data = 0;
+    if (read_num(&key, "Key: ") == EOF || read_num(&data, "Data: ") == EOF) {
+        tree_dealloc(tree);
+        return _EOF;
+    }
+    size_t *key_ptr = gen_number(key), *data_ptr = gen_number(data);
+    Foo return_code = OK;
+    void* tmp = NULL;
+    if (key_ptr == NULL || data_ptr == NULL) {
+        free(key_ptr);
+        free(data_ptr);
+        return_code = BAD_ALLOC;
+    } else if ((return_code = tree_insert(tree, key_ptr, data_ptr, &tmp)) != OK) {
+        free(key_ptr);
+        free(data_ptr);
+    }
+    dealloc(tmp);
+    fprintf(stderr, "%s", errors[return_code]);
+    return OK;
+}
+
+Foo
+_delete(Tree* tree) {
+    size_t num;
+    if (read_num(&num, "Key: ") == EOF) {
+        tree_dealloc(tree);
+        return _EOF;
+    }
+    Foo return_code = tree_delete(tree, &num);
+    fprintf(stderr, "%s", errors[return_code]);
+    return OK;
+}
+
+Foo
+search(Tree* tree) {
+    Node* node = NULL;
+    size_t key = 0;
+    if (read_num(&key, "Key: ") == EOF) {
+        tree_dealloc(tree);
+        return _EOF;
+    }
+    Foo return_code = tree_search(tree, &key, &node);
+    fprintf(stderr, "%s", errors[return_code]);
+    printf("\n");
+    if (return_code == OK) {
+        printf("key\tdata\n");
+        node_print(node, tree);
+        node_dealloc(node, tree);
+    }
+    return OK;
+}
+
+void
+print_desc(Tree* tree) {
+    tree_print_desc(tree);
+    fprintf(stderr, "%s", errors[OK]);
+}
+
+void
+print_postorder(Tree* tree) {
+    Foo return_code = tree_print_postorder(tree);
+    fprintf(stderr, "%s", errors[return_code]);
 }
 
 void
@@ -71,4 +143,21 @@ gen_number(size_t value) {
     }
     *number = value;
     return number;
+}
+
+int
+get_number(const char* format, void* number) {
+    int call_back = scanf(format, number);
+    while (!call_back) {
+        scanf("%*[^\n]");
+        printf("Incorrect input\n");
+        call_back = scanf(format, number);
+    }
+    return call_back;
+}
+
+int
+read_num(size_t* num, const char* prompt) {
+    printf("%s", prompt);
+    return get_number("%zu", num);
 }

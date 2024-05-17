@@ -16,7 +16,7 @@ __info_valid(Info* info) {
 
 Foo
 info_init(Info** info, fptr_compare compare, fptr_default key_print, fptr_default data_print, fptr_default key_dealloc,
-          fptr_default data_dealloc, size_t data_size) {
+          fptr_default data_dealloc) {
     if (info == NULL) {
         return BAD_DATA;
     }
@@ -29,7 +29,6 @@ info_init(Info** info, fptr_compare compare, fptr_default key_print, fptr_defaul
     (*info)->data_print = data_print;
     (*info)->key_dealloc = key_dealloc;
     (*info)->data_dealloc = data_dealloc;
-    (*info)->data_size = data_size;
     return OK;
 }
 
