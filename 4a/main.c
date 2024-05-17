@@ -69,7 +69,7 @@ file(Tree* tree) {
         return _EOF;
         tree_dealloc(tree);
     }
-    return_code = import(tree, file_name);
+    return_code = import_txt(tree, file_name);
     free(file_name);
     fprintf(stderr, "%s", errors[return_code]);
     return OK;
@@ -126,7 +126,6 @@ search(Tree* tree) {
     if (return_code == OK) {
         printf("key\tdata\n");
         node_print(node, tree);
-        node_dealloc(node, tree);
     }
     return OK;
 }

@@ -7,7 +7,7 @@
 #include "tree_lib.h"
 
 Foo
-import(Tree* tree, const char* file_name) {
+import_txt(Tree* tree, const char* file_name) {
     Foo return_code = OK;
     size_t key = 0;
     size_t* key_ptr = NULL;

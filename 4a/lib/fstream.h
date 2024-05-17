@@ -3,6 +3,6 @@
 
 #include "tree.h"
 
-Foo import(Tree* tree, const char* file_name);
+Foo import_txt(Tree* tree, const char* file_name);
 
 #endif
