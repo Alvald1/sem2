@@ -11,7 +11,7 @@
 #define PROMPT                                                                                                         \
     "\n(i) - insert\n(r) - remove\n(s) - search\n(m) - search max key\n(2) - print_2D\n(d) - print_desc\n(p) - "       \
     "print_postorder\n(f) - "                                                                                          \
-    "file\n"
+    "file\n(g) - graphViz\n"
 
 int
 main() {
@@ -48,6 +48,7 @@ main() {
                     return 0;
                 }
                 break;
+            case 'g': graphviz(tree); break;
             case 'm': max(tree); break;
             case '2': print_2D(tree); break;
             case 'p': print_postorder(tree); break;
@@ -61,6 +62,12 @@ main() {
     tree_dealloc(tree);
     info_dealloc(info);
     return 0;
+}
+
+void
+graphviz(Tree* tree) {
+    Foo return_code = export_dot(tree);
+    fprintf(stderr, "%s", errors[return_code]);
 }
 
 Foo

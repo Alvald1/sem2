@@ -13,6 +13,7 @@ Foo insert(Tree* tree);
 Foo _delete(Tree* tree);
 Foo file(Tree* tree);
 Foo search(Tree* tree);
+void graphviz(Tree* tree);
 void max(Tree* tree);
 void print_desc(Tree* tree);
 void print_postorder(Tree* tree);

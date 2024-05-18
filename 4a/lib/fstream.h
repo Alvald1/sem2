@@ -4,5 +4,6 @@
 #include "tree.h"
 
 Foo import_txt(Tree* tree, const char* file_name);
+Foo export_dot(Tree* tree);
 
 #endif

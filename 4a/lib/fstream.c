@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include "fstream_lib.h"
 #include "numbers.h"
 #include "readline.h"
 #include "tree_lib.h"
@@ -48,4 +49,44 @@ import_txt(Tree* tree, const char* file_name) {
     }
     fclose(file);
     return OK;
+}
+
+Foo
+export_dot(Tree* tree) {
+    const char* file_name = "output.dot";
+    FILE* file = fopen(file_name, "w");
+    if (file == NULL) {
+        return BAD_FILE;
+    }
+    fprintf(file, "graph BST {\n");
+    fclose(file);
+    Foo return_code = __tree_postorder(tree, __export_dot);
+    if (return_code != OK) {
+        return return_code;
+    }
+    file = fopen(file_name, "a");
+    fprintf(file, "node [shape=circle, style=filled, color=lightblue, fontcolor=black];\nedge [color=black];\n}\n");
+    fclose(file);
+    system("dot -Tpng output.dot -o output.png");
+    system("rm output.dot");
+    return OK;
+}
+
+void
+__export_dot(Node* node, Tree* tree) {
+    const char* file_name = "output.dot";
+    static FILE* file = NULL;
+    if (file == NULL) {
+        file = fopen(file_name, "a");
+    }
+    if (node->left != NULL) {
+        fprintf(file, "%zu -- %zu;\n", *((size_t*)node->key), *((size_t*)node->left->key));
+    }
+    if (node->right != NULL) {
+        fprintf(file, "%zu -- %zu;\n", *((size_t*)node->key), *((size_t*)node->right->key));
+    }
+    if (node == tree->root) {
+        fclose(file);
+        file = NULL;
+    }
 }
