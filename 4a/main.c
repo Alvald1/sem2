@@ -75,8 +75,8 @@ file(Tree* tree) {
     Foo return_code = OK;
     char* file_name = readline(stdin, "File name: ");
     if (file_name == NULL) {
-        return _EOF;
         tree_dealloc(tree);
+        return _EOF;
     }
     return_code = import_txt(tree, file_name);
     free(file_name);
