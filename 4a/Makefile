@@ -43,12 +43,28 @@ valgrind: debug
 fuzz: afl
 	rm -rf in out
 	mkdir in out
-	echo 1 >> in/1
-	echo "p" >> in/p
-	tmux new-session -d -s my_session -n Window1 '$(AFL_PATH)afl-fuzz -i in -o out -M master -x utf8.dict -- ./$(EXECUTABLE)_afl'
-	tmux new-window -t my_session:1 -n Window2 '$(AFL_PATH)afl-fuzz -i in -o out -S slave1 -x utf8.dict -- ./$(EXECUTABLE)_afl'
-	tmux new-window -t my_session:2 -n Window3 '$(AFL_PATH)afl-fuzz -i in -o out -S slave2 -x utf8.dict -- ./$(EXECUTABLE)_afl'
-	tmux new-window -t my_session:3 -n Window4 '$(AFL_PATH)afl-fuzz -i in -o out -S slave3 -x utf8.dict -- ./$(EXECUTABLE)_afl'
+	echo 'i' > in/i
+	echo 'r' > in/r
+	echo 's' > in/s
+	echo 'f' > in/f
+	echo 'g' > in/g
+	echo 'm' > in/m
+	echo '2' > in/2
+	echo 'p' > in/p
+	echo 'd' > in/d
+	echo 'ir' > in/ir
+	echo 'sf' > in/sf
+	echo 'gmp' > in/gmp
+	echo 'd2p' > in/d2p
+	echo 'i123' > in/i123
+	echo 'r456' > in/r456
+	echo '' > in/empty
+	echo 'xyz' > in/invalid
+	echo '123' > in/nocommand
+	tmux new-session -d -s my_session -n Window1 '$(AFL_PATH)afl-fuzz -i in -o out -M master -x utf8.dict -P -- ./$(EXECUTABLE)_afl'
+	tmux new-window -t my_session:1 -n Window2 '$(AFL_PATH)afl-fuzz -i in -o out -S slave1 -x utf8.dict -P -- ./$(EXECUTABLE)_afl'
+	tmux new-window -t my_session:2 -n Window3 '$(AFL_PATH)afl-fuzz -i in -o out -S slave2 -x utf8.dict -P -- ./$(EXECUTABLE)_afl'
+	tmux new-window -t my_session:3 -n Window4 '$(AFL_PATH)afl-fuzz -i in -o out -S slave3 -x utf8.dict -P -- ./$(EXECUTABLE)_afl'
 	tmux select-window -t my_session:0
 	tmux attach-session -t my_session
 
