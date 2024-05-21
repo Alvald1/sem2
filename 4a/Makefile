@@ -22,6 +22,9 @@ debug:
 asan:
 	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_asan" SAN="$(SAN),address"
 
+gprof:
+	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_gprof" SAN="" CC="gcc" CFLAGS="-pg"
+
 msan:
 	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_msan" SAN="$(SAN),memory"
 
@@ -71,7 +74,7 @@ fuzz: afl
 compile: $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $^ -o $@ $(SAN) $(LDFLAGS) $(OPTIM) $(COV_FLAG)
+	$(CC) $^ -o $@ $(CFLAGS) $(SAN) $(LDFLAGS) $(OPTIM) $(COV_FLAG)
 
 $(OBJECT_DIR)/%.o: %.c
 	mkdir -p $(@D)
@@ -81,4 +84,4 @@ static:
 	clang --analyze -Xanalyzer -analyzer-output=html *.c $(LIB_DIR)/*.c
 
 clean:
-	rm -rf $(EXECUTABLE)* $(OBJECT_DIR) *.plist in
+	rm -rf $(EXECUTABLE)* $(OBJECT_DIR) *.plist in gmon.out
