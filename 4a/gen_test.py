@@ -45,17 +45,26 @@ def parse_profile():
                 calls_tree_delete.append(results['tree_delete']['calls'])
                 ms_per_call_total_tree_delete.append(results['tree_delete']['ms_per_call_total'])
 
-        avg_cumulative_seconds_tree_search = sum(cumulative_seconds_tree_search) / len(cumulative_seconds_tree_search)
-        avg_calls_tree_search = sum(calls_tree_search) / len(calls_tree_search)
-        avg_ms_per_call_total_tree_search = sum(ms_per_call_total_tree_search) / len(ms_per_call_total_tree_search)
+        if cumulative_seconds_tree_search:
+            avg_cumulative_seconds_tree_search = sum(cumulative_seconds_tree_search) / len(cumulative_seconds_tree_search)
+            avg_calls_tree_search = sum(calls_tree_search) / len(calls_tree_search)
+            avg_ms_per_call_total_tree_search = sum(ms_per_call_total_tree_search) / len(ms_per_call_total_tree_search)
+        else:
+            avg_cumulative_seconds_tree_search = avg_calls_tree_search = avg_ms_per_call_total_tree_search = 0
 
-        avg_cumulative_seconds_tree_insert = sum(cumulative_seconds_tree_insert) / len(cumulative_seconds_tree_insert)
-        avg_calls_tree_insert = sum(calls_tree_insert) / len(calls_tree_insert)
-        avg_ms_per_call_total_tree_insert = sum(ms_per_call_total_tree_insert) / len(ms_per_call_total_tree_insert)
+        if cumulative_seconds_tree_insert:
+            avg_cumulative_seconds_tree_insert = sum(cumulative_seconds_tree_insert) / len(cumulative_seconds_tree_insert)
+            avg_calls_tree_insert = sum(calls_tree_insert) / len(calls_tree_insert)
+            avg_ms_per_call_total_tree_insert = sum(ms_per_call_total_tree_insert) / len(ms_per_call_total_tree_insert)
+        else:
+            avg_cumulative_seconds_tree_insert = avg_calls_tree_insert = avg_ms_per_call_total_tree_insert = 0
 
-        avg_cumulative_seconds_tree_delete = sum(cumulative_seconds_tree_delete) / len(cumulative_seconds_tree_delete)
-        avg_calls_tree_delete = sum(calls_tree_delete) / len(calls_tree_delete)
-        avg_ms_per_call_total_tree_delete = sum(ms_per_call_total_tree_delete) / len(ms_per_call_total_tree_delete)
+        if cumulative_seconds_tree_delete:
+            avg_cumulative_seconds_tree_delete = sum(cumulative_seconds_tree_delete) / len(cumulative_seconds_tree_delete)
+            avg_calls_tree_delete = sum(calls_tree_delete) / len(calls_tree_delete)
+            avg_ms_per_call_total_tree_delete = sum(ms_per_call_total_tree_delete) / len(ms_per_call_total_tree_delete)
+        else:
+            avg_cumulative_seconds_tree_delete = avg_calls_tree_delete = avg_ms_per_call_total_tree_delete = 0
 
         print(f"tree_search: avg_cumulative_seconds= {avg_cumulative_seconds_tree_search} avg_calls= {avg_calls_tree_search} avg_ms_per_call_total= {avg_ms_per_call_total_tree_search}\n")
         print(f"tree_insert: avg_cumulative_seconds= {avg_cumulative_seconds_tree_insert} avg_calls= {avg_calls_tree_insert} avg_ms_per_call_total= {avg_ms_per_call_total_tree_insert}\n")
@@ -85,4 +94,5 @@ def test():
             os.system('rm gmon.out')
 
         
-        
+if __name__== '__main__':
+    parse_profile()
