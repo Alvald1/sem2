@@ -38,7 +38,8 @@ import_txt(Tree* tree, const char* file_name) {
             fclose(file);
             return OK;
         }
-        if ((return_code = tree_insert(tree, key_ptr, data, &tmp)) != OK && return_code != DUPLICATE) {
+        return_code = tree_insert(tree, key_ptr, data, &tmp);
+        if (return_code != OK && return_code != DUPLICATE) {
             free(key_ptr);
             free(data);
         } else if (return_code == DUPLICATE) {
