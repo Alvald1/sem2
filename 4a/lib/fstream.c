@@ -53,6 +53,9 @@ import_txt(Tree* tree, const char* file_name) {
 
 Foo
 export_dot(Tree* tree) {
+    if (__tree_valid(tree) == BAD_DATA) {
+        return BAD_DATA;
+    }
     const char* file_name = "output.dot";
     FILE* file = fopen(file_name, "w");
     if (file == NULL) {
@@ -65,7 +68,7 @@ export_dot(Tree* tree) {
         return return_code;
     }
     file = fopen(file_name, "a");
-    fprintf(file, "node [shape=circle, style=filled, color=lightblue, fontcolor=black];\nedge [color=black];\n}\n");
+    fprintf(file, "}\n");
     fclose(file);
     system("dot -Tpng output.dot -o output.png");
     system("rm output.dot");
@@ -79,11 +82,12 @@ __export_dot(Node* node, Tree* tree) {
     if (file == NULL) {
         file = fopen(file_name, "a");
     }
+    fprintf(file, "%zu\n", *((size_t*)node->key));
     if (node->left != NULL) {
-        fprintf(file, "%zu -- %zu;\n", *((size_t*)node->key), *((size_t*)node->left->key));
+        fprintf(file, "%zu -- %zu\n", *((size_t*)node->key), *((size_t*)node->left->key));
     }
     if (node->right != NULL) {
-        fprintf(file, "%zu -- %zu;\n", *((size_t*)node->key), *((size_t*)node->right->key));
+        fprintf(file, "%zu -- %zu\n", *((size_t*)node->key), *((size_t*)node->right->key));
     }
     if (node == tree->root) {
         fclose(file);
