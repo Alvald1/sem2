@@ -1,99 +1,101 @@
-#include "tree.h"
+#include "rb.h"
 
 #include <stdio.h>
 #include <stdlib.h>
 
 #include "info_lib.h"
-#include "tree_lib.h"
+#include "rb_lib.h"
 
 void
-node_print(Node* node, Tree* tree) {
-    tree->info->key_print(node->key);
-    tree->info->data_print(node->data);
+node_print(Node* node, RB* rb) {
+    rb->info->key_print(node->key);
+    rb->info->data_print(node->data);
     printf("\n");
 }
 
 void
-node_dealloc(Node* node, Tree* tree) {
-    tree->info->key_dealloc(node->key);
-    tree->info->data_dealloc(node->data);
+node_dealloc(Node* node, RB* rb) {
+    rb->info->key_dealloc(node->key);
+    rb->info->data_dealloc(node->data);
     free(node);
 }
 
 Foo
-tree_init(Tree** tree, Info* info) {
-    if (tree == NULL || __info_valid(info) == BAD_DATA) {
+rb_init(RB** rb, Info* info) {
+    if (rb == NULL || __info_valid(info) == BAD_DATA) {
         return BAD_DATA;
     }
-    *tree = (Tree*)calloc(1, sizeof(Tree));
-    if (*tree == NULL) {
+    *rb = (RB*)calloc(1, sizeof(RB));
+    if (*rb == NULL) {
         return BAD_ALLOC;
     }
-    (*tree)->info = info;
+    (*rb)->info = info;
     return OK;
 }
 
 Foo
-tree_insert(Tree* tree, void* key, void* data, void** result) {
-    if (__tree_valid(tree) == BAD_DATA || key == NULL || data == NULL || result == NULL) {
+rb_insert(RB* rb, void* key, void* data, void** result) {
+    if (__rb_valid(rb) == BAD_DATA || key == NULL || data == NULL || result == NULL) {
         return BAD_DATA;
     }
     Foo return_code = OK;
     Node *node_result = NULL, *node = NULL;
-    switch (tree_search(tree, key, &node_result)) {
+    switch (rb_search(rb, key, &node_result)) {
         case OK:
-            *result = node_result->data;
-            node_result->data = data;
+            if (__list_push(&(node_result->list), data) == BAD_ALLOC) {
+                return BAD_ALLOC;
+            }
             return DUPLICATE;
         case NOT_FOUND:
             if ((return_code = __node_init(&node, key, data)) != OK) {
                 return return_code;
             }
             if (node_result == NULL) {
-                tree->root = node;
-            } else if ((*tree->info->compare)(key, node_result->key) == LESS) {
+                rb->root = node;
+            } else if ((*rb->info->compare)(key, node_result->key) == LESS) {
                 node_result->left = node;
             } else {
                 node_result->right = node;
             }
             node->parent = node_result;
-            return OK;
         default: return BAD_DATA;
     }
+    __rb_insert_fixup(rb, node);
+    return OK;
 }
 
 Foo
-tree_delete(Tree* tree, void* key) {
-    if (__tree_valid(tree) == BAD_DATA || key == NULL) {
+rb_delete(RB* rb, void* key) {
+    if (__rb_valid(rb) == BAD_DATA || key == NULL) {
         return BAD_DATA;
     }
     Foo return_code = OK;
     Node *successor = NULL, *result = NULL;
-    if ((return_code = tree_search(tree, key, &result)) != OK) {
+    if ((return_code = rb_search(rb, key, &result)) != OK) {
         return return_code;
     }
     if (result->left == NULL) {
-        __tree_transplant(tree, result, result->right);
+        __rb_transplant(rb, result, result->right);
     } else if (result->right == NULL) {
-        __tree_transplant(tree, result, result->left);
+        __rb_transplant(rb, result, result->left);
     } else {
         successor = __node_minimum(result->right);
         if (successor != result->right) {
-            __tree_transplant(tree, successor, successor->right);
+            __rb_transplant(rb, successor, successor->right);
             successor->right = result->right;
             successor->right->parent = successor;
         }
-        __tree_transplant(tree, result, successor);
+        __rb_transplant(rb, result, successor);
         successor->left = result->left;
         successor->left->parent = successor;
     }
-    node_dealloc(result, tree);
+    node_dealloc(result, rb);
     return OK;
 }
 
 Node*
-tree_maximum(Tree* tree) {
-    Node* root = tree->root;
+rb_maximum(RB* rb) {
+    Node* root = rb->root;
     while (root != NULL && root->right != NULL) {
         root = root->right;
     }
@@ -101,13 +103,13 @@ tree_maximum(Tree* tree) {
 }
 
 Foo
-tree_search(Tree* tree, void* key, Node** result) {
-    if (__tree_valid(tree) == BAD_DATA || key == NULL || result == NULL) {
+rb_search(RB* rb, void* key, Node** result) {
+    if (__rb_valid(rb) == BAD_DATA || key == NULL || result == NULL) {
         return BAD_DATA;
     }
-    fptr_compare compare = tree->info->compare;
+    fptr_compare compare = rb->info->compare;
     Compare return_code = EQUAL;
-    Node *root = tree->root, *parent = NULL;
+    Node *root = rb->root, *parent = NULL;
     while (root != NULL && (return_code = (*compare)(key, root->key)) != EQUAL) {
         parent = root;
         if (return_code == LESS) {
@@ -125,28 +127,28 @@ tree_search(Tree* tree, void* key, Node** result) {
 }
 
 Foo
-tree_dealloc(Tree* tree) {
-    Foo return_code = __tree_dealloc(tree);
+rb_dealloc(RB* rb) {
+    Foo return_code = __rb_dealloc(rb);
     if (return_code != OK) {
         return return_code;
     }
-    free(tree);
+    free(rb);
     return OK;
 }
 
 void
-tree_print_2D(Tree* tree) {
-    __tree_2D(tree, tree->root, 0);
+rb_print_2D(RB* rb) {
+    __rb_2D(rb, rb->root, 0);
 }
 
 Foo
-tree_print_postorder(Tree* tree) {
+rb_print_postorder(RB* rb) {
     printf("key\tdata\n");
-    return __tree_postorder(tree, node_print);
+    return __rb_postorder(rb, node_print);
 }
 
 void
-tree_print_desc(Tree* tree) {
+rb_print_desc(RB* rb) {
     printf("key\tdata\n");
-    __tree_desc(tree, tree->root);
+    __rb_desc(rb, rb->root);
 }

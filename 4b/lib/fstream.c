@@ -4,23 +4,23 @@
 
 #include "fstream_lib.h"
 #include "numbers.h"
+#include "rb_lib.h"
 #include "readline.h"
-#include "tree_lib.h"
 
 Foo
-import_txt(Tree* tree, const char* file_name) {
+import_txt(RB* rb, const char* file_name) {
     Foo return_code = OK;
     size_t key = 0;
     size_t* key_ptr = NULL;
     void* tmp = NULL;
     char* data = NULL;
-    if (__tree_valid(tree) == BAD_DATA) {
+    if (__rb_valid(rb) == BAD_DATA) {
         return BAD_DATA;
     }
-    if ((return_code = __tree_dealloc(tree)) != OK) {
+    if ((return_code = __rb_dealloc(rb)) != OK) {
         return return_code;
     }
-    tree->root = NULL;
+    rb->root = NULL;
     FILE* file = fopen(file_name, "r");
     if (file == NULL) {
         return BAD_FILE;
@@ -38,7 +38,7 @@ import_txt(Tree* tree, const char* file_name) {
             fclose(file);
             return OK;
         }
-        return_code = tree_insert(tree, key_ptr, data, &tmp);
+        return_code = rb_insert(rb, key_ptr, data, &tmp);
         if (return_code != OK && return_code != DUPLICATE) {
             free(key_ptr);
             free(data);
@@ -53,8 +53,8 @@ import_txt(Tree* tree, const char* file_name) {
 }
 
 Foo
-export_dot(Tree* tree) {
-    if (__tree_valid(tree) == BAD_DATA) {
+export_dot(RB* rb) {
+    if (__rb_valid(rb) == BAD_DATA) {
         return BAD_DATA;
     }
     const char* file_name = "output.dot";
@@ -64,7 +64,7 @@ export_dot(Tree* tree) {
     }
     fprintf(file, "graph BST {\n");
     fclose(file);
-    Foo return_code = __tree_postorder(tree, __export_dot);
+    Foo return_code = __rb_postorder(rb, __export_dot);
     if (return_code != OK) {
         return return_code;
     }
@@ -77,7 +77,7 @@ export_dot(Tree* tree) {
 }
 
 void
-__export_dot(Node* node, Tree* tree) {
+__export_dot(Node* node, RB* rb) {
     const char* file_name = "output.dot";
     static FILE* file = NULL;
     if (file == NULL) {
@@ -90,7 +90,7 @@ __export_dot(Node* node, Tree* tree) {
     if (node->right != NULL) {
         fprintf(file, "%zu -- %zu\n", *((size_t*)node->key), *((size_t*)node->right->key));
     }
-    if (node == tree->root) {
+    if (node == rb->root) {
         fclose(file);
         file = NULL;
     }

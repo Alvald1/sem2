@@ -1,8 +1,8 @@
 #ifndef LAB4A_4A_LIB_FSTREAM_LIB_H_
 #define LAB4A_4A_LIB_FSTREAM_LIB_H_
 
-#include "tree.h"
+#include "rb.h"
 
-void __export_dot(Node* node, Tree* tree);
+void __export_dot(Node* node, RB* rb);
 
 #endif
