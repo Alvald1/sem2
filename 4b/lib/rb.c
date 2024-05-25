@@ -9,14 +9,14 @@
 void
 node_print(Node* node, RB* rb) {
     rb->info->key_print(node->key);
-    rb->info->data_print(node->data);
+    //rb->info->data_print(node->data);
     printf("\n");
 }
 
 void
 node_dealloc(Node* node, RB* rb) {
     rb->info->key_dealloc(node->key);
-    rb->info->data_dealloc(node->data);
+    //rb->info->data_dealloc(node->data);
     free(node);
 }
 
@@ -25,10 +25,16 @@ rb_init(RB** rb, Info* info) {
     if (rb == NULL || __info_valid(info) == BAD_DATA) {
         return BAD_DATA;
     }
-    *rb = (RB*)calloc(1, sizeof(RB));
-    if (*rb == NULL) {
+    *rb = (RB*)malloc(sizeof(RB));
+    Node* nil = (Node*)calloc(1, sizeof(Node));
+    if (*rb == NULL || nil == NULL) {
+        free(*rb);
+        free(nil);
         return BAD_ALLOC;
     }
+    nil->color = BLACK;
+    (*rb)->root = nil;
+    (*rb)->nil = nil;
     (*rb)->info = info;
     return OK;
 }
@@ -39,7 +45,7 @@ rb_insert(RB* rb, void* key, void* data, void** result) {
         return BAD_DATA;
     }
     Foo return_code = OK;
-    Node *node_result = NULL, *node = NULL;
+    Node *node_result = rb->nil, *node = NULL;
     switch (rb_search(rb, key, &node_result)) {
         case OK:
             if (__list_push(&(node_result->list), data) == BAD_ALLOC) {
@@ -47,10 +53,10 @@ rb_insert(RB* rb, void* key, void* data, void** result) {
             }
             return DUPLICATE;
         case NOT_FOUND:
-            if ((return_code = __node_init(&node, key, data)) != OK) {
+            if ((return_code = __node_init(rb, &node, key, data)) != OK) {
                 return return_code;
             }
-            if (node_result == NULL) {
+            if (node_result == rb->nil) {
                 rb->root = node;
             } else if ((*rb->info->compare)(key, node_result->key) == LESS) {
                 node_result->left = node;
@@ -58,6 +64,7 @@ rb_insert(RB* rb, void* key, void* data, void** result) {
                 node_result->right = node;
             }
             node->parent = node_result;
+            break;
         default: return BAD_DATA;
     }
     __rb_insert_fixup(rb, node);
@@ -109,8 +116,8 @@ rb_search(RB* rb, void* key, Node** result) {
     }
     fptr_compare compare = rb->info->compare;
     Compare return_code = EQUAL;
-    Node *root = rb->root, *parent = NULL;
-    while (root != NULL && (return_code = (*compare)(key, root->key)) != EQUAL) {
+    Node *root = rb->root, *parent = rb->nil;
+    while (root != rb->nil && (return_code = (*compare)(key, root->key)) != EQUAL) {
         parent = root;
         if (return_code == LESS) {
             root = root->left;
@@ -118,7 +125,7 @@ rb_search(RB* rb, void* key, Node** result) {
             root = root->right;
         }
     }
-    if (root != NULL) {
+    if (root != rb->nil) {
         *result = root;
         return OK;
     }

@@ -7,6 +7,8 @@
 
 typedef enum _color { RED, BLACK } Color;
 
+extern const char* colors[];
+
 struct _list {
     List* next;
     void* data;
@@ -22,6 +24,7 @@ struct _node {
 
 struct _rb {
     Node* root;
+    Node* nil;
     Info* info;
 };
 
@@ -34,8 +37,10 @@ Foo __rb_postorder(RB* rb, fptr_action action);
 void __rb_transplant(RB* rb, Node* u, Node* v);
 Foo __rb_valid(RB* rb);
 Node* __node_minimum(Node* root);
-Foo __node_init(Node** node, void* key, void* data);
+Foo __node_init(RB* rb, Node** node, void* key, void* data);
 Foo __list_push(List** list, void* data);
+void __left_rotate(RB* rb, Node* node);
+void __right_rotate(RB* rb, Node* node);
 void __rb_insert_fixup(RB* rb, Node* node);
 
 #endif

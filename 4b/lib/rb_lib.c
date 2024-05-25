@@ -7,6 +7,8 @@
 
 #define COUNT 10
 
+const char* colors[] = {"red", "black"};
+
 Foo
 __list_push(List** list, void* data) {
     List* new = (List*)malloc(sizeof(List));
@@ -29,8 +31,8 @@ __node_minimum(Node* root) {
 }
 
 Foo
-__node_init(Node** node, void* key, void* data) {
-    *node = (Node*)calloc(1, sizeof(Node));
+__node_init(RB* rb, Node** node, void* key, void* data) {
+    *node = (Node*)malloc(sizeof(Node));
     List* list = (List*)malloc(sizeof(List));
     if (*node == NULL || list == NULL) {
         free(*node);
@@ -40,6 +42,8 @@ __node_init(Node** node, void* key, void* data) {
     list->data = data;
     list->next = NULL;
     list->release = 1;
+    (*node)->left = rb->nil;
+    (*node)->right = rb->nil;
     (*node)->key = key;
     (*node)->list = list;
     (*node)->color = RED;
@@ -101,39 +105,39 @@ __rb_transplant(RB* rb, Node* u, Node* v) {
 Foo
 __rb_postorder(RB* rb, fptr_action action) {
     Foo return_code = OK;
-    Node* current = NULL;
-    Node *previous = NULL, *predecessor = NULL;
-    Node *successor = NULL, *temp = NULL;
-    if (rb->root == NULL) {
+    Node* current = rb->nil;
+    Node *previous = rb->nil, *predecessor = rb->nil;
+    Node *successor = rb->nil, *temp = rb->nil;
+    if (rb->root == rb->nil) {
         return OK;
     }
-    if ((return_code = __node_init(&current, NULL, NULL)) != OK) {
+    if ((return_code = __node_init(rb, &current, NULL, NULL)) != OK) {
         return return_code;
     }
     current->left = rb->root;
-    while (current != NULL) {
-        if (current->left == NULL) {
+    while (current != rb->nil) {
+        if (current->left == rb->nil) {
             current = current->right;
         } else {
             predecessor = current->left;
-            while (predecessor->right != NULL && predecessor->right != current) {
+            while (predecessor->right != rb->nil && predecessor->right != current) {
                 predecessor = predecessor->right;
             }
-            if (predecessor->right == NULL) {
+            if (predecessor->right == rb->nil) {
                 predecessor->right = current;
                 current = current->left;
             } else {
-                predecessor->right = NULL;
+                predecessor->right = rb->nil;
                 successor = current;
                 current = current->left;
-                previous = NULL;
-                while (current != NULL) {
+                previous = rb->nil;
+                while (current != rb->nil) {
                     temp = current->right;
                     current->right = previous;
                     previous = current;
                     current = temp;
                 }
-                while (previous != NULL) {
+                while (previous != rb->nil) {
                     temp = previous->right;
                     previous->right = current;
                     current = previous;
@@ -150,24 +154,62 @@ __rb_postorder(RB* rb, fptr_action action) {
 }
 
 void
+__left_rotate(RB* rb, Node* node) {
+    Node* current = node->right;
+    node->right = current->left;
+    if (current->left != rb->nil) {
+        current->left->parent = node;
+    }
+    current->parent = node->parent;
+    if (node->parent == rb->nil) {
+        rb->root = current;
+    } else if (node == node->parent->left) {
+        node->parent->left = current;
+    } else {
+        node->parent->right = current;
+    }
+    current->left = node;
+    node->parent = current;
+}
+
+void
+__right_rotate(RB* rb, Node* node) {
+    Node* current = node->left;
+    node->left = current->right;
+    if (current->right != rb->nil) {
+        current->left->parent = node;
+    }
+    current->parent = node->parent;
+    if (node->parent == rb->nil) {
+        rb->root = current;
+    } else if (node == node->parent->left) {
+        node->parent->left = current;
+    } else {
+        node->parent->right = current;
+    }
+    current->right = node;
+    node->parent = current;
+}
+
+void
 __rb_insert_fixup(RB* rb, Node* node) {
     Node* uncle = NULL;
     while (node->parent->color == RED) {
         if (node->parent == node->parent->parent->left) {
             uncle = node->parent->parent->right;
-            if (uncle->color == RED) {
-                node->parent->color = BLACK;
+            if (uncle->color == RED) {       //дядя - красный
+                node->parent->color = BLACK; //средний уровень - черный
                 uncle->color = BLACK;
-                node->parent->parent->color = RED;
+                node->parent->parent->color = RED; //остальные - красный
                 node = node->parent->parent;
-            } else {
-                if (node == node->parent->right) {
-                    node = node->parent;
-                    __left_rotate(rb, node);
-                }
-                node->parent->color = BLACK;
+            } else {                               //дядя - черный
+                if (node == node->parent->right) { //справа
+                    node = node->parent;           //перепрыгнуть на родителя
+                    __left_rotate(rb, node);       //левый поворот от себя
+                } //слева
+                node->parent->color = BLACK; //смена цветов деда и родителя
                 node->parent->parent->color = RED;
-                __right_rotate(rb, node->parent->parent);
+                __right_rotate(rb, node->parent->parent); //правый поворот от деда
             }
         } else {
             uncle = node->parent->parent->left;
@@ -186,6 +228,6 @@ __rb_insert_fixup(RB* rb, Node* node) {
                 __left_rotate(rb, node->parent->parent);
             }
         }
-        rb->root->color = BLACK;
     }
+    rb->root->color = BLACK;
 }
