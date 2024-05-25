@@ -40,8 +40,8 @@ rb_init(RB** rb, Info* info) {
 }
 
 Foo
-rb_insert(RB* rb, void* key, void* data, void** result) {
-    if (__rb_valid(rb) == BAD_DATA || key == NULL || data == NULL || result == NULL) {
+rb_insert(RB* rb, void* key, void* data) {
+    if (__rb_valid(rb) == BAD_DATA || key == NULL || data == NULL) {
         return BAD_DATA;
     }
     Node *node_result = rb->nil, *node = NULL;
@@ -109,15 +109,6 @@ rb_delete(RB* rb, void* key) {
         __rb_delete_fixup(rb, node);
     }
     return OK;
-}
-
-Node*
-rb_maximum(RB* rb) {
-    Node* root = rb->root;
-    while (root != NULL && root->right != NULL) {
-        root = root->right;
-    }
-    return root;
 }
 
 Foo

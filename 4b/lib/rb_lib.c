@@ -65,7 +65,7 @@ __rb_valid(RB* rb) {
 
 void
 __rb_2D(RB* rb, Node* node, size_t space) {
-    if (node == NULL) {
+    if (node == rb->nil) {
         return;
     }
     space += COUNT;
@@ -80,7 +80,7 @@ __rb_2D(RB* rb, Node* node, size_t space) {
 
 void
 __rb_desc(RB* rb, Node* node) {
-    if (node == NULL) {
+    if (node == rb->nil) {
         return;
     }
     __rb_desc(rb, node->right);
@@ -128,14 +128,14 @@ __rb_postorder(RB* rb, fptr_action action) {
                 predecessor->right = rb->nil;
                 successor = current;
                 current = current->left;
-                previous = rb->nil;
+                previous = NULL;
                 while (current != rb->nil) {
                     temp = current->right;
                     current->right = previous;
                     previous = current;
                     current = temp;
                 }
-                while (previous != rb->nil) {
+                while (previous != NULL) {
                     temp = previous->right;
                     previous->right = current;
                     current = previous;

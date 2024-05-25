@@ -12,7 +12,6 @@ import_txt(RB* rb, const char* file_name) {
     Foo return_code = OK;
     size_t key = 0;
     size_t* key_ptr = NULL;
-    void* tmp = NULL;
     char* data = NULL;
     if (__rb_valid(rb) == BAD_DATA) {
         return BAD_DATA;
@@ -38,13 +37,12 @@ import_txt(RB* rb, const char* file_name) {
             fclose(file);
             return OK;
         }
-        return_code = rb_insert(rb, key_ptr, data, &tmp);
+        return_code = rb_insert(rb, key_ptr, data);
         if (return_code != OK && return_code != DUPLICATE) {
             free(key_ptr);
             free(data);
         } else if (return_code == DUPLICATE) {
             free(key_ptr);
-            free(tmp);
         }
         fprintf(stderr, "%s", errors[return_code]);
     }

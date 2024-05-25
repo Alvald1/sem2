@@ -10,7 +10,7 @@
 #include "lib/readline.h"
 
 #define PROMPT                                                                                                         \
-    "\n(i) - insert\n(r) - remove\n(s) - search\n(m) - search max key\n(2) - print_2D\n(d) - print_desc\n(p) - "       \
+    "\n(i) - insert\n(r) - remove\n(s) - search\n(2) - print_2D\n(d) - print_desc\n(p) - "                             \
     "print_postorder\n(f) - "                                                                                          \
     "file\n(g) - graphViz\n"
 
@@ -50,7 +50,6 @@ main() {
                 }
                 break;
             case 'g': graphviz(rb); break;
-            case 'm': max(rb); break;
             case '2': print_2D(rb); break;
             case 'p': print_postorder(rb); break;
             case 'd': print_desc(rb); break;
@@ -87,24 +86,22 @@ file(RB* rb) {
 
 Foo
 insert(RB* rb) {
-    size_t key = 0;
-    char* data = NULL;
-    if (read_num(&key, "Key: ") == EOF || (data = readline(stdin, "Data: ")) == NULL) {
+    size_t data = 0;
+    char* key = NULL;
+    if ((key = readline(stdin, "Key: ")) == NULL || read_num(&data, "Data: ") == EOF) {
         rb_dealloc(rb);
         return _EOF;
     }
-    size_t* key_ptr = gen_number(key);
+    size_t* data_ptr = gen_number(data);
     Foo return_code = OK;
-    void* tmp = NULL;
-    if (key_ptr == NULL) {
-        free(data);
+    if (data_ptr == NULL) {
+        free(key);
         return_code = BAD_ALLOC;
-    } else if ((return_code = rb_insert(rb, key_ptr, data, &tmp)) != OK && return_code != DUPLICATE) {
-        free(key_ptr);
-        free(data);
+    } else if ((return_code = rb_insert(rb, key, data_ptr)) != OK && return_code != DUPLICATE) {
+        free(data_ptr);
+        free(key);
     } else if (return_code == DUPLICATE) {
-        free(key_ptr);
-        free(tmp);
+        free(key);
     }
     fprintf(stderr, "%s", errors[return_code]);
     return OK;
@@ -112,12 +109,13 @@ insert(RB* rb) {
 
 Foo
 _delete(RB* rb) {
-    size_t num;
-    if (read_num(&num, "Key: ") == EOF) {
+    char* key = NULL;
+    if ((key = readline(stdin, "Key: ")) == NULL) {
         rb_dealloc(rb);
         return _EOF;
     }
-    Foo return_code = rb_delete(rb, &num);
+    Foo return_code = rb_delete(rb, key);
+    free(key);
     fprintf(stderr, "%s", errors[return_code]);
     return OK;
 }
@@ -125,12 +123,13 @@ _delete(RB* rb) {
 Foo
 search(RB* rb) {
     Node* node = NULL;
-    size_t key = 0;
-    if (read_num(&key, "Key: ") == EOF) {
+    char* key = NULL;
+    if ((key = readline(stdin, "Key: ")) == NULL) {
         rb_dealloc(rb);
         return _EOF;
     }
-    Foo return_code = rb_search(rb, &key, &node);
+    Foo return_code = rb_search(rb, key, &node);
+    free(key);
     fprintf(stderr, "%s", errors[return_code]);
     printf("\n");
     if (return_code == OK) {
@@ -138,16 +137,6 @@ search(RB* rb) {
         node_print(node, rb);
     }
     return OK;
-}
-
-void
-max(RB* rb) {
-    Node* node = rb_maximum(rb);
-    if (node != NULL) {
-        printf("key\tdata\n");
-        node_print(node, rb);
-    }
-    fprintf(stderr, "%s", errors[OK]);
 }
 
 void

@@ -8,6 +8,7 @@ readline(FILE* file, const char* prompt) {
     char* new_buffer = NULL;
     char* buffer = (char*)malloc(max_len);
     char* cur_pos = buffer;
+    scanf("%*c");
     while (1) {
         cnt = 0;
         if (fscanf(file, "%50[^\n]%n", cur_pos, &cnt) == EOF) {

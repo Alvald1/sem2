@@ -14,7 +14,6 @@ Foo _delete(RB* rb);
 Foo file(RB* rb);
 Foo search(RB* rb);
 void graphviz(RB* rb);
-void max(RB* rb);
 void print_desc(RB* rb);
 void print_postorder(RB* rb);
 void print_2D(RB* rb);
