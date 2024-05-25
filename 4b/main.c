@@ -43,7 +43,6 @@ main() {
                 }
                 break;
             case 'f':
-                scanf("%*c");
                 if (file(rb) == _EOF) {
                     info_dealloc(info);
                     return 0;

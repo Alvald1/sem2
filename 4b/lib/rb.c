@@ -141,6 +141,7 @@ rb_dealloc(RB* rb) {
     if (return_code != OK) {
         return return_code;
     }
+    free(rb->nil);
     free(rb);
     return OK;
 }

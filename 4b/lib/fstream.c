@@ -10,39 +10,38 @@
 Foo
 import_txt(RB* rb, const char* file_name) {
     Foo return_code = OK;
-    size_t key = 0;
-    size_t* key_ptr = NULL;
-    char* data = NULL;
+    size_t data = 0;
+    size_t* data_ptr = NULL;
+    char* key = NULL;
     if (__rb_valid(rb) == BAD_DATA) {
         return BAD_DATA;
     }
     if ((return_code = __rb_dealloc(rb)) != OK) {
         return return_code;
     }
-    rb->root = NULL;
+    rb->root = rb->nil;
     FILE* file = fopen(file_name, "r");
     if (file == NULL) {
         return BAD_FILE;
     }
-    while (fscanf(file, "%zu", &key) != EOF) {
-        key_ptr = gen_number(key);
-        if (key_ptr == NULL) {
+    while ((key = readline(file, "")) != NULL) {
+        if (key == NULL) {
             fclose(file);
             return BAD_ALLOC;
         }
-        fscanf(file, "%*c");
-        data = readline(file, "");
-        if (data == NULL) {
-            free(key_ptr);
+        fscanf(file, "%zu", &data);
+        data_ptr = gen_number(data);
+        if (data_ptr == NULL) {
+            free(key);
             fclose(file);
             return OK;
         }
-        return_code = rb_insert(rb, key_ptr, data);
+        return_code = rb_insert(rb, key, data_ptr);
         if (return_code != OK && return_code != DUPLICATE) {
-            free(key_ptr);
-            free(data);
+            free(data_ptr);
+            free(key);
         } else if (return_code == DUPLICATE) {
-            free(key_ptr);
+            free(key);
         }
         fprintf(stderr, "%s", errors[return_code]);
     }
