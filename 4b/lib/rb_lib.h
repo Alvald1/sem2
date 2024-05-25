@@ -36,11 +36,12 @@ void __rb_desc(RB* rb, Node* node);
 Foo __rb_postorder(RB* rb, fptr_action action);
 void __rb_transplant(RB* rb, Node* u, Node* v);
 Foo __rb_valid(RB* rb);
-Node* __node_minimum(Node* root);
+Node* __node_minimum(RB* rb, Node* root);
 Foo __node_init(RB* rb, Node** node, void* key, void* data);
 Foo __list_push(List** list, void* data);
 void __left_rotate(RB* rb, Node* node);
 void __right_rotate(RB* rb, Node* node);
 void __rb_insert_fixup(RB* rb, Node* node);
+void __rb_delete_fixup(RB* rb, Node* node);
 
 #endif

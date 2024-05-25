@@ -23,8 +23,8 @@ __list_push(List** list, void* data) {
 }
 
 Node*
-__node_minimum(Node* root) {
-    while (root->left != NULL) {
+__node_minimum(RB* rb, Node* root) {
+    while (root->left != rb->nil) {
         root = root->left;
     }
     return root;
@@ -90,16 +90,14 @@ __rb_desc(RB* rb, Node* node) {
 
 void
 __rb_transplant(RB* rb, Node* u, Node* v) {
-    if (u->parent == NULL) {
+    if (u->parent == rb->nil) {
         rb->root = v;
     } else if (u == u->parent->left) {
         u->parent->left = v;
     } else {
         u->parent->right = v;
     }
-    if (v != NULL) {
-        v->parent = u->parent;
-    }
+    v->parent = u->parent;
 }
 
 Foo
@@ -230,4 +228,61 @@ __rb_insert_fixup(RB* rb, Node* node) {
         }
     }
     rb->root->color = BLACK;
+}
+
+void
+__rb_delete_fixup(RB* rb, Node* node) {
+    Node* brother = NULL;
+    while (node != rb->root && node->color == BLACK) {
+        if (node == node->parent->left) {
+            brother = node->parent->right;
+            if (brother->color == RED) {
+                brother->color = BLACK;
+                node->parent->color = RED;
+                __left_rotate(rb, node->parent);
+                brother = node->parent->right;
+            }
+            if (brother->left->color == BLACK && brother->right->color == BLACK) {
+                brother->color = RED;
+                node = node->parent;
+            } else {
+                if (brother->right->color == BLACK) {
+                    brother->left->color = BLACK;
+                    brother->color = RED;
+                    __right_rotate(rb, brother);
+                    brother = node->parent->right;
+                }
+                brother->color = node->parent->color;
+                node->parent->color = BLACK;
+                brother->right->color = BLACK;
+                __left_rotate(rb, node->parent);
+                node = rb->root;
+            }
+        } else {
+            brother = node->parent->left;
+            if (brother->color == RED) {
+                brother->color = BLACK;
+                node->parent->color = RED;
+                __right_rotate(rb, node->parent);
+                brother = node->parent->left;
+            }
+            if (brother->left->color == BLACK && brother->right->color == BLACK) {
+                brother->color = RED;
+                node = node->parent;
+            } else {
+                if (brother->left->color == BLACK) {
+                    brother->right->color = BLACK;
+                    brother->color = RED;
+                    __left_rotate(rb, brother);
+                    brother = node->parent->left;
+                }
+                brother->color = node->parent->color;
+                node->parent->color = BLACK;
+                brother->left->color = BLACK;
+                __right_rotate(rb, node->parent);
+                node = rb->root;
+            }
+        }
+    }
+    node->color = BLACK;
 }

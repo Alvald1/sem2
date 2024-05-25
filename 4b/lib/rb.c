@@ -44,7 +44,6 @@ rb_insert(RB* rb, void* key, void* data, void** result) {
     if (__rb_valid(rb) == BAD_DATA || key == NULL || data == NULL || result == NULL) {
         return BAD_DATA;
     }
-    Foo return_code = OK;
     Node *node_result = rb->nil, *node = NULL;
     switch (rb_search(rb, key, &node_result)) {
         case OK:
@@ -53,8 +52,8 @@ rb_insert(RB* rb, void* key, void* data, void** result) {
             }
             return DUPLICATE;
         case NOT_FOUND:
-            if ((return_code = __node_init(rb, &node, key, data)) != OK) {
-                return return_code;
+            if (__node_init(rb, &node, key, data) == BAD_ALLOC) {
+                return BAD_ALLOC;
             }
             if (node_result == rb->nil) {
                 rb->root = node;
@@ -77,17 +76,25 @@ rb_delete(RB* rb, void* key) {
         return BAD_DATA;
     }
     Foo return_code = OK;
-    Node *successor = NULL, *result = NULL;
+    Node *successor = NULL, *result = NULL, *node = NULL;
     if ((return_code = rb_search(rb, key, &result)) != OK) {
         return return_code;
     }
-    if (result->left == NULL) {
+    successor = result;
+    Color successor_orig_color = successor->color;
+    if (result->left == rb->nil) {
+        node = result->right;
         __rb_transplant(rb, result, result->right);
-    } else if (result->right == NULL) {
+    } else if (result->right == rb->nil) {
+        node = result->left;
         __rb_transplant(rb, result, result->left);
     } else {
-        successor = __node_minimum(result->right);
-        if (successor != result->right) {
+        successor = __node_minimum(rb, result->right);
+        successor_orig_color = successor->color;
+        node = successor->right;
+        if (successor == result->right) {
+            node->parent = successor;
+        } else {
             __rb_transplant(rb, successor, successor->right);
             successor->right = result->right;
             successor->right->parent = successor;
@@ -95,8 +102,12 @@ rb_delete(RB* rb, void* key) {
         __rb_transplant(rb, result, successor);
         successor->left = result->left;
         successor->left->parent = successor;
+        successor->color = result->color;
     }
     node_dealloc(result, rb);
+    if (successor_orig_color == BLACK) {
+        __rb_delete_fixup(rb, node);
+    }
     return OK;
 }
 
