@@ -7,6 +7,8 @@
 
 typedef enum _color { RED, BLACK } Color;
 
+typedef enum _count { ONE, MANY, _NOT_FOUND } Count;
+
 extern const char* colors[];
 
 struct _list {
@@ -30,6 +32,7 @@ struct _rb {
 
 typedef void (*fptr_action)(Node* node, RB* rb);
 
+Count __delete_release(RB* rb, List** list, size_t release);
 Foo __rb_dealloc(RB* rb);
 void __rb_2D(RB* rb, Node* node, size_t space);
 void __rb_desc(RB* rb, Node* node);

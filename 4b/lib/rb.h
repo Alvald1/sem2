@@ -10,7 +10,7 @@ typedef struct _node Node;
 
 Foo rb_init(RB** rb, Info* info);
 Foo rb_insert(RB* rb, void* key, void* data);
-Foo rb_delete(RB* rb, void* key);
+Foo rb_delete(RB* rb, void* key, size_t release);
 Foo rb_search(RB* rb, void* key, Node** result);
 Foo rb_print_postorder(RB* rb);
 void rb_print_2D(RB* rb);

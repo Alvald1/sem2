@@ -50,6 +50,33 @@ __node_init(RB* rb, Node** node, void* key, void* data) {
     return OK;
 }
 
+Count
+__delete_release(RB* rb, List** list, size_t release) {
+    if ((*list)->next == NULL) {
+        return ONE;
+    }
+    List *current = NULL, *temp = NULL;
+    if ((*list)->release == release) {
+        rb->info->data_dealloc((*list)->data);
+        current = (*list);
+        *list = (*list)->next;
+        free(current);
+        return MANY;
+    }
+    current = *list;
+    while (current->next != NULL) {
+        if ((*list)->next->release == release) {
+            rb->info->data_dealloc((*list)->next->data);
+            temp = (*list)->next;
+            (*list)->next = temp->next;
+            free(temp);
+            return MANY;
+        }
+        current = current->next;
+    }
+    return _NOT_FOUND;
+}
+
 Foo
 __rb_dealloc(RB* rb) {
     return __rb_postorder(rb, node_dealloc);

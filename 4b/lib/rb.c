@@ -9,14 +9,25 @@
 void
 node_print(Node* node, RB* rb) {
     rb->info->key_print(node->key);
-    //rb->info->data_print(node->data);
+    List* current = node->list;
+    while (current != NULL) {
+        rb->info->data_print(current->data);
+        printf(":%zu\t", current->release);
+        current = current->next;
+    }
     printf("\n");
 }
 
 void
 node_dealloc(Node* node, RB* rb) {
     rb->info->key_dealloc(node->key);
-    //rb->info->data_dealloc(node->data);
+    List *current = node->list, *temp = NULL;
+    while (current != NULL) {
+        rb->info->data_dealloc(current->data);
+        temp = current;
+        current = current->next;
+        free(temp);
+    }
     free(node);
 }
 
@@ -71,7 +82,7 @@ rb_insert(RB* rb, void* key, void* data) {
 }
 
 Foo
-rb_delete(RB* rb, void* key) {
+rb_delete(RB* rb, void* key, size_t release) {
     if (__rb_valid(rb) == BAD_DATA || key == NULL) {
         return BAD_DATA;
     }
@@ -79,6 +90,11 @@ rb_delete(RB* rb, void* key) {
     Node *successor = NULL, *result = NULL, *node = NULL;
     if ((return_code = rb_search(rb, key, &result)) != OK) {
         return return_code;
+    }
+    switch (__delete_release(rb, &(result->list), release)) {
+        case ONE: break;
+        case MANY: return OK;
+        case _NOT_FOUND: return NOT_FOUND;
     }
     successor = result;
     Color successor_orig_color = successor->color;

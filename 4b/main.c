@@ -109,11 +109,16 @@ insert(RB* rb) {
 Foo
 _delete(RB* rb) {
     char* key = NULL;
+    size_t release = 0;
     if ((key = readline(stdin, "Key: ")) == NULL) {
         rb_dealloc(rb);
         return _EOF;
     }
-    Foo return_code = rb_delete(rb, key);
+    if ((read_num(&release, "Release: ")) == EOF) {
+        free(key);
+        rb_dealloc(rb);
+    }
+    Foo return_code = rb_delete(rb, key, release);
     free(key);
     fprintf(stderr, "%s", errors[return_code]);
     return OK;
@@ -168,7 +173,7 @@ key_print(void* key) {
 
 void
 data_print(void* data) {
-    printf("%zu\t", *((size_t*)data));
+    printf("%zu", *((size_t*)data));
 }
 
 Compare
