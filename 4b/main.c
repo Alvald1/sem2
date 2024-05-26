@@ -10,7 +10,7 @@
 #include "lib/readline.h"
 
 #define PROMPT                                                                                                         \
-    "\n(i) - insert\n(r) - remove\n(s) - search\n(2) - print_2D\n"                                                     \
+    "\n(i) - insert\n(r) - remove\n(s) - search\n(S) - search_nearest\n(2) - print_2D\n"                               \
     "(p) - print_inorder\n(P) - print_postorder\n(o) - print_out_of_range\n"                                           \
     "(f) - file\n(g) - graphViz\n"
 
@@ -38,6 +38,12 @@ main() {
                 break;
             case 's':
                 if (search(rb) == _EOF) {
+                    info_dealloc(info);
+                    return 0;
+                }
+                break;
+            case 'S':
+                if (search_nearest(rb) == _EOF) {
                     info_dealloc(info);
                     return 0;
                 }
@@ -136,6 +142,25 @@ search(RB* rb) {
         return _EOF;
     }
     Foo return_code = rb_search(rb, key, &node);
+    free(key);
+    fprintf(stderr, "%s", errors[return_code]);
+    printf("\n");
+    if (return_code == OK) {
+        printf("key\tdata\n");
+        node_print(rb, node);
+    }
+    return OK;
+}
+
+Foo
+search_nearest(RB* rb) {
+    Node* node = NULL;
+    char* key = NULL;
+    if ((key = readline(stdin, "Key: ")) == NULL) {
+        rb_dealloc(rb);
+        return _EOF;
+    }
+    Foo return_code = rb_search_nearest(rb, key, &node);
     free(key);
     fprintf(stderr, "%s", errors[return_code]);
     printf("\n");

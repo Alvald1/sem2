@@ -43,6 +43,19 @@ __node_minimum(RB* rb, Node* root) {
     return root;
 }
 
+Node*
+__rb_successor(RB* rb, Node* node) {
+    if (node->right != rb->nil) {
+        return __node_minimum(rb, node->right);
+    }
+    Node* successor = node->parent;
+    while (successor != rb->nil && node == successor->right) {
+        node = successor;
+        successor = successor->parent;
+    }
+    return successor;
+}
+
 void
 __node_print(RB* rb, Node* node, const char* left, const char* right) {
     Compare compare_left, compare_right;

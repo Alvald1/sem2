@@ -149,6 +149,25 @@ rb_dealloc(RB* rb) {
     return OK;
 }
 
+Foo
+rb_search_nearest(RB* rb, void* key, Node** result) {
+    switch (rb_search(rb, key, result)) {
+        case OK: *result = __rb_successor(rb, *result); break;
+        case NOT_FOUND:
+            switch (rb->info->compare(key, (*result)->key)) {
+                case LESS: break;
+                case MORE: *result = __rb_successor(rb, *result); break;
+                default: return OK;
+            }
+            break;
+        default: return BAD_DATA;
+    }
+    if (*result != rb->nil) {
+        return OK;
+    }
+    return NOT_FOUND;
+}
+
 void
 rb_print_2D(RB* rb) {
     __rb_2D(rb, rb->root, 0);

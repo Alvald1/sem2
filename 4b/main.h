@@ -13,6 +13,7 @@ Foo insert(RB* rb);
 Foo _delete(RB* rb);
 Foo file(RB* rb);
 Foo search(RB* rb);
+Foo search_nearest(RB* rb);
 void graphviz(RB* rb);
 Foo print_out_of_range(RB* rb);
 void print_inorder(RB* rb);
