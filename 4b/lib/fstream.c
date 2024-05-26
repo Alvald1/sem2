@@ -61,10 +61,7 @@ export_dot(RB* rb) {
     }
     fprintf(file, "graph BST {\n");
     fclose(file);
-    Foo return_code = __rb_postorder(rb, __export_dot);
-    if (return_code != OK) {
-        return return_code;
-    }
+    __rb_postorder(rb, __export_dot);
     file = fopen(file_name, "a");
     fprintf(file, "}\n");
     fclose(file);
@@ -80,12 +77,12 @@ __export_dot(Node* node, RB* rb) {
     if (file == NULL) {
         file = fopen(file_name, "a");
     }
-    fprintf(file, "%zu [color = %s]\n", *((size_t*)node->key), colors[node->color]);
+    fprintf(file, "%s [color = %s]\n", (char*)node->key, colors[node->color]);
     if (node->left != rb->nil) {
-        fprintf(file, "%zu -- %zu\n", *((size_t*)node->key), *((size_t*)node->left->key));
+        fprintf(file, "%s -- %s\n", (char*)node->key, (char*)node->left->key);
     }
     if (node->right != rb->nil) {
-        fprintf(file, "%zu -- %zu\n", *((size_t*)node->key), *((size_t*)node->right->key));
+        fprintf(file, "%s -- %s\n", (char*)node->key, (char*)node->right->key);
     }
     if (node == rb->root) {
         fclose(file);

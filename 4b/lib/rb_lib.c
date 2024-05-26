@@ -106,16 +106,6 @@ __rb_2D(RB* rb, Node* node, size_t space) {
 }
 
 void
-__rb_desc(RB* rb, Node* node) {
-    if (node == rb->nil) {
-        return;
-    }
-    __rb_desc(rb, node->right);
-    node_print(node, rb);
-    __rb_desc(rb, node->left);
-}
-
-void
 __rb_transplant(RB* rb, Node* u, Node* v) {
     if (u->parent == rb->nil) {
         rb->root = v;
@@ -176,6 +166,36 @@ __rb_postorder(RB* rb, fptr_action action) {
     }
     node_dealloc(successor, rb);
     return OK;
+}
+
+void
+__rb_inorder(RB* rb, fptr_action action) {
+    Node *current = NULL, *predecessor = NULL, *temp = NULL;
+    if (rb->root == rb->nil) {
+        return;
+    }
+    current = rb->root;
+    while (current != rb->nil) {
+        if (current->left == rb->nil) {
+            temp = current->right;
+            (*action)(current, rb);
+            current = temp;
+        } else {
+            predecessor = current->left;
+            while (predecessor->right != rb->nil && predecessor->right != current) {
+                predecessor = predecessor->right;
+            }
+            if (predecessor->right == rb->nil) {
+                predecessor->right = current;
+                current = current->left;
+            } else {
+                predecessor->right = rb->nil;
+                temp = current->right;
+                (*action)(current, rb);
+                current = temp;
+            }
+        }
+    }
 }
 
 void

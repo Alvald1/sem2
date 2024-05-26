@@ -10,8 +10,8 @@
 #include "lib/readline.h"
 
 #define PROMPT                                                                                                         \
-    "\n(i) - insert\n(r) - remove\n(s) - search\n(2) - print_2D\n(d) - print_desc\n(p) - "                             \
-    "print_postorder\n(f) - "                                                                                          \
+    "\n(i) - insert\n(r) - remove\n(s) - search\n(2) - print_2D\n(p) - "                                               \
+    "print_inorder\n(P) - print_postorder\n(f) - "                                                                     \
     "file\n(g) - graphViz\n"
 
 int
@@ -50,8 +50,8 @@ main() {
                 break;
             case 'g': graphviz(rb); break;
             case '2': print_2D(rb); break;
-            case 'p': print_postorder(rb); break;
-            case 'd': print_desc(rb); break;
+            case 'p': print_inorder(rb); break;
+            case 'P': print_postorder(rb); break;
             default: printf("Incorrect input_2\n"); break;
         }
         scanf("%*[^\n]");
@@ -144,21 +144,21 @@ search(RB* rb) {
 }
 
 void
-print_desc(RB* rb) {
-    rb_print_desc(rb);
-    fprintf(stderr, "%s", errors[OK]);
-}
-
-void
 print_2D(RB* rb) {
     rb_print_2D(rb);
     fprintf(stderr, "%s", errors[OK]);
 }
 
 void
+print_inorder(RB* rb) {
+    rb_print_inorder(rb);
+    fprintf(stderr, "%s", errors[OK]);
+}
+
+void
 print_postorder(RB* rb) {
-    Foo return_code = rb_print_postorder(rb);
-    fprintf(stderr, "%s", errors[return_code]);
+    rb_print_postorder(rb);
+    fprintf(stderr, "%s", errors[OK]);
 }
 
 void

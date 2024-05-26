@@ -167,14 +167,14 @@ rb_print_2D(RB* rb) {
     __rb_2D(rb, rb->root, 0);
 }
 
-Foo
-rb_print_postorder(RB* rb) {
+void
+rb_print_inorder(RB* rb) {
     printf("key\tdata\n");
-    return __rb_postorder(rb, node_print);
+    __rb_inorder(rb, node_print);
 }
 
 void
-rb_print_desc(RB* rb) {
+rb_print_postorder(RB* rb) {
     printf("key\tdata\n");
-    __rb_desc(rb, rb->root);
+    __rb_postorder(rb, node_print);
 }
