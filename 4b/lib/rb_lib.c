@@ -220,23 +220,23 @@ void
 __rb_insert_fixup(RB* rb, Node* node) {
     Node* uncle = NULL;
     while (node->parent->color == RED) {
-        if (node->parent == node->parent->parent->left) {
+        if (node->parent == node->parent->parent->left) { //левый сын?
             uncle = node->parent->parent->right;
-            if (uncle->color == RED) {       //дядя - красный
+            if (uncle->color == RED) {       //дядя - красный?
                 node->parent->color = BLACK; //средний уровень - черный
                 uncle->color = BLACK;
                 node->parent->parent->color = RED; //остальные - красный
                 node = node->parent->parent;
-            } else {                               //дядя - черный
-                if (node == node->parent->right) { //справа
+            } else {                               //дядя - черный?
+                if (node == node->parent->right) { //справа?
                     node = node->parent;           //перепрыгнуть на родителя
                     __left_rotate(rb, node);       //левый поворот от себя
-                } //слева
+                } //слева?
                 node->parent->color = BLACK; //смена цветов деда и родителя
                 node->parent->parent->color = RED;
                 __right_rotate(rb, node->parent->parent); //правый поворот от деда
             }
-        } else {
+        } else { //правый сын?
             uncle = node->parent->parent->left;
             if (uncle->color == RED) {
                 node->parent->color = BLACK;
@@ -261,31 +261,31 @@ void
 __rb_delete_fixup(RB* rb, Node* node) {
     Node* brother = NULL;
     while (node != rb->root && node->color == BLACK) {
-        if (node == node->parent->left) {
+        if (node == node->parent->left) { //левый сын?
             brother = node->parent->right;
-            if (brother->color == RED) {
-                brother->color = BLACK;
+            if (brother->color == RED) { //брат-красный?
+                brother->color = BLACK;  //смена цветов брата и родителя
                 node->parent->color = RED;
-                __left_rotate(rb, node->parent);
+                __left_rotate(rb, node->parent); //левый поворот от родителя
                 brother = node->parent->right;
             }
-            if (brother->left->color == BLACK && brother->right->color == BLACK) {
-                brother->color = RED;
-                node = node->parent;
+            if (brother->left->color == BLACK && brother->right->color == BLACK) { //брат-черный? дети-черные?
+                brother->color = RED;                                              //брат-красный
+                node = node->parent; //перепрыгнуть на родителя
             } else {
-                if (brother->right->color == BLACK) {
-                    brother->left->color = BLACK;
+                if (brother->right->color == BLACK) { //левый ребенок-красный?
+                    brother->left->color = BLACK; //смена цветов брата и левого ребенка
                     brother->color = RED;
-                    __right_rotate(rb, brother);
+                    __right_rotate(rb, brother); //правый поворот от брата
                     brother = node->parent->right;
-                }
-                brother->color = node->parent->color;
-                node->parent->color = BLACK;
-                brother->right->color = BLACK;
-                __left_rotate(rb, node->parent);
+                } //правый ребенок-красный?
+                brother->color = node->parent->color; //брат-цвет родителя
+                node->parent->color = BLACK;          //родитель-черный
+                brother->right->color = BLACK;        //ребенок-черный
+                __left_rotate(rb, node->parent);      //левый поворот от родителя
                 node = rb->root;
             }
-        } else {
+        } else { //правый сын?
             brother = node->parent->left;
             if (brother->color == RED) {
                 brother->color = BLACK;
