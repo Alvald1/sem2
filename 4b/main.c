@@ -11,8 +11,8 @@
 
 #define PROMPT                                                                                                         \
     "\n(i) - insert\n(r) - remove\n(s) - search\n(2) - print_2D\n"                                                     \
-    "(p) - print_inorder\n(P) - print_postorder\n(f) - "                                                               \
-    "file\n(g) - graphViz\n"
+    "(p) - print_inorder\n(P) - print_postorder\n(o) - print_out_of_range\n"                                           \
+    "(f) - file\n(g) - graphViz\n"
 
 int
 main() {
@@ -135,9 +135,22 @@ search(RB* rb) {
     printf("\n");
     if (return_code == OK) {
         printf("key\tdata\n");
-        node_print(node, rb);
+        node_print(rb, node);
     }
     return OK;
+}
+
+Foo
+print_out_of_range(RB* rb) {
+    char *left = NULL, *right = NULL;
+    if ((left = readline(stdin, "Left: ")) == NULL || (right = readline(stdin, "Right: ")) == NULL) {
+        free(left);
+        free(right);
+        rb_dealloc(rb);
+        return _EOF;
+    }
+    rb_print_out_of_range(rb, left, right);
+    fprintf(stderr, "%s", errors[OK]);
 }
 
 void

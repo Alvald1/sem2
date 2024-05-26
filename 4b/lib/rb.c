@@ -7,7 +7,7 @@
 #include "rb_lib.h"
 
 void
-node_print(Node* node, RB* rb) {
+node_print(RB* rb, Node* node) {
     rb->info->key_print(node->key);
     List* current = node->list;
     while (current != NULL) {
@@ -16,19 +16,6 @@ node_print(Node* node, RB* rb) {
         current = current->next;
     }
     printf("\n");
-}
-
-void
-node_dealloc(Node* node, RB* rb) {
-    rb->info->key_dealloc(node->key);
-    List *current = node->list, *temp = NULL;
-    while (current != NULL) {
-        rb->info->data_dealloc(current->data);
-        temp = current;
-        current = current->next;
-        free(temp);
-    }
-    free(node);
 }
 
 Foo
@@ -120,7 +107,7 @@ rb_delete(RB* rb, void* key, size_t release) {
         successor->left->parent = successor;
         successor->color = result->color;
     }
-    node_dealloc(result, rb);
+    __node_dealloc(result, rb);
     if (successor_orig_color == BLACK) {
         __rb_delete_fixup(rb, node);
     }
@@ -177,4 +164,9 @@ void
 rb_print_postorder(RB* rb) {
     printf("key\tdata\n");
     __rb_postorder(rb, node_print);
+}
+
+void
+rb_print_out_of_range(RB* rb, const char* left, const char* right) {
+    printf("key\tdata\n");
 }

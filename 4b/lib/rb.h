@@ -15,8 +15,8 @@ Foo rb_search(RB* rb, void* key, Node** result);
 void rb_print_inorder(RB* rb);
 void rb_print_postorder(RB* rb);
 void rb_print_2D(RB* rb);
+void rb_print_out_of_range(RB* rb, const char* left, const char* right);
 Foo rb_dealloc(RB* rb);
-void node_print(Node* node, RB* rb);
-void node_dealloc(Node* node, RB* rb);
+void node_print(RB* rb, Node* node);
 
 #endif

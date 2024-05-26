@@ -30,8 +30,9 @@ struct _rb {
     Info* info;
 };
 
-typedef void (*fptr_action)(Node* node, RB* rb);
+typedef void (*fptr_action)(RB* rb, Node* node);
 
+void __node_dealloc(RB* rb, Node* node);
 Count __delete_release(RB* rb, List** list, size_t release);
 Foo __rb_dealloc(RB* rb);
 void __rb_2D(RB* rb, Node* node, size_t space);
@@ -39,6 +40,7 @@ Foo __rb_postorder(RB* rb, fptr_action action);
 void __rb_inorder(RB* rb, fptr_action action);
 void __rb_transplant(RB* rb, Node* u, Node* v);
 Foo __rb_valid(RB* rb);
+void __node_print(RB* rb, Node* node, const char* left, const char* right);
 Node* __node_minimum(RB* rb, Node* root);
 Foo __node_init(RB* rb, Node** node, void* key, void* data);
 Foo __list_push(List** list, void* data);

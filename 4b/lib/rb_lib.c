@@ -9,6 +9,19 @@
 
 const char* colors[] = {"red", "black"};
 
+void
+__node_dealloc(RB* rb, Node* node) {
+    rb->info->key_dealloc(node->key);
+    List *current = node->list, *temp = NULL;
+    while (current != NULL) {
+        rb->info->data_dealloc(current->data);
+        temp = current;
+        current = current->next;
+        free(temp);
+    }
+    free(node);
+}
+
 Foo
 __list_push(List** list, void* data) {
     List* new = (List*)malloc(sizeof(List));
@@ -28,6 +41,16 @@ __node_minimum(RB* rb, Node* root) {
         root = root->left;
     }
     return root;
+}
+
+void
+__node_print(RB* rb, Node* node, const char* left, const char* right) {
+    Compare compare_left, compare_right;
+    compare_left = rb->info->compare(node->key, left);
+    compare_right = rb->info->compare(node->key, right);
+    if (compare_left == LESS && compare_right == MORE) {
+        node_print(rb, node);
+    }
 }
 
 Foo
@@ -79,7 +102,7 @@ __delete_release(RB* rb, List** list, size_t release) {
 
 Foo
 __rb_dealloc(RB* rb) {
-    return __rb_postorder(rb, node_dealloc);
+    return __rb_postorder(rb, __node_dealloc);
 }
 
 Foo
@@ -156,7 +179,7 @@ __rb_postorder(RB* rb, fptr_action action) {
                     temp = previous->right;
                     previous->right = current;
                     current = previous;
-                    (*action)(previous, rb);
+                    (*action)(rb, previous);
                     previous = temp;
                 }
                 current = successor;
@@ -164,7 +187,7 @@ __rb_postorder(RB* rb, fptr_action action) {
             }
         }
     }
-    node_dealloc(successor, rb);
+    __node_dealloc(successor, rb);
     return OK;
 }
 
@@ -177,7 +200,7 @@ __rb_inorder(RB* rb, fptr_action action) {
     current = rb->root;
     while (current != rb->nil) {
         if (current->left == rb->nil) {
-            (*action)(current, rb);
+            (*action)(rb, current);
             current = current->right;
         } else {
             predecessor = current->left;
@@ -189,7 +212,7 @@ __rb_inorder(RB* rb, fptr_action action) {
                 current = current->left;
             } else {
                 predecessor->right = rb->nil;
-                (*action)(current, rb);
+                (*action)(rb, current);
                 current = current->right;
             }
         }
