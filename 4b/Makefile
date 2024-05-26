@@ -49,15 +49,15 @@ fuzz: afl
 	echo 'i' > in/i
 	echo 'r' > in/r
 	echo 's' > in/s
-	echo 'f' > in/f
+	echo 'S' > in/S
 	echo 'g' > in/g
-	echo 'm' > in/m
+	echo 'P' > in/P
 	echo '2' > in/2
 	echo 'p' > in/p
 	echo 'd' > in/d
 	echo 'ir' > in/ir
 	echo 'sf' > in/sf
-	echo 'gmp' > in/gmp
+	echo 'grp' > in/grp
 	echo 'd2p' > in/d2p
 	echo 'i123' > in/i123
 	echo 'r456' > in/r456

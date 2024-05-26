@@ -147,7 +147,13 @@ __rb_2D(RB* rb, Node* node, size_t space) {
     for (size_t i = COUNT; i < space; ++i) {
         printf(" ");
     }
+    if (node->color == RED) {
+        printf("\033[31m");
+    } else {
+        printf("\033[90m");
+    }
     rb->info->key_print(node->key);
+    printf("\033[0m");
     __rb_2D(rb, node->left, space);
 }
 

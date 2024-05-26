@@ -8,6 +8,11 @@
 
 void
 node_print(RB* rb, Node* node) {
+    if (node->color == RED) {
+        printf("\033[31m");
+    } else {
+        printf("\033[90m");
+    }
     rb->info->key_print(node->key);
     List* current = node->list;
     while (current != NULL) {
@@ -15,6 +20,7 @@ node_print(RB* rb, Node* node) {
         printf(":%zu\t", current->release);
         current = current->next;
     }
+    printf("\033[0m");
     printf("\n");
 }
 
