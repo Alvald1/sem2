@@ -46,11 +46,21 @@ __node_minimum(RB* rb, Node* root) {
 void
 __node_print(RB* rb, Node* node, const char* left, const char* right) {
     Compare compare_left, compare_right;
-    compare_left = rb->info->compare(node->key, left);
-    compare_right = rb->info->compare(node->key, right);
-    if (compare_left == LESS && compare_right == MORE) {
+    compare_left = rb->info->compare(node->key, (void*)left);
+    compare_right = rb->info->compare(node->key, (void*)right);
+    if (compare_left == LESS || compare_right == MORE) {
         node_print(rb, node);
     }
+}
+
+void
+__rb_out_of_range(RB* rb, Node* node, const char* left, const char* right) {
+    if (node == rb->nil) {
+        return;
+    }
+    __rb_out_of_range(rb, node->left, left, right);
+    __node_print(rb, node, left, right);
+    __rb_out_of_range(rb, node->right, left, right);
 }
 
 Foo
@@ -187,7 +197,7 @@ __rb_postorder(RB* rb, fptr_action action) {
             }
         }
     }
-    __node_dealloc(successor, rb);
+    __node_dealloc(rb, successor);
     return OK;
 }
 

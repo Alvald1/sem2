@@ -3,6 +3,6 @@
 
 #include "rb.h"
 
-void __export_dot(Node* node, RB* rb);
+void __export_dot(RB* rb, Node* node);
 
 #endif

@@ -71,7 +71,7 @@ export_dot(RB* rb) {
 }
 
 void
-__export_dot(Node* node, RB* rb) {
+__export_dot(RB* rb, Node* node) {
     const char* file_name = "output.dot";
     static FILE* file = NULL;
     if (file == NULL) {

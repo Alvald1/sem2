@@ -107,7 +107,7 @@ rb_delete(RB* rb, void* key, size_t release) {
         successor->left->parent = successor;
         successor->color = result->color;
     }
-    __node_dealloc(result, rb);
+    __node_dealloc(rb, result);
     if (successor_orig_color == BLACK) {
         __rb_delete_fixup(rb, node);
     }
@@ -169,4 +169,5 @@ rb_print_postorder(RB* rb) {
 void
 rb_print_out_of_range(RB* rb, const char* left, const char* right) {
     printf("key\tdata\n");
+    __rb_out_of_range(rb, rb->root, left, right);
 }

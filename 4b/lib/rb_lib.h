@@ -36,6 +36,7 @@ void __node_dealloc(RB* rb, Node* node);
 Count __delete_release(RB* rb, List** list, size_t release);
 Foo __rb_dealloc(RB* rb);
 void __rb_2D(RB* rb, Node* node, size_t space);
+void __rb_out_of_range(RB* rb, Node* node, const char* left, const char* right);
 Foo __rb_postorder(RB* rb, fptr_action action);
 void __rb_inorder(RB* rb, fptr_action action);
 void __rb_transplant(RB* rb, Node* u, Node* v);

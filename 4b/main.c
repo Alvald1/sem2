@@ -48,6 +48,12 @@ main() {
                     return 0;
                 }
                 break;
+            case 'o':
+                if (print_out_of_range(rb) == _EOF) {
+                    info_dealloc(info);
+                    return 0;
+                }
+                break;
             case 'g': graphviz(rb); break;
             case '2': print_2D(rb); break;
             case 'p': print_inorder(rb); break;
@@ -150,7 +156,10 @@ print_out_of_range(RB* rb) {
         return _EOF;
     }
     rb_print_out_of_range(rb, left, right);
+    free(left);
+    free(right);
     fprintf(stderr, "%s", errors[OK]);
+    return OK;
 }
 
 void
