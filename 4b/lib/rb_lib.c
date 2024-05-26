@@ -97,7 +97,7 @@ __rb_2D(RB* rb, Node* node, size_t space) {
     }
     space += COUNT;
     __rb_2D(rb, node->right, space);
-    printf("\n");
+    printf("\n\n");
     for (size_t i = COUNT; i < space; ++i) {
         printf(" ");
     }
@@ -120,9 +120,9 @@ __rb_transplant(RB* rb, Node* u, Node* v) {
 Foo
 __rb_postorder(RB* rb, fptr_action action) {
     Foo return_code = OK;
-    Node* current = rb->nil;
-    Node *previous = rb->nil, *predecessor = rb->nil;
-    Node *successor = rb->nil, *temp = rb->nil;
+    Node* current = NULL;
+    Node *previous = NULL, *predecessor = NULL;
+    Node *successor = NULL, *temp = NULL;
     if (rb->root == rb->nil) {
         return OK;
     }
@@ -170,16 +170,15 @@ __rb_postorder(RB* rb, fptr_action action) {
 
 void
 __rb_inorder(RB* rb, fptr_action action) {
-    Node *current = NULL, *predecessor = NULL, *temp = NULL;
+    Node *current = NULL, *predecessor = NULL;
     if (rb->root == rb->nil) {
         return;
     }
     current = rb->root;
     while (current != rb->nil) {
         if (current->left == rb->nil) {
-            temp = current->right;
             (*action)(current, rb);
-            current = temp;
+            current = current->right;
         } else {
             predecessor = current->left;
             while (predecessor->right != rb->nil && predecessor->right != current) {
@@ -190,9 +189,8 @@ __rb_inorder(RB* rb, fptr_action action) {
                 current = current->left;
             } else {
                 predecessor->right = rb->nil;
-                temp = current->right;
                 (*action)(current, rb);
-                current = temp;
+                current = current->right;
             }
         }
     }

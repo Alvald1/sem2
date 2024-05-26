@@ -10,8 +10,8 @@
 #include "lib/readline.h"
 
 #define PROMPT                                                                                                         \
-    "\n(i) - insert\n(r) - remove\n(s) - search\n(2) - print_2D\n(p) - "                                               \
-    "print_inorder\n(P) - print_postorder\n(f) - "                                                                     \
+    "\n(i) - insert\n(r) - remove\n(s) - search\n(2) - print_2D\n"                                                     \
+    "(p) - print_inorder\n(P) - print_postorder\n(f) - "                                                               \
     "file\n(g) - graphViz\n"
 
 int
@@ -110,13 +110,10 @@ Foo
 _delete(RB* rb) {
     char* key = NULL;
     size_t release = 0;
-    if ((key = readline(stdin, "Key: ")) == NULL) {
+    if ((key = readline(stdin, "Key: ")) == NULL || (read_num(&release, "Release: ")) == EOF) {
         rb_dealloc(rb);
-        return _EOF;
-    }
-    if ((read_num(&release, "Release: ")) == EOF) {
         free(key);
-        rb_dealloc(rb);
+        return _EOF;
     }
     Foo return_code = rb_delete(rb, key, release);
     free(key);
