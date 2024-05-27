@@ -109,11 +109,14 @@ insert(RB* rb) {
     if (data_ptr == NULL) {
         free(key);
         return_code = BAD_ALLOC;
-    } else if ((return_code = rb_insert(rb, key, data_ptr)) != OK && return_code != DUPLICATE) {
-        free(data_ptr);
-        free(key);
-    } else if (return_code == DUPLICATE) {
-        free(key);
+    } else {
+        return_code = rb_insert(rb, key, data_ptr);
+        if (return_code != OK && return_code != DUPLICATE) {
+            free(data_ptr);
+            free(key);
+        } else if (return_code == DUPLICATE) {
+            free(key);
+        }
     }
     fprintf(stderr, "insert - %s", errors[return_code]);
     return OK;
