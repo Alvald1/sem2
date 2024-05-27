@@ -90,7 +90,7 @@ rb_delete(RB* rb, void* key, size_t release) {
         case _NOT_FOUND: return NOT_FOUND;
     }
     successor = result;
-    Color successor_orig_color = successor->color;
+    Color successor_original_color = successor->color;
     if (result->left == rb->nil) {
         node = result->right;
         __rb_transplant(rb, result, result->right);
@@ -99,14 +99,14 @@ rb_delete(RB* rb, void* key, size_t release) {
         __rb_transplant(rb, result, result->left);
     } else {
         successor = __node_minimum(rb, result->right);
-        successor_orig_color = successor->color;
+        successor_original_color = successor->color;
         node = successor->right;
-        if (successor == result->right) {
-            node->parent = successor;
-        } else {
+        if (successor != result->right) {
             __rb_transplant(rb, successor, successor->right);
             successor->right = result->right;
             successor->right->parent = successor;
+        } else {
+            node->parent = successor;
         }
         __rb_transplant(rb, result, successor);
         successor->left = result->left;
@@ -114,7 +114,7 @@ rb_delete(RB* rb, void* key, size_t release) {
         successor->color = result->color;
     }
     __node_dealloc(rb, result);
-    if (successor_orig_color == BLACK) {
+    if (successor_original_color == BLACK) {
         __rb_delete_fixup(rb, node);
     }
     return OK;
@@ -160,10 +160,12 @@ rb_search_nearest(RB* rb, void* key, Node** result) {
     switch (rb_search(rb, key, result)) {
         case OK: *result = __rb_successor(rb, *result); break;
         case NOT_FOUND:
-            switch (rb->info->compare(key, (*result)->key)) {
-                case LESS: break;
-                case MORE: *result = __rb_successor(rb, *result); break;
-                default: return OK;
+            if (*result != rb->nil) {
+                switch (rb->info->compare(key, (*result)->key)) {
+                    case LESS: break;
+                    case MORE: *result = __rb_successor(rb, *result); break;
+                    default: return OK;
+                }
             }
             break;
         default: return BAD_DATA;

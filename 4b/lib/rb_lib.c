@@ -12,13 +12,6 @@ const char* colors[] = {"red", "black"};
 void
 __node_dealloc(RB* rb, Node* node) {
     rb->info->key_dealloc(node->key);
-    List *current = node->list, *temp = NULL;
-    while (current != NULL) {
-        rb->info->data_dealloc(current->data);
-        temp = current;
-        current = current->next;
-        free(temp);
-    }
     free(node);
 }
 
@@ -98,26 +91,23 @@ __node_init(RB* rb, Node** node, void* key, void* data) {
 
 Count
 __delete_release(RB* rb, List** list, size_t release) {
-    if ((*list)->next == NULL) {
-        return ONE;
-    }
-    List *current = NULL, *temp = NULL;
-    if ((*list)->release == release) {
-        rb->info->data_dealloc((*list)->data);
-        current = (*list);
-        *list = (*list)->next;
-        free(current);
-        return MANY;
-    }
-    current = *list;
-    while (current->next != NULL) {
-        if ((*list)->next->release == release) {
-            rb->info->data_dealloc((*list)->next->data);
-            temp = (*list)->next;
-            (*list)->next = temp->next;
-            free(temp);
-            return MANY;
+    List *current = *list, *previous = NULL;
+    while (current != NULL) {
+        if (current->release == release) {
+            rb->info->data_dealloc(current->data);
+            if (previous == NULL) {
+                *list = current->next;
+            } else {
+                previous->next = current->next;
+            }
+            free(current);
+            if (*list == NULL) {
+                return ONE;
+            } else {
+                return MANY;
+            }
         }
+        previous = current;
         current = current->next;
     }
     return _NOT_FOUND;
@@ -272,7 +262,7 @@ __right_rotate(RB* rb, Node* node) {
     Node* current = node->left;
     node->left = current->right;
     if (current->right != rb->nil) {
-        current->left->parent = node;
+        current->right->parent = node;
     }
     current->parent = node->parent;
     if (node->parent == rb->nil) {

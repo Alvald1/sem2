@@ -78,7 +78,7 @@ main() {
 void
 graphviz(RB* rb) {
     Foo return_code = export_dot(rb);
-    fprintf(stderr, "%s", errors[return_code]);
+    fprintf(stderr, "graphviz - %s", errors[return_code]);
 }
 
 Foo
@@ -91,7 +91,7 @@ file(RB* rb) {
     }
     return_code = import_txt(rb, file_name);
     free(file_name);
-    fprintf(stderr, "%s", errors[return_code]);
+    fprintf(stderr, "file - %s", errors[return_code]);
     return OK;
 }
 
@@ -101,6 +101,7 @@ insert(RB* rb) {
     char* key = NULL;
     if ((key = readline(stdin, "Key: ")) == NULL || read_num(&data, "Data: ") == EOF) {
         rb_dealloc(rb);
+        free(key);
         return _EOF;
     }
     size_t* data_ptr = gen_number(data);
@@ -114,7 +115,7 @@ insert(RB* rb) {
     } else if (return_code == DUPLICATE) {
         free(key);
     }
-    fprintf(stderr, "%s", errors[return_code]);
+    fprintf(stderr, "insert - %s", errors[return_code]);
     return OK;
 }
 
@@ -129,7 +130,7 @@ _delete(RB* rb) {
     }
     Foo return_code = rb_delete(rb, key, release);
     free(key);
-    fprintf(stderr, "%s", errors[return_code]);
+    fprintf(stderr, "_delete - %s", errors[return_code]);
     return OK;
 }
 
@@ -143,12 +144,11 @@ search(RB* rb) {
     }
     Foo return_code = rb_search(rb, key, &node);
     free(key);
-    fprintf(stderr, "%s", errors[return_code]);
-    printf("\n");
     if (return_code == OK) {
         printf("key\tdata\n");
         node_print(rb, node);
     }
+    fprintf(stderr, "search - %s", errors[return_code]);
     return OK;
 }
 
@@ -162,12 +162,11 @@ search_nearest(RB* rb) {
     }
     Foo return_code = rb_search_nearest(rb, key, &node);
     free(key);
-    fprintf(stderr, "%s", errors[return_code]);
-    printf("\n");
     if (return_code == OK) {
         printf("key\tdata\n");
         node_print(rb, node);
     }
+    fprintf(stderr, "search_nearest - %s", errors[return_code]);
     return OK;
 }
 
@@ -183,26 +182,26 @@ print_out_of_range(RB* rb) {
     rb_print_out_of_range(rb, left, right);
     free(left);
     free(right);
-    fprintf(stderr, "%s", errors[OK]);
+    fprintf(stderr, "print_out_of_range - %s", errors[OK]);
     return OK;
 }
 
 void
 print_2D(RB* rb) {
     rb_print_2D(rb);
-    fprintf(stderr, "%s", errors[OK]);
+    fprintf(stderr, "print_2D - %s", errors[OK]);
 }
 
 void
 print_inorder(RB* rb) {
     rb_print_inorder(rb);
-    fprintf(stderr, "%s", errors[OK]);
+    fprintf(stderr, "print_inorder - %s", errors[OK]);
 }
 
 void
 print_postorder(RB* rb) {
     rb_print_postorder(rb);
-    fprintf(stderr, "%s", errors[OK]);
+    fprintf(stderr, "print_postorder - %s", errors[OK]);
 }
 
 void
