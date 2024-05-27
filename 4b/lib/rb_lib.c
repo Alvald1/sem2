@@ -12,6 +12,13 @@ const char* colors[] = {"red", "black"};
 void
 __node_dealloc(RB* rb, Node* node) {
     rb->info->key_dealloc(node->key);
+    List *current = node->list, *temp = NULL;
+    while (current != NULL) {
+        rb->info->data_dealloc(current->data);
+        temp = current;
+        current = current->next;
+        free(temp);
+    }
     free(node);
 }
 
