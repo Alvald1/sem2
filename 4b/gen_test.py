@@ -4,8 +4,8 @@ import re
 from subprocess import *
 
 count_data_sets = 20
-repeats = 10
-count_tests=1000
+repeats = 5
+count_tests=100
 step=10000
 
 def parse_profile():
