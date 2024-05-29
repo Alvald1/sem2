@@ -66,7 +66,7 @@ def data_sets():
         with open(f"data_sets/{i}",'w') as file:
             for _ in range(step*i):  
                 rand=randint(0,100000000000)
-                file.write(f'{rand}\n{rand}\n')
+                file.write(f'\n{rand}\n{rand}')
 
 def tests():
     for i in range(count_data_sets):
@@ -75,10 +75,10 @@ def tests():
             for _ in range(count_tests):  
                 rand=randint(0,100000000000)
                 file.write(f'i\n{rand}\n{rand}\n')
-                file.write(f's\n{rand}\n\n')
-                file.write(f'r\n{rand}\n\n')
-                file.write('m\n')
-                file.write('p\n')
+                file.write(f's\n{rand}\n')
+                file.write(f'r\n{rand}\n1\n')
+                file.write('S\np\n')
+                file.write(f'o\n{randint(0,100000000000)}\n{randint(0,100000000000)}\n')
 
 def run():
     for i in range(count_data_sets):
