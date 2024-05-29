@@ -1,13 +1,15 @@
 from random import *
 import os
 import re
+from subprocess import *
 
-count_files = 20
-repeats = 5
-count_tests=100
+count_data_sets = 20
+repeats = 10
+count_tests=1000
+step=10000
 
 def parse_profile():
-    for i in range(count_files):
+    for i in range(count_data_sets):
         cumulative_seconds_search = []
         cumulative_seconds_insert = []
         cumulative_seconds_delete = []
@@ -52,39 +54,37 @@ def parse_profile():
         avg_cumulative_seconds_print_postorder = sum(cumulative_seconds_print_postorder) / len(cumulative_seconds_print_postorder) if cumulative_seconds_print_postorder else 0
         avg_cumulative_seconds_max = sum(cumulative_seconds_max) / len(cumulative_seconds_max) if cumulative_seconds_max else 0
 
-        print(f"search: {2**i} {avg_cumulative_seconds_search/count_tests}")
-        print(f"insert: {2**i} {avg_cumulative_seconds_insert/count_tests}")
-        print(f"delete: {2**i} {avg_cumulative_seconds_delete/count_tests}")
-        print(f"print_postorder: {2**i} {avg_cumulative_seconds_print_postorder/count_tests}")
-        print(f"max: {2**i} {avg_cumulative_seconds_max/count_tests}")
+        print(f"search: {step * i} {avg_cumulative_seconds_search/count_tests}")
+        print(f"insert: {step * i} {avg_cumulative_seconds_insert/count_tests}")
+        print(f"delete: {step * i} {avg_cumulative_seconds_delete/count_tests}")
+        print(f"print_postorder: {step * i} {avg_cumulative_seconds_print_postorder/count_tests}")
+        print(f"max: {step * i} {avg_cumulative_seconds_max/count_tests}")
 
 
-def gen_data_set():
-    i=0
-    n=1
-    for i in range(count_files):
-        with open(f"data_set/test_gen_{i}.txt",'w') as file:
-            for _ in range(n):  
+def data_sets():
+    for i in range(count_data_sets):
+        with open(f"data_sets/{i}",'w') as file:
+            for _ in range(step*i):  
                 rand=randint(0,100000000000)
-                file.write(str(rand)+'\n')
-                file.write(' \n')
-        n*=2
+                file.write(f'{rand}\n{rand}\n')
 
-def gen_test_gen():
-    for i in range(count_files):
-        with open(f"test_gen/test_gen_{i}.txt",'w') as file:
-            file.write(f'f data_set/test_gen_{i}.txt\n')
+def tests():
+    for i in range(count_data_sets):
+        with open(f"tests/{i}",'w') as file:
+            file.write(f'f\ndata_sets/{i}\n')
             for _ in range(count_tests):  
                 rand=randint(0,100000000000)
-                file.write('i\n'+str(rand)+'\n\n')
-                file.write('s\n'+str(rand)+'\n\n')
-                file.write('r\n'+str(rand)+'\n\n')
+                file.write(f'i\n{rand}\n{rand}\n')
+                file.write(f's\n{rand}\n\n')
+                file.write(f'r\n{rand}\n\n')
                 file.write('m\n')
                 file.write('p\n')
 
-def test():
-    for i in range(count_files):
+def run():
+    for i in range(count_data_sets):
         for j in range(repeats):
-            os.system(f"./bin_gprof < test_gen/test_gen_{i}.txt")
-            os.system(f'gprof bin_gprof gmon.out > res_dir/result_{i}_{j}')
-            os.system('rm gmon.out')
+            with open(f"tests/{i}",'r') as stdin, open(f'res_dir/result_{i}_{j}', 'w') as stdout:
+                call('./bin_gprof',stdin=stdin,stdout=DEVNULL,stderr=DEVNULL)
+                call(['gprof','bin_gprof','gmon.out'],stdout=stdout)
+                call(['rm','gmon.out'])
+                print(f'i = {i} j = {j}')

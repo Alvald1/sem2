@@ -17,7 +17,7 @@ all:
 	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_clean" SAN=""
 
 debug:
-	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_debug" CFLAGS="-g" SAN=""
+	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_debug" CFLAGS="-g -fno-omit-frame-pointer -ggdb3" SAN="" OPTIM="-Og"
 
 asan:
 	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_asan" SAN="$(SAN),address"

@@ -105,7 +105,7 @@ insert(Tree* tree) {
         free(key_ptr);
         free(tmp);
     }
-    fprintf(stderr, "%s", errors[return_code]);
+    fprintf(stderr, "insert - %s", errors[return_code]);
     return OK;
 }
 
@@ -117,7 +117,7 @@ _delete(Tree* tree) {
         return _EOF;
     }
     Foo return_code = tree_delete(tree, &num);
-    fprintf(stderr, "%s", errors[return_code]);
+    fprintf(stderr, "_delete - %s", errors[return_code]);
     return OK;
 }
 
@@ -130,7 +130,7 @@ search(Tree* tree) {
         return _EOF;
     }
     Foo return_code = tree_search(tree, &key, &node);
-    fprintf(stderr, "%s", errors[return_code]);
+    fprintf(stderr, "search - %s", errors[return_code]);
     printf("\n");
     if (return_code == OK) {
         printf("key\tdata\n");
@@ -146,25 +146,25 @@ max(Tree* tree) {
         printf("key\tdata\n");
         node_print(node, tree);
     }
-    fprintf(stderr, "%s", errors[OK]);
+    fprintf(stderr, "max - %s", errors[OK]);
 }
 
 void
 print_desc(Tree* tree) {
     tree_print_desc(tree);
-    fprintf(stderr, "%s", errors[OK]);
+    fprintf(stderr, "print_desc - %s", errors[OK]);
 }
 
 void
 print_2D(Tree* tree) {
     tree_print_2D(tree);
-    fprintf(stderr, "%s", errors[OK]);
+    fprintf(stderr, "print_2D - %s", errors[OK]);
 }
 
 void
 print_postorder(Tree* tree) {
     Foo return_code = tree_print_postorder(tree);
-    fprintf(stderr, "%s", errors[return_code]);
+    fprintf(stderr, "print_postorder - %s", errors[return_code]);
 }
 
 void
