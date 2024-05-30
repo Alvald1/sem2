@@ -1,12 +1,12 @@
 CFLAGS = -Wall -Wextra -Werror
 CC = clang
 SAN = -g -fsanitize=undefined
-LIB_DIR = lib
+LIB_DIR = lib hash_table
 OBJECT_DIR = object
 EXECUTABLE = bin
 LDFLAGS = 
 OPTIM = -O0
-SOURCES = $(wildcard *.c $(LIB_DIR)/*.c)
+SOURCES = $(wildcard *.c $(foreach dir,$(LIB_DIRS),$(dir)/*.c))
 OBJECTS = $(SOURCES:%.c=$(OBJECT_DIR)/%.o)
 DEP_FLAGS = -MMD -MP
 COV_FLAG =
