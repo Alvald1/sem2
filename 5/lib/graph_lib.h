@@ -29,5 +29,7 @@ struct _graph {
 };
 
 Node* __node_create(void* data, int weight);
+void __data_dealloc(void* data);
 Graph_Foo __add_edge(Item* items, Node* new, size_t first, size_t second, void* data_first);
+
 #endif

@@ -14,7 +14,8 @@ graph_init(Graph** graph) {
     Hash_Info* hash_info;
     *graph = (Graph*)malloc(sizeof(Graph));
     if (*graph == NULL
-        || info_init(&hash_info, compare, dealloc, dealloc, key_print, data_print, sizeof(Node)) == HASH_BAD_ALLOC) {
+        || info_init(&hash_info, compare, dealloc, __data_dealloc, key_print, data_print, sizeof(Node))
+               == HASH_BAD_ALLOC) {
         return GRAPH_BAD_ALLOC;
     }
     Table* table = NULL;
@@ -121,15 +122,7 @@ graph_delete_node(Graph* graph, void* data) {
         free(temp->data);
         free(temp);
     }
-    node_info = (Node_Info*)(graph->table->items)[first].data;
-    node = node_info->node;
-    previous = NULL;
-    while (node != NULL) {
-        previous = node;
-        free(node->data);
-        node = node->next;
-        free(previous);
-    }
+    ((Node_Info*)(graph->table->items)[first].data)->back_trace = NULL;
     table_remove(graph->table, data);
     return GRAPH_OK;
 }
@@ -165,22 +158,34 @@ graph_graphViz(Graph* graph) {
 }
 
 void
-graph_dealloc(Graph* graph) {
+__data_dealloc(void* data) {
     Node_Info* node_info = NULL;
-    Node *node = NULL, *previous = NULL;
-    Item* items = graph->table->items;
-    size_t capacity = graph->table->capacity;
-    for (size_t i = 0; i < capacity; ++i) {
-        if (items[i].status == HASH_BUSY) {
-            node_info = (Node_Info*)(graph->table->items)[i].data;
-            node = node_info->node;
-            previous = NULL;
-            while (node != NULL) {
-                previous = node;
-                node = node->next;
-                free(previous);
-            }
-            table_dealloc(graph->table);
-        }
+    Node* node = NULL;
+    void* previous = NULL;
+    Back_Trace* back_trace = NULL;
+    node_info = (Node_Info*)data;
+    node = node_info->node;
+    back_trace = node_info->back_trace;
+    previous = NULL;
+    while (node != NULL) {
+        previous = node;
+        free(node->data);
+        node = node->next;
+        free(previous);
     }
+    while (back_trace != NULL) {
+        previous = back_trace;
+        free(back_trace->data);
+        back_trace = back_trace->next;
+        free(previous);
+    }
+    free(data);
+}
+
+void
+graph_dealloc(Graph* graph) {
+    void* info = graph->table->info;
+    table_dealloc(graph->table);
+    info_dealloc(info);
+    free(graph);
 }
