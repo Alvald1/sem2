@@ -1,5 +1,6 @@
 #include "graph.h"
 
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "../hash_table/info_lib.h"
@@ -51,16 +52,16 @@ graph_add_node(Graph* graph, void* data) {
 }
 
 Graph_Foo
-__add_edge(Node_Info* node, Node* new, void* data_first) {
-    new->next = node->node;
-    node->node = new;
+__add_edge(Item* items, Node* new, size_t first, size_t second, void* data_first) {
+    new->next = ((Node_Info*)(items)[first].data)->node;
+    ((Node_Info*)(items)[first].data)->node = new;
     Back_Trace* back_trace = (Back_Trace*)malloc(sizeof(Back_Trace));
     if (back_trace == NULL) {
         return GRAPH_BAD_ALLOC;
     }
     back_trace->data = data_first;
-    back_trace->next = node->back_trace;
-    node->back_trace = back_trace;
+    back_trace->next = ((Node_Info*)(items)[second].data)->back_trace;
+    ((Node_Info*)(items)[second].data)->back_trace = back_trace;
     return GRAPH_OK;
 }
 
@@ -74,11 +75,11 @@ graph_add_edge(Graph* graph, void* data_first, void* data_second, int weight) {
         || __table_search(graph->table, data_second, &second) != HASH_OK) {
         return GRAPH_BAD_DATA;
     }
-    Node* node = create_node(data_second, weight);
+    Node* node = __node_create(data_second, weight);
     if (node == NULL) {
         return GRAPH_BAD_ALLOC;
     }
-    if (__add_edge((Node_Info*)(graph->table->items)[second].data, node, data_first) != GRAPH_OK) {
+    if (__add_edge(graph->table->items, node, first, second, data_first) != GRAPH_OK) {
         return GRAPH_BAD_ALLOC;
     }
     return GRAPH_OK;
@@ -93,7 +94,7 @@ graph_delete_node(Graph* graph, void* data) {
     Node_Info* node_info = NULL;
     Node *node = NULL, *previous = NULL;
     int flag = 1;
-    void* tmp = NULL;
+    Back_Trace* temp = NULL;
     Back_Trace* back_trace = ((Node_Info*)(graph->table->items)[first].data)->back_trace;
     while (back_trace != NULL) {
         __table_search(graph->table, back_trace->data, &tmp);
@@ -108,22 +109,78 @@ graph_delete_node(Graph* graph, void* data) {
                     previous->next = node->next;
                 }
                 flag = 0;
+                free(node->data);
                 free(node);
+                break;
             }
             previous = node;
             node = node->next;
         }
-        tmp = back_trace;
+        temp = back_trace;
         back_trace = back_trace->next;
-        free(tmp);
+        free(temp->data);
+        free(temp);
     }
     node_info = (Node_Info*)(graph->table->items)[first].data;
     node = node_info->node;
     previous = NULL;
     while (node != NULL) {
         previous = node;
+        free(node->data);
         node = node->next;
         free(previous);
     }
+    table_remove(graph->table, data);
     return GRAPH_OK;
+}
+
+Graph_Foo
+graph_graphViz(Graph* graph) {
+    const char* file_name = "output.dot";
+    FILE* file = fopen(file_name, "w");
+    if (file == NULL) {
+        return GRAPH_BAD_FILE;
+    }
+    fprintf(file, "digraph {\n");
+    Item* items = graph->table->items;
+    size_t capacity = graph->table->capacity;
+    Node* node = NULL;
+    int weight = 0;
+    for (size_t i = 0; i < capacity; ++i) {
+        if (items[i].status == HASH_BUSY) {
+            fprintf(file, "%s\n", (char*)items[i].key);
+            node = ((Node_Info*)items[i].data)->node;
+            while (node != NULL) {
+                weight = node->weight;
+                fprintf(file, "%s -> %s [label = %d]\n", (char*)items[i].key, (char*)node->data, weight);
+                node = node->next;
+            }
+        }
+    }
+    fprintf(file, "}\n");
+    fclose(file);
+    system("dot -Tpng output.dot -o output.png");
+    system("rm output.dot");
+    return GRAPH_OK;
+}
+
+void
+graph_dealloc(Graph* graph) {
+    Node_Info* node_info = NULL;
+    Node *node = NULL, *previous = NULL;
+    Item* items = graph->table->items;
+    size_t capacity = graph->table->capacity;
+    for (size_t i = 0; i < capacity; ++i) {
+        if (items[i].status == HASH_BUSY) {
+            node_info = (Node_Info*)(graph->table->items)[i].data;
+            node = node_info->node;
+            previous = NULL;
+            while (node != NULL) {
+                previous = node;
+                node = node->next;
+                free(previous);
+            }
+            table_dealloc(graph->table);
+        }
+    }
 }

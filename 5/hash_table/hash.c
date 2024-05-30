@@ -4,8 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "hash_lib.h"
-
 size_t
 hash(void* key, size_t capacity) {
     char* number = (char*)key;

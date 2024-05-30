@@ -4,18 +4,19 @@
 #include <stddef.h>
 
 #include "../hash_table/table.h"
+#include "graph.h"
 
 #define INF INT_MAX
 
 typedef struct _node {
     void* data;
     int weight;
-    Node* next;
+    struct _node* next;
 } Node;
 
 typedef struct _back_trace {
     void* data;
-    Back_Trace* next;
+    struct _back_trace* next;
 } Back_Trace;
 
 typedef struct _node_info {
@@ -28,6 +29,5 @@ struct _graph {
 };
 
 Node* __node_create(void* data, int weight);
-Graph_Foo __add_edge(Node_Info* node, Node* new, void* data_first);
-
+Graph_Foo __add_edge(Item* items, Node* new, size_t first, size_t second, void* data_first);
 #endif

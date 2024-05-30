@@ -6,6 +6,7 @@
 #include "code_status.h"
 #include "info.h"
 #include "item.h"
+#include "table.h"
 
 struct _table {
     Item* items;

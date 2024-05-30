@@ -47,7 +47,7 @@ table_import(Table** table, Hash_Info* info, const char* file_name) {
     if (*table != NULL) {
         table_dealloc(*table);
     }
-    size_t key_size = info->key_size, data_size = info->data_size;
+    size_t key_size = 100, data_size = info->data_size;
     size_t capacity = 0, size = 0;
     fread(&capacity, sizeof(size_t), 1, file);
     fread(&size, sizeof(size_t), 1, file);
@@ -93,13 +93,13 @@ table_export(Table* table, const char* file_name) {
     }
     size_t capacity = table->capacity;
     Item* items = table->items;
-    size_t key_size = table->info->key_size;
+    size_t key_size = 100;
     size_t data_size = table->info->data_size;
     fwrite(text, strlen(text) + 1, 1, file);
     fwrite(&capacity, sizeof(size_t), 1, file);
     fwrite(&(table->size), sizeof(size_t), 1, file);
     for (size_t i = 0; i < capacity; ++i) {
-        if (items[i].status == BUSY) {
+        if (items[i].status == HASH_BUSY) {
             fwrite(items[i].key, key_size, 1, file);
             fwrite(items[i].data, data_size, 1, file);
         }
