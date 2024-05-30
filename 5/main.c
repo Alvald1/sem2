@@ -20,6 +20,7 @@ main() {
     graph_add_edge(graph, strdup("e"), strdup("c"), 5);
     graph_add_edge(graph, strdup("d"), strdup("a"), 5);
     graph_delete_node(graph, "a");
+    graph_delete_edge(graph, "b", "d");
     graph_graphViz(graph);
     graph_dealloc(graph);
     return 0;

@@ -94,22 +94,20 @@ graph_delete_node(Graph* graph, void* data) {
     }
     Node_Info* node_info = NULL;
     Node *node = NULL, *previous = NULL;
-    int flag = 1;
+    fptr_compare compare = graph->table->info->compare;
     Back_Trace* temp = NULL;
     Back_Trace* back_trace = ((Node_Info*)(graph->table->items)[first].data)->back_trace;
     while (back_trace != NULL) {
         __table_search(graph->table, back_trace->data, &tmp);
         node_info = (Node_Info*)(graph->table->items)[tmp].data;
         node = node_info->node;
-        flag = 1;
-        while (flag == 1 && node != NULL) {
-            if (graph->table->info->compare(data, node->data) == EQUAL) {
+        while (node != NULL) {
+            if ((*compare)(data, node->data) == EQUAL) {
                 if (previous == NULL) {
                     node_info->node = node->next;
                 } else {
                     previous->next = node->next;
                 }
-                flag = 0;
                 free(node->data);
                 free(node);
                 break;
@@ -188,4 +186,52 @@ graph_dealloc(Graph* graph) {
     table_dealloc(graph->table);
     info_dealloc(info);
     free(graph);
+}
+
+Graph_Foo
+graph_delete_edge(Graph* graph, void* data_first, void* data_second) {
+    size_t first, second;
+    Node_Info* node_info = NULL;
+    Node* node = NULL;
+    Back_Trace* back_trace = NULL;
+    void* previous = NULL;
+    if (__table_search(graph->table, data_first, &first) != HASH_OK
+        || __table_search(graph->table, data_second, &second) != HASH_OK) {
+        return GRAPH_BAD_DATA;
+    }
+    fptr_compare compare = graph->table->info->compare;
+    node_info = (Node_Info*)(graph->table->items)[first].data;
+    node = node_info->node;
+    while (node != NULL) {
+        if ((*compare)(node->data, data_second) == EQUAL) {
+            if (previous == NULL) {
+                node_info->node = node->next;
+            } else {
+                ((Node*)previous)->next = node->next;
+            }
+            free(node->data);
+            free(node);
+            break;
+        }
+        previous = node;
+        node = node->next;
+    }
+    node_info = (Node_Info*)(graph->table->items)[second].data;
+    back_trace = node_info->back_trace;
+    previous = NULL;
+    while (back_trace != NULL) {
+        if ((*compare)(back_trace->data, data_first) == EQUAL) {
+            if (previous == NULL) {
+                node_info->back_trace = back_trace->next;
+            } else {
+                ((Back_Trace*)previous)->next = back_trace->next;
+            }
+            free(back_trace->data);
+            free(back_trace);
+            break;
+        }
+        previous = back_trace;
+        back_trace = back_trace->next;
+    }
+    return GRAPH_OK;
 }
