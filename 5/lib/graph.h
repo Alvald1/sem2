@@ -8,7 +8,7 @@ typedef struct _graph Graph;
 
 Graph_Foo graph_init(Graph** graph);
 Graph_Foo graph_add_node(Graph* graph, void* data);
-Graph_Foo graph_add_edge(Graph* graph, int index_first, int index_second, int weight);
+Graph_Foo graph_add_edge(Graph* graph, void* data_first, void* data_second, int weight);
 Graph_Foo graph_delete_node(Graph* graph, int index);
 Graph_Foo graph_delete_edge(Graph* graph, int index_first, int index_second);
 Graph_Foo graph_change_node(Graph* graph, int index, void* data);

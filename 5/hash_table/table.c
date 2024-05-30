@@ -121,7 +121,7 @@ __table_search(Table* table, void* key, size_t* pos) {
     }
     do {
         hash_num = (hash_num + step) % capacity;
-        if (items[hash_num].status == HASH_BUSY && compare((items[hash_num]).key, key) == 0) {
+        if (items[hash_num].status == HASH_BUSY && compare((items[hash_num]).key, key) == EQUAL) {
             flag = 1;
             break;
         } else {

@@ -9,11 +9,25 @@
 
 typedef struct _node {
     void* data;
+    int weight;
     Node* next;
 } Node;
+
+typedef struct _back_trace {
+    void* data;
+    Back_Trace* next;
+} Back_Trace;
+
+typedef struct _node_info {
+    Back_Trace* back_trace;
+    Node* node;
+} Node_Info;
 
 struct _graph {
     Table* table;
 };
+
+Node* __node_create(void* data, int weight);
+Graph_Foo __add_edge(Node_Info* node, Node* new, void* data_first);
 
 #endif
