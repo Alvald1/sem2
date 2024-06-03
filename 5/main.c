@@ -13,6 +13,7 @@ main() {
     graph_add_node(graph, strdup("c"));
     graph_add_node(graph, strdup("d"));
     graph_add_node(graph, strdup("e"));
+
     graph_add_edge(graph, strdup("a"), strdup("b"), 5);
     graph_add_edge(graph, strdup("a"), strdup("c"), 5);
     graph_add_edge(graph, strdup("b"), strdup("d"), 5);
@@ -21,6 +22,12 @@ main() {
     graph_add_edge(graph, strdup("d"), strdup("a"), 5);
     graph_delete_node(graph, "a");
     graph_delete_edge(graph, "b", "d");
+    graph_add_edge(graph, strdup("b"), strdup("b"), 5);
+    graph_add_edge(graph, strdup("b"), strdup("c"), 5);
+    graph_add_edge(graph, strdup("b"), strdup("d"), 5);
+    graph_add_edge(graph, strdup("c"), strdup("e"), 5);
+    graph_add_edge(graph, strdup("d"), strdup("e"), 5);
+    graph_change_node(graph, "b", strdup("a"));
     graph_graphViz(graph);
     graph_dealloc(graph);
     return 0;

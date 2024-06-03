@@ -17,7 +17,7 @@ key_print(void* key) {
 
 void
 data_print(void* data) {
-    printf("%zu", *((size_t*)data));
+    (void)data;
 }
 
 Compare

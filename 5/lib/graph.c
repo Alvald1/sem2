@@ -235,3 +235,28 @@ graph_delete_edge(Graph* graph, void* data_first, void* data_second) {
     }
     return GRAPH_OK;
 }
+
+Graph_Foo
+graph_change_node(Graph* graph, void* data, void* data_new) {
+    size_t first;
+    if (__table_search(graph->table, data, &first) != HASH_OK) {
+        return GRAPH_BAD_DATA;
+    }
+    Graph_Foo return_code = GRAPH_OK;
+
+    if ((return_code = graph_add_node(graph, data_new)) != GRAPH_OK) {
+        return return_code;
+    }
+    Node_Info* node_info = (Node_Info*)(graph->table->items)[first].data;
+    Node* node = node_info->node;
+    while (node != NULL) {
+        if ((return_code = graph_add_edge(graph, data_new, node->data, node->weight)) != GRAPH_OK) {
+            return return_code;
+        }
+        node = node->next;
+    }
+    if ((return_code = graph_delete_node(graph, data)) != GRAPH_OK) {
+        return return_code;
+    }
+    return GRAPH_OK;
+}
