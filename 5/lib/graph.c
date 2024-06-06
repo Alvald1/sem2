@@ -91,7 +91,16 @@ graph_add_edge(Graph* graph, void* data_first, void* data_second, int weight) {
         || __table_search(graph->table, data_second, &second) != HASH_OK) {
         return GRAPH_BAD_DATA;
     }
-    if (__add_edge(graph->table->items, first, second, weight) != GRAPH_OK) {
+    Item* items = graph->table->items;
+    Node* node = ((Node_Info*)items[first].data)->node;
+    fptr_compare compare = graph->table->info->compare;
+    while (node != NULL) {
+        if ((*compare)(node->data, data_second) == EQUAL) {
+            return GRAPH_DUPLICATE;
+        }
+        node = node->next;
+    }
+    if (__add_edge(items, first, second, weight) != GRAPH_OK) {
         return GRAPH_BAD_ALLOC;
     }
     return GRAPH_OK;

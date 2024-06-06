@@ -27,6 +27,8 @@ main() {
     graph_add_edge(graph, ("b"), ("d"), 9);
     graph_add_edge(graph, ("c"), ("e"), 10);
     graph_add_edge(graph, ("d"), ("e"), -10);
+    graph_add_edge(graph, ("c"), ("e"), 10);
+    graph_add_edge(graph, ("d"), ("e"), -10);
     graph_change_edge(graph, ("d"), ("e"), 10);
     graph_change_node(graph, "b", strdup("a"));
     graph_graphViz(graph);
