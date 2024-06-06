@@ -269,3 +269,34 @@ graph_change_node(Graph* graph, void* data, void* data_new) {
     }
     return GRAPH_OK;
 }
+
+Graph_Foo
+graph_change_edge(Graph* graph, void* data_first, void* data_second, int weight) {
+    if (-10 > weight || weight > 10) {
+        return GRAPH_BAD_WEIGHT;
+    }
+    size_t first = 0, second = 0;
+    if (__table_search(graph->table, data_first, &first) != HASH_OK
+        || __table_search(graph->table, data_second, &second) != HASH_OK) {
+        return GRAPH_BAD_DATA;
+    }
+    fptr_compare compare = graph->table->info->compare;
+    Item* items = graph->table->items;
+    Node_Info* node_info = items[first].data;
+    Node* node = node_info->node;
+    while (node != NULL) {
+        if ((*compare)(node->data, data_second) == EQUAL) {
+            node->weight = weight;
+            break;
+        }
+    }
+    node_info = items[second].data;
+    Back_Trace* back_trace = node_info->back_trace;
+    while (back_trace != NULL) {
+        if ((*compare)(back_trace->data, data_first) == EQUAL) {
+            back_trace->weight = weight;
+            break;
+        }
+    }
+    return GRAPH_OK;
+}
