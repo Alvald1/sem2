@@ -5,17 +5,23 @@ LIB_LIB = hash_table
 LIB_DIR = lib
 OBJECT_DIR = object
 EXECUTABLE = bin
-LDFLAGS = 
+LDFLAGS = -l$(LIB_LIB) -L.
 OPTIM = -O0
-SOURCES = $(wildcard *.c $(LIB_DIR)/*.c $(LIB_LIB)/*.c)
+LIB_NAME = 
+LIB_SOURCES = $(wildcard $(LIB_LIB)/*.c)
+LIB_OBJECTS = $(LIB_SOURCES:%.c=$(OBJECT_DIR)/%.o)
+SOURCES = $(wildcard *.c $(LIB_DIR)/*.c)
 OBJECTS = $(SOURCES:%.c=$(OBJECT_DIR)/%.o)
 DEP_FLAGS = -MMD -MP
 COV_FLAG =
 
-.PHONY: all debug asan msan afl static clean cov valgrind fuzz compile
+.PHONY: all lib debug asan msan afl static clean cov valgrind fuzz compile
 
 all:
 	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_clean" SAN=""
+
+lib:
+	$(MAKE) build LIB_NAME="lib$(LIB_LIB)" CFLAGS="-g" SAN=""
 
 debug:
 	$(MAKE) compile EXECUTABLE="$(EXECUTABLE)_debug" CFLAGS="-g" SAN=""
@@ -73,6 +79,11 @@ fuzz: afl
 	tmux attach-session -t my_session
 
 compile: $(EXECUTABLE)
+
+build: $(LIB_NAME).a
+
+$(LIB_NAME).a: $(LIB_OBJECTS)
+	ar rcs $@ $(LIB_OBJECTS)
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $^ -o $@ $(CFLAGS) $(SAN) $(LDFLAGS) $(OPTIM) $(COV_FLAG)
