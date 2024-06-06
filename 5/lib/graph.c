@@ -27,15 +27,27 @@ graph_init(Graph** graph) {
 }
 
 Node*
-__node_create(void* data, int weight) {
+__node_create(void* data, int weight, Node* next) {
     Node* node = (Node*)malloc(sizeof(Node));
     if (node == NULL) {
         return NULL;
     }
     node->data = data;
-    node->next = NULL;
+    node->next = next;
     node->weight = weight;
     return node;
+}
+
+Back_Trace*
+__back_trace_create(void* data, int weight, Back_Trace* next) {
+    Back_Trace* back_trace = (Back_Trace*)malloc(sizeof(Back_Trace));
+    if (back_trace == NULL) {
+        return NULL;
+    }
+    back_trace->data = data;
+    back_trace->next = next;
+    back_trace->weight = weight;
+    return back_trace;
 }
 
 Graph_Foo
@@ -53,16 +65,19 @@ graph_add_node(Graph* graph, void* data) {
 }
 
 Graph_Foo
-__add_edge(Item* items, Node* new, size_t first, size_t second, void* data_first) {
-    new->next = ((Node_Info*)(items)[first].data)->node;
-    ((Node_Info*)(items)[first].data)->node = new;
-    Back_Trace* back_trace = (Back_Trace*)malloc(sizeof(Back_Trace));
+__add_edge(Item* items, size_t first, size_t second, int weight) {
+    Node_Info* node_info = items[first].data;
+    Node* node = __node_create(items[second].key, weight, node_info->node);
+    if (node == NULL) {
+        return GRAPH_BAD_ALLOC;
+    }
+    node_info->node = node;
+    node_info = items[second].data;
+    Back_Trace* back_trace = __back_trace_create(items[first].key, weight, node_info->back_trace);
     if (back_trace == NULL) {
         return GRAPH_BAD_ALLOC;
     }
-    back_trace->data = data_first;
-    back_trace->next = ((Node_Info*)(items)[second].data)->back_trace;
-    ((Node_Info*)(items)[second].data)->back_trace = back_trace;
+    node_info->back_trace = back_trace;
     return GRAPH_OK;
 }
 
@@ -76,11 +91,7 @@ graph_add_edge(Graph* graph, void* data_first, void* data_second, int weight) {
         || __table_search(graph->table, data_second, &second) != HASH_OK) {
         return GRAPH_BAD_DATA;
     }
-    Node* node = __node_create(data_second, weight);
-    if (node == NULL) {
-        return GRAPH_BAD_ALLOC;
-    }
-    if (__add_edge(graph->table->items, node, first, second, data_first) != GRAPH_OK) {
+    if (__add_edge(graph->table->items, first, second, weight) != GRAPH_OK) {
         return GRAPH_BAD_ALLOC;
     }
     return GRAPH_OK;
@@ -88,39 +99,32 @@ graph_add_edge(Graph* graph, void* data_first, void* data_second, int weight) {
 
 Graph_Foo
 graph_delete_node(Graph* graph, void* data) {
-    size_t first, tmp;
-    if (__table_search(graph->table, data, &first) != HASH_OK) {
+    size_t current, second;
+    if (__table_search(graph->table, data, &current) != HASH_OK) {
         return GRAPH_BAD_DATA;
     }
-    Node_Info* node_info = NULL;
-    Node *node = NULL, *previous = NULL;
+    Node_Info* node_info = (graph->table->items)[current].data;
+    Node* node = NULL;
+    void* previous = NULL;
     fptr_compare compare = graph->table->info->compare;
-    Back_Trace* temp = NULL;
-    Back_Trace* back_trace = ((Node_Info*)(graph->table->items)[first].data)->back_trace;
+    Back_Trace* back_trace = node_info->back_trace;
     while (back_trace != NULL) {
-        __table_search(graph->table, back_trace->data, &tmp);
-        node_info = (Node_Info*)(graph->table->items)[tmp].data;
-        node = node_info->node;
-        while (node != NULL) {
-            if ((*compare)(data, node->data) == EQUAL) {
-                if (previous == NULL) {
-                    node_info->node = node->next;
-                } else {
-                    previous->next = node->next;
-                }
-                free(node->data);
-                free(node);
-                break;
-            }
-            previous = node;
-            node = node->next;
-        }
-        temp = back_trace;
+        __table_search(graph->table, back_trace->data, &second);
+        __node_delete((graph->table->items)[second].data, data, compare);
+        previous = back_trace;
         back_trace = back_trace->next;
-        free(temp->data);
-        free(temp);
+        free(previous);
     }
-    ((Node_Info*)(graph->table->items)[first].data)->back_trace = NULL;
+    node = node_info->node;
+    while (node != NULL) {
+        __table_search(graph->table, node->data, &second);
+        __back_trace_delete((graph->table->items)[second].data, data, compare);
+        previous = node;
+        node = node->next;
+        free(previous);
+    }
+    node_info->back_trace = NULL;
+    node_info->node = NULL;
     table_remove(graph->table, data);
     return GRAPH_OK;
 }
@@ -157,23 +161,19 @@ graph_graphViz(Graph* graph) {
 
 void
 __data_dealloc(void* data) {
-    Node_Info* node_info = NULL;
+    Node_Info* node_info = data;
     Node* node = NULL;
     void* previous = NULL;
     Back_Trace* back_trace = NULL;
-    node_info = (Node_Info*)data;
     node = node_info->node;
     back_trace = node_info->back_trace;
-    previous = NULL;
     while (node != NULL) {
         previous = node;
-        free(node->data);
         node = node->next;
         free(previous);
     }
     while (back_trace != NULL) {
         previous = back_trace;
-        free(back_trace->data);
         back_trace = back_trace->next;
         free(previous);
     }
@@ -188,72 +188,81 @@ graph_dealloc(Graph* graph) {
     free(graph);
 }
 
-Graph_Foo
-graph_delete_edge(Graph* graph, void* data_first, void* data_second) {
-    size_t first, second;
-    Node_Info* node_info = NULL;
-    Node* node = NULL;
-    Back_Trace* back_trace = NULL;
-    void* previous = NULL;
-    if (__table_search(graph->table, data_first, &first) != HASH_OK
-        || __table_search(graph->table, data_second, &second) != HASH_OK) {
-        return GRAPH_BAD_DATA;
-    }
-    fptr_compare compare = graph->table->info->compare;
-    node_info = (Node_Info*)(graph->table->items)[first].data;
-    node = node_info->node;
+void
+__node_delete(Node_Info* node_info, void* data, fptr_compare compare) {
+    Node* node = node_info->node;
+    Node* previous = NULL;
     while (node != NULL) {
-        if ((*compare)(node->data, data_second) == EQUAL) {
+        if ((*compare)(node->data, data) == EQUAL) {
             if (previous == NULL) {
                 node_info->node = node->next;
             } else {
-                ((Node*)previous)->next = node->next;
+                previous->next = node->next;
             }
-            free(node->data);
             free(node);
             break;
         }
         previous = node;
         node = node->next;
     }
-    node_info = (Node_Info*)(graph->table->items)[second].data;
-    back_trace = node_info->back_trace;
-    previous = NULL;
+}
+
+void
+__back_trace_delete(Node_Info* node_info, void* data, fptr_compare compare) {
+    Back_Trace* previous = NULL;
+    Back_Trace* back_trace = node_info->back_trace;
     while (back_trace != NULL) {
-        if ((*compare)(back_trace->data, data_first) == EQUAL) {
+        if ((*compare)(back_trace->data, data) == EQUAL) {
             if (previous == NULL) {
                 node_info->back_trace = back_trace->next;
             } else {
-                ((Back_Trace*)previous)->next = back_trace->next;
+                previous->next = back_trace->next;
             }
-            free(back_trace->data);
             free(back_trace);
             break;
         }
         previous = back_trace;
         back_trace = back_trace->next;
     }
+}
+
+Graph_Foo
+graph_delete_edge(Graph* graph, void* data_first, void* data_second) {
+    size_t first, second;
+    if (__table_search(graph->table, data_first, &first) != HASH_OK
+        || __table_search(graph->table, data_second, &second) != HASH_OK) {
+        return GRAPH_BAD_DATA;
+    }
+    fptr_compare compare = graph->table->info->compare;
+    __node_delete((graph->table->items)[first].data, data_second, compare);
+    __back_trace_delete((graph->table->items)[second].data, data_first, compare);
     return GRAPH_OK;
 }
 
 Graph_Foo
 graph_change_node(Graph* graph, void* data, void* data_new) {
-    size_t first;
-    if (__table_search(graph->table, data, &first) != HASH_OK) {
+    size_t current;
+    if (__table_search(graph->table, data, &current) != HASH_OK) {
         return GRAPH_BAD_DATA;
     }
     Graph_Foo return_code = GRAPH_OK;
-
     if ((return_code = graph_add_node(graph, data_new)) != GRAPH_OK) {
         return return_code;
     }
-    Node_Info* node_info = (Node_Info*)(graph->table->items)[first].data;
+    Node_Info* node_info = (graph->table->items)[current].data;
     Node* node = node_info->node;
+    Back_Trace* back_trace = node_info->back_trace;
     while (node != NULL) {
         if ((return_code = graph_add_edge(graph, data_new, node->data, node->weight)) != GRAPH_OK) {
             return return_code;
         }
         node = node->next;
+    }
+    while (back_trace != NULL) {
+        if ((return_code = graph_add_edge(graph, back_trace->data, data_new, back_trace->weight)) != GRAPH_OK) {
+            return return_code;
+        }
+        back_trace = back_trace->next;
     }
     if ((return_code = graph_delete_node(graph, data)) != GRAPH_OK) {
         return return_code;

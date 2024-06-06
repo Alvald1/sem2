@@ -16,6 +16,7 @@ typedef struct _node {
 
 typedef struct _back_trace {
     void* data;
+    int weight;
     struct _back_trace* next;
 } Back_Trace;
 
@@ -28,8 +29,11 @@ struct _graph {
     Table* table;
 };
 
-Node* __node_create(void* data, int weight);
+Back_Trace* __back_trace_create(void* data, int weight, Back_Trace* next);
+void __back_trace_delete(Node_Info* node_info, void* data, fptr_compare compare);
+void __node_delete(Node_Info* node_info, void* data, fptr_compare compare);
+Node* __node_create(void* data, int weight, Node* next);
 void __data_dealloc(void* data);
-Graph_Foo __add_edge(Item* items, Node* new, size_t first, size_t second, void* data_first);
+Graph_Foo __add_edge(Item* items, size_t first, size_t second, int weight);
 
 #endif
