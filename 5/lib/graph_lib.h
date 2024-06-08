@@ -10,6 +10,10 @@
 
 typedef enum _color { WHITE, GRAY, BLACK } Color;
 
+typedef enum _status { PRINT, BFS } Status;
+
+typedef void (*fptr_color)(char** node_color, char** edge_color);
+
 typedef struct _node {
     void* data;
     int weight;
@@ -31,6 +35,8 @@ struct _graph {
     Table* table;
 };
 
+Graph_Foo __graph_graphViz(Graph* graph, Status status);
+void __set_color_print(char** node_color, char** edge_color);
 Back_Trace* __back_trace_create(void* data, int weight, Back_Trace* next);
 void __back_trace_delete(Node_Info* node_info, void* data, fptr_compare compare);
 void __node_delete(Node_Info* node_info, void* data, fptr_compare compare);

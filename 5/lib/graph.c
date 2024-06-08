@@ -3,6 +3,7 @@
 #include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "../hash_table/info_lib.h"
 #include "../hash_table/item_lib.h"
@@ -152,11 +153,9 @@ graph_graphViz(Graph* graph) {
     size_t capacity = graph->table->capacity;
     Node* node = NULL;
     int weight = 0;
-    char *node_color = NULL, *edge_color = NULL, *node_label = NULL;
-    __set_color(&node_color, &edge_color);
     for (size_t i = 0; i < capacity; ++i) {
         if (items[i].status == HASH_BUSY) {
-            fprintf(file, "%s\n [label = \"%s | %zu\"]", (char*)items[i].key, (char*)items[i].key, i);
+            fprintf(file, "%s\n", (char*)items[i].key);
             node = ((Node_Info*)items[i].data)->node;
             while (node != NULL) {
                 weight = node->weight;
@@ -366,11 +365,39 @@ graph_bfs(Graph* graph, void* data) {
         }
         colors[current] = BLACK;
     }
+    FILE* file = fopen("result_bfs", "w");
     for (size_t i = 0; i < capacity; ++i) {
         if (distance[i] > 1 && distance[i] != INF) {
             printf("%s\n", (char*)items[i].key);
+            fprintf(file, "%s\n", (char*)items[i].key);
         }
     }
+    fclose(file);
+    file = fopen("output.dot", "w");
+    if (file == NULL) {
+        return GRAPH_BAD_FILE;
+    }
+    fprintf(file, "digraph {\n");
+    int weight = 0;
+    for (size_t i = 0; i < capacity; ++i) {
+        if (items[i].status == HASH_BUSY) {
+            if (i == first) {
+                fprintf(file, "%s [color = red]\n", (char*)items[i].key);
+            } else {
+                fprintf(file, "%s [label = \"%s | %d\"]\n", (char*)items[i].key, (char*)items[i].key, distance[i]);
+            }
+            node = ((Node_Info*)items[i].data)->node;
+            while (node != NULL) {
+                weight = node->weight;
+                fprintf(file, "%s -> %s [label = %d]\n", (char*)items[i].key, (char*)node->data, weight);
+                node = node->next;
+            }
+        }
+    }
+    fprintf(file, "}\n");
+    fclose(file);
+    system("dot -Tpng output.dot -o output_bfs.png");
+    system("rm output.dot");
     free(colors);
     free(distance);
     free(parent);
