@@ -519,3 +519,55 @@ graph_bellman_ford(Graph* graph, void* data_first, void* data_second) {
     free(parents);
     return GRAPH_OK;
 }
+
+Matrix**
+__matrix_init(size_t capacity) {
+    Matrix** matrix = (Matrix**)calloc(capacity, sizeof(Matrix*));
+    if (matrix == NULL) {
+        return NULL;
+    }
+    for (size_t i = 0; i < capacity; ++i) {
+        matrix[i] = (Matrix*)calloc(capacity, sizeof(Matrix));
+        if (matrix[i] == NULL) {
+            for (; i >= 0; --i) {
+                free(matrix[i]);
+            }
+            free(matrix);
+            return NULL;
+        }
+    }
+}
+
+Matrix**
+__convert_to_matrix(Graph* graph) {
+    size_t capacity = graph->table->capacity;
+    Matrix** matrix = __matrix_init(capacity);
+    if (matrix == NULL) {
+        return NULL;
+    }
+    Item* items = graph->table->items;
+    Node* node = NULL;
+    size_t ind = 0;
+    for (size_t i = 0; i < capacity; ++i) {
+        if (items[i].status == HASH_BUSY) {
+            matrix[i][i].status = OK;
+            matrix[i][i].value = 0;
+            node = ((Node_Info*)items[i].data)->node;
+            while (node != NULL) {
+                __table_search(graph->table, node->data, &ind);
+                matrix[i][ind].value = node->weight;
+                node = node->next;
+            }
+        } else {
+            matrix[i][i].status = NOT_OK;
+        }
+    }
+    for (size_t i = 0; i < capacity; ++i) {
+        for (size_t j = 0; j < capacity; ++j) {
+            if (i != j && matrix[i][i].status == OK) {
+                matrix[i][j].value = INF / 2;
+            }
+        }
+    }
+    return matrix;
+}
