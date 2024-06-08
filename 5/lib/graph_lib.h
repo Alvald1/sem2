@@ -8,6 +8,8 @@
 
 #define INF INT_MAX
 
+typedef enum _color { WHITE, GRAY, BLACK } Color;
+
 typedef struct _node {
     void* data;
     int weight;

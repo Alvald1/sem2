@@ -5,19 +5,19 @@
 
 #include "queue.h"
 
-typedef struct _node {
+typedef struct _Qnode {
     size_t data;
-    struct _node* next;
-} Node;
+    struct _Qnode* next;
+} QNode;
 
 typedef struct _queue {
-    Node *front, *rear;
+    QNode *front, *rear;
 } Queue;
 
-Node* node_new(size_t data);
+QNode* node_new(size_t data);
 Queue* queue_create();
 void enQueue(Queue* queue, int data);
-void deQueue(Queue* queue);
+size_t deQueue(Queue* queue);
 void queue_dealloc(Queue* queue);
 
 #endif

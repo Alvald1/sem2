@@ -14,7 +14,7 @@ Graph_Foo graph_delete_node(Graph* graph, void* data);
 Graph_Foo graph_delete_edge(Graph* graph, void* data_first, void* data_second);
 Graph_Foo graph_change_node(Graph* graph, void* data, void* data_new);
 Graph_Foo graph_change_edge(Graph* graph, void* data_first, void* data_second, int weight);
-Graph_Foo graph_bfs(Graph* graph, int index);
+Graph_Foo graph_bfs(Graph* graph, void* data);
 Graph_Foo graph_bellman_ford(Graph* graph);
 Graph_Foo graph_floyd_warshall(Graph* graph);
 Graph_Foo graph_graphViz(Graph* graph);

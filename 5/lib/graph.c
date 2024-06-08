@@ -1,5 +1,6 @@
 #include "graph.h"
 
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -8,6 +9,7 @@
 #include "../hash_table/table_lib.h"
 #include "general.h"
 #include "graph_lib.h"
+#include "queue.h"
 
 Graph_Foo
 graph_init(Graph** graph) {
@@ -150,9 +152,11 @@ graph_graphViz(Graph* graph) {
     size_t capacity = graph->table->capacity;
     Node* node = NULL;
     int weight = 0;
+    char *node_color = NULL, *edge_color = NULL, *node_label = NULL;
+    __set_color(&node_color, &edge_color);
     for (size_t i = 0; i < capacity; ++i) {
         if (items[i].status == HASH_BUSY) {
-            fprintf(file, "%s\n", (char*)items[i].key);
+            fprintf(file, "%s\n [label = \"%s | %zu\"]", (char*)items[i].key, (char*)items[i].key, i);
             node = ((Node_Info*)items[i].data)->node;
             while (node != NULL) {
                 weight = node->weight;
@@ -309,3 +313,70 @@ graph_change_edge(Graph* graph, void* data_first, void* data_second, int weight)
     }
     return GRAPH_OK;
 }
+
+Graph_Foo
+graph_bfs(Graph* graph, void* data) {
+    size_t capacity = graph->table->capacity;
+    Color* colors = (Color*)calloc(capacity, sizeof(Color));
+    int* distance = (int*)malloc(capacity * sizeof(int));
+    size_t* parent = (size_t*)malloc(capacity * sizeof(size_t));
+    if (colors == NULL || distance == NULL || parent == NULL) {
+        free(colors);
+        free(distance);
+        free(parent);
+        return GRAPH_BAD_ALLOC;
+    }
+    size_t first = 0, current = 0, adj = 0;
+    if (__table_search(graph->table, data, &first) != HASH_OK) {
+        free(colors);
+        free(distance);
+        free(parent);
+        return GRAPH_BAD_DATA;
+    }
+    for (size_t i = 0; i < capacity; ++i) {
+        if (i != first) {
+            distance[i] = INF;
+        }
+        parent[i] = capacity;
+    }
+    colors[first] = GRAY;
+    distance[first] = 0;
+    Queue* queue = queue_create();
+    if (queue == NULL) {
+        free(colors);
+        free(distance);
+        free(parent);
+        return GRAPH_BAD_ALLOC;
+    }
+    Node* node = NULL;
+    enQueue(queue, first);
+    Item* items = graph->table->items;
+    while (queue->front != NULL) {
+        current = deQueue(queue);
+        node = ((Node_Info*)items[current].data)->node;
+        while (node != NULL) {
+            __table_search(graph->table, node->data, &adj);
+            if (node->weight >= 0 && colors[adj] == WHITE) {
+                colors[adj] = GRAY;
+                distance[adj] = distance[current] + 1;
+                parent[adj] = current;
+                enQueue(queue, adj);
+            }
+            node = node->next;
+        }
+        colors[current] = BLACK;
+    }
+    for (size_t i = 0; i < capacity; ++i) {
+        if (distance[i] > 1 && distance[i] != INF) {
+            printf("%s\n", (char*)items[i].key);
+        }
+    }
+    free(colors);
+    free(distance);
+    free(parent);
+    queue_dealloc(queue);
+    return GRAPH_OK;
+}
+
+Graph_Foo
+graph_bellman_ford(Graph* graph) {}

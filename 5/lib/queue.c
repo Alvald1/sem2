@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-Node*
+QNode*
 node_new(size_t data) {
-    Node* node = (Node*)malloc(sizeof(Node));
+    QNode* node = (QNode*)malloc(sizeof(QNode));
     if (node == NULL) {
         return NULL;
     }
@@ -25,7 +25,7 @@ queue_create() {
 
 void
 enQueue(Queue* queue, int data) {
-    Node* node = node_new(data);
+    QNode* node = node_new(data);
     if (queue->rear == NULL) {
         queue->front = queue->rear = node;
         return;
@@ -34,22 +34,24 @@ enQueue(Queue* queue, int data) {
     queue->rear = node;
 }
 
-void
+size_t
 deQueue(Queue* queue) {
     if (queue->front == NULL) {
-        return;
+        return 0;
     }
-    Node* node = queue->front;
+    QNode* node = queue->front;
     queue->front = queue->front->next;
     if (queue->front == NULL) {
         queue->rear = NULL;
     }
+    size_t tmp = node->data;
     free(node);
+    return tmp;
 }
 
 void
 queue_dealloc(Queue* queue) {
-    Node *node = queue->front, *previous = NULL;
+    QNode *node = queue->front, *previous = NULL;
     while (node != NULL) {
         previous = node;
         node = node->next;
