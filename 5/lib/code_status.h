@@ -7,7 +7,8 @@ typedef enum _graph_foo {
     GRAPH_DUPLICATE,
     GRAPH_BAD_WEIGHT,
     GRAPH_BAD_DATA,
-    GRAPH_BAD_FILE
+    GRAPH_BAD_FILE,
+    GRAPH_NEGATIVE_CYCLE
 } Graph_Foo;
 
 #endif

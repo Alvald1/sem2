@@ -318,25 +318,25 @@ graph_bfs(Graph* graph, void* data) {
     size_t capacity = graph->table->capacity;
     Color* colors = (Color*)calloc(capacity, sizeof(Color));
     int* distance = (int*)malloc(capacity * sizeof(int));
-    size_t* parent = (size_t*)malloc(capacity * sizeof(size_t));
-    if (colors == NULL || distance == NULL || parent == NULL) {
+    size_t* parents = (size_t*)malloc(capacity * sizeof(size_t));
+    if (colors == NULL || distance == NULL || parents == NULL) {
         free(colors);
         free(distance);
-        free(parent);
+        free(parents);
         return GRAPH_BAD_ALLOC;
     }
     size_t first = 0, current = 0, adj = 0;
     if (__table_search(graph->table, data, &first) != HASH_OK) {
         free(colors);
         free(distance);
-        free(parent);
+        free(parents);
         return GRAPH_BAD_DATA;
     }
     for (size_t i = 0; i < capacity; ++i) {
         if (i != first) {
             distance[i] = INF;
         }
-        parent[i] = capacity;
+        parents[i] = capacity;
     }
     colors[first] = GRAY;
     distance[first] = 0;
@@ -344,7 +344,7 @@ graph_bfs(Graph* graph, void* data) {
     if (queue == NULL) {
         free(colors);
         free(distance);
-        free(parent);
+        free(parents);
         return GRAPH_BAD_ALLOC;
     }
     Node* node = NULL;
@@ -358,7 +358,7 @@ graph_bfs(Graph* graph, void* data) {
             if (node->weight >= 0 && colors[adj] == WHITE) {
                 colors[adj] = GRAY;
                 distance[adj] = distance[current] + 1;
-                parent[adj] = current;
+                parents[adj] = current;
                 enQueue(queue, adj);
             }
             node = node->next;
@@ -400,10 +400,122 @@ graph_bfs(Graph* graph, void* data) {
     system("rm output.dot");
     free(colors);
     free(distance);
-    free(parent);
+    free(parents);
     queue_dealloc(queue);
     return GRAPH_OK;
 }
 
+void
+__relax(int* distance, size_t* parents, size_t first, size_t second, int weight) {
+    if (distance[second] > distance[first] + weight) {
+        distance[second] = distance[first] + weight;
+        parents[second] = first;
+    }
+}
+
 Graph_Foo
-graph_bellman_ford(Graph* graph) {}
+graph_bellman_ford(Graph* graph, void* data_first, void* data_second) {
+    size_t first = 0, second = 0, adj = 0;
+    if (__table_search(graph->table, data_first, &first) != HASH_OK
+        || __table_search(graph->table, data_second, &second) != HASH_OK) {
+        return GRAPH_BAD_DATA;
+    }
+    size_t capacity = graph->table->capacity;
+    size_t* path = (size_t*)malloc(capacity * sizeof(size_t));
+    int* distance = (int*)malloc(capacity * sizeof(int));
+    size_t* parents = (size_t*)malloc(capacity * sizeof(size_t));
+    if (path == NULL || distance == NULL || parents == NULL) {
+        free(path);
+        free(distance);
+        free(parents);
+        return GRAPH_BAD_ALLOC;
+    }
+    for (size_t i = 0; i < capacity; ++i) {
+        if (i != first) {
+            distance[i] = INF / 2;
+        }
+        path[i] = capacity;
+        parents[i] = capacity;
+    }
+    distance[first] = 0;
+    Node* node = NULL;
+    Item* items = graph->table->items;
+    for (size_t count = 0; count < capacity - 1; ++count) {
+        for (size_t i = 0; i < capacity; ++i) {
+            if (items[i].status == HASH_BUSY) {
+                node = ((Node_Info*)items[i].data)->node;
+                while (node != NULL) {
+                    __table_search(graph->table, node->data, &adj);
+                    __relax(distance, parents, i, adj, node->weight);
+                    node = node->next;
+                }
+            }
+        }
+    }
+    for (size_t i = 0; i < capacity; ++i) {
+        if (items[i].status == HASH_BUSY) {
+            node = ((Node_Info*)items[i].data)->node;
+            while (node != NULL) {
+                __table_search(graph->table, node->data, &adj);
+                if (distance[adj] > distance[i] + node->weight) {
+                    free(path);
+                    free(distance);
+                    free(parents);
+                    return GRAPH_NEGATIVE_CYCLE;
+                }
+                node = node->next;
+            }
+        }
+    }
+    FILE* file = fopen("result_bellman_ford", "w");
+    size_t next = second;
+    while (next != first) {
+        path[next] = parents[next];
+        printf("%s <- ", (char*)items[next].key);
+        fprintf(file, "%s\n", (char*)items[next].key);
+        next = parents[next];
+    }
+    printf("%s\n", (char*)items[next].key);
+    fprintf(file, "%s\n", (char*)items[next].key);
+    fclose(file);
+    file = fopen("output.dot", "w");
+    if (file == NULL) {
+        free(path);
+        free(distance);
+        free(parents);
+        return GRAPH_BAD_FILE;
+    }
+    fprintf(file, "digraph {\n");
+    int weight = 0;
+    size_t tmp = 0;
+    for (size_t i = 0; i < capacity; ++i) {
+        if (items[i].status == HASH_BUSY) {
+            if (i == first || i == second) {
+                fprintf(file, "%s [color = red] [label = \"%s | %d\"]\n", (char*)items[i].key, (char*)items[i].key,
+                        distance[i]);
+            } else {
+                fprintf(file, "%s [label = \"%s | %d\"]\n", (char*)items[i].key, (char*)items[i].key, distance[i]);
+            }
+            node = ((Node_Info*)items[i].data)->node;
+            while (node != NULL) {
+                weight = node->weight;
+                __table_search(graph->table, node->data, &tmp);
+                if (path[tmp] == i) {
+                    fprintf(file, "%s -> %s [color = red] [label = %d]\n", (char*)items[i].key, (char*)node->data,
+                            weight);
+                } else {
+                    fprintf(file, "%s -> %s [label = %d]\n", (char*)items[i].key, (char*)node->data, weight);
+                }
+                node = node->next;
+            }
+        }
+    }
+    fprintf(file, "}\n");
+    fclose(file);
+    system("dot -Tpng output.dot -o output_bellman_ford.png");
+    system("rm output.dot");
+    free(distance);
+    free(path);
+    free(parents);
+    return GRAPH_OK;
+}
