@@ -264,19 +264,21 @@ graph_change_node(Graph* graph, void* data, void* data_new) {
         return return_code;
     }
     Node_Info* node_info = (graph->table->items)[current].data;
-    Node* node = node_info->node;
-    Back_Trace* back_trace = node_info->back_trace;
-    while (node != NULL) {
-        if ((return_code = graph_add_edge(graph, data_new, node->data, node->weight)) != GRAPH_OK) {
-            return return_code;
+    if (node_info != NULL) {
+        Node* node = node_info->node;
+        Back_Trace* back_trace = node_info->back_trace;
+        while (node != NULL) {
+            if ((return_code = graph_add_edge(graph, data_new, node->data, node->weight)) != GRAPH_OK) {
+                return return_code;
+            }
+            node = node->next;
         }
-        node = node->next;
-    }
-    while (back_trace != NULL) {
-        if ((return_code = graph_add_edge(graph, back_trace->data, data_new, back_trace->weight)) != GRAPH_OK) {
-            return return_code;
+        while (back_trace != NULL) {
+            if ((return_code = graph_add_edge(graph, back_trace->data, data_new, back_trace->weight)) != GRAPH_OK) {
+                return return_code;
+            }
+            back_trace = back_trace->next;
         }
-        back_trace = back_trace->next;
     }
     if ((return_code = graph_delete_node(graph, data)) != GRAPH_OK) {
         return return_code;
