@@ -315,6 +315,10 @@ graph_change_edge(Graph* graph, void* data_first, void* data_second, int weight)
 
 Graph_Foo
 graph_bfs(Graph* graph, void* data) {
+    size_t first = 0, current = 0, adj = 0;
+    if (__table_search(graph->table, data, &first) != HASH_OK) {
+        return GRAPH_BAD_DATA;
+    }
     size_t capacity = graph->table->capacity;
     Color* colors = (Color*)calloc(capacity, sizeof(Color));
     int* distance = (int*)malloc(capacity * sizeof(int));
@@ -324,13 +328,6 @@ graph_bfs(Graph* graph, void* data) {
         free(distance);
         free(parents);
         return GRAPH_BAD_ALLOC;
-    }
-    size_t first = 0, current = 0, adj = 0;
-    if (__table_search(graph->table, data, &first) != HASH_OK) {
-        free(colors);
-        free(distance);
-        free(parents);
-        return GRAPH_BAD_DATA;
     }
     for (size_t i = 0; i < capacity; ++i) {
         if (i != first) {
@@ -522,12 +519,12 @@ graph_bellman_ford(Graph* graph, void* data_first, void* data_second) {
 
 Matrix**
 __matrix_init(size_t capacity) {
-    Matrix** matrix = (Matrix**)calloc(capacity, sizeof(Matrix*));
+    Matrix** matrix = (Matrix**)malloc(capacity * sizeof(Matrix*));
     if (matrix == NULL) {
         return NULL;
     }
     for (size_t i = 0; i < capacity; ++i) {
-        matrix[i] = (Matrix*)calloc(capacity, sizeof(Matrix));
+        matrix[i] = (Matrix*)malloc(capacity * sizeof(Matrix));
         if (matrix[i] == NULL) {
             for (; i >= 0; --i) {
                 free(matrix[i]);
@@ -535,7 +532,12 @@ __matrix_init(size_t capacity) {
             free(matrix);
             return NULL;
         }
+        for (size_t j = 0; j < capacity; ++j) {
+            matrix[i][j].status = NOT_OK;
+            matrix[i][j].value = INF / 2;
+        }
     }
+    return matrix;
 }
 
 Matrix**
@@ -558,16 +560,68 @@ __convert_to_matrix(Graph* graph) {
                 matrix[i][ind].value = node->weight;
                 node = node->next;
             }
-        } else {
-            matrix[i][i].status = NOT_OK;
-        }
-    }
-    for (size_t i = 0; i < capacity; ++i) {
-        for (size_t j = 0; j < capacity; ++j) {
-            if (i != j && matrix[i][i].status == OK) {
-                matrix[i][j].value = INF / 2;
-            }
         }
     }
     return matrix;
+}
+
+void
+__matrix_dealloc(Matrix** matrix, size_t capacity) {
+    for (size_t i = 0; i < capacity; ++i) {
+        free(matrix[i]);
+    }
+    free(matrix);
+}
+
+Graph_Foo
+graph_floyd_warshall(Graph* graph, void* data_first, void* data_second) {
+    size_t first = 0, second = 0;
+    if (__table_search(graph->table, data_first, &first) != HASH_OK
+        || __table_search(graph->table, data_second, &second) != HASH_OK) {
+        return GRAPH_BAD_DATA;
+    }
+    size_t capacity = graph->table->capacity;
+    Matrix** matrix = __convert_to_matrix(graph);
+    Matrix** parents = __matrix_init(capacity);
+    if (matrix == NULL || parents == NULL) {
+        __matrix_dealloc(matrix, capacity);
+        __matrix_dealloc(parents, capacity);
+        return GRAPH_BAD_ALLOC;
+    }
+    for (size_t i = 0; i < capacity; ++i) {
+        if (matrix[i][i].status == OK) {
+            for (size_t j = 0; j < capacity; ++j) {
+                if (i != j && matrix[i][j].value < INF / 2) {
+                    parents[i][j].value = i;
+                }
+            }
+        }
+    }
+    for (size_t k = 0; k < capacity; ++k) {
+        if (matrix[k][k].status == OK) {
+            for (size_t i = 0; i < capacity; ++i) {
+                if (matrix[i][i].status == OK) {
+                    for (size_t j = 0; j < capacity; ++j) {
+                        if (matrix[i][j].value > matrix[i][k].value + matrix[k][j].value) {
+                            matrix[i][j].value = matrix[i][k].value + matrix[k][j].value;
+                            parents[i][j].value = parents[k][j].value;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    size_t next = second;
+    Item* items = graph->table->items;
+    if (parents[first][next].value == INF / 2) {
+        printf("Path not exist\n");
+    }
+    while (next != first) {
+        printf("%s <- ", (char*)items[next].key);
+        next = parents[first][next].value;
+    }
+    printf("%s\n", (char*)items[next].key);
+    __matrix_dealloc(matrix, capacity);
+    __matrix_dealloc(parents, capacity);
+    return GRAPH_OK;
 }

@@ -33,6 +33,7 @@ main() {
     graph_change_node(graph, "b", strdup("f"));
     graph_bfs(graph, "d");
     graph_bellman_ford(graph, "d", "e");
+    graph_floyd_warshall(graph, "d", "e");
     graph_graphViz(graph);
     graph_dealloc(graph);
     return 0;
