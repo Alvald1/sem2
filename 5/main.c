@@ -22,51 +22,61 @@ main() {
         switch (status) {
             case 'a':
                 if (add_node(graph) == GRAPH_EOF) {
+                    graph_dealloc(graph);
                     return 0;
                 }
                 break;
             case 'A':
                 if (add_edge(graph) == GRAPH_EOF) {
+                    graph_dealloc(graph);
                     return 0;
                 }
                 break;
             case 'd':
                 if (delete_node(graph) == GRAPH_EOF) {
+                    graph_dealloc(graph);
                     return 0;
                 }
                 break;
             case 'D':
                 if (delete_edge(graph) == GRAPH_EOF) {
+                    graph_dealloc(graph);
                     return 0;
                 }
                 break;
             case 'c':
                 if (change_node(graph) == GRAPH_EOF) {
+                    graph_dealloc(graph);
                     return 0;
                 }
                 break;
             case 'C':
                 if (change_edge(graph) == GRAPH_EOF) {
+                    graph_dealloc(graph);
                     return 0;
                 }
                 break;
             case 'b':
                 if (bfs(graph) == GRAPH_EOF) {
+                    graph_dealloc(graph);
                     return 0;
                 }
                 break;
             case 'B':
                 if (bellman_ford(graph) == GRAPH_EOF) {
+                    graph_dealloc(graph);
                     return 0;
                 }
                 break;
             case 'f':
                 if (floyd_warshall(graph) == GRAPH_EOF) {
+                    graph_dealloc(graph);
                     return 0;
                 }
                 break;
             case 'i':
                 if (import(graph) == GRAPH_EOF) {
+                    graph_dealloc(graph);
                     return 0;
                 }
                 break;
