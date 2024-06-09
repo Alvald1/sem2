@@ -6,6 +6,7 @@
 
 typedef struct _graph Graph;
 
+Graph_Foo graph_import(Graph* graph, const char* file_name);
 Graph_Foo graph_init(Graph** graph);
 void graph_dealloc(Graph* graph);
 Graph_Foo graph_add_node(Graph* graph, void* data);

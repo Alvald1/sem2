@@ -11,6 +11,7 @@
 #include "general.h"
 #include "graph_lib.h"
 #include "queue.h"
+#include "readline.h"
 
 Graph_Foo
 graph_init(Graph** graph) {
@@ -696,5 +697,30 @@ graph_floyd_warshall(Graph* graph, void* data_first) {
     free(path);
     __matrix_dealloc(matrix, capacity);
     __matrix_dealloc(parents, capacity);
+    return GRAPH_OK;
+}
+
+Graph_Foo
+graph_import(Graph* graph, const char* file_name) {
+    FILE* file = fopen(file_name, "r");
+    if (file == NULL) {
+        return GRAPH_BAD_FILE;
+    }
+    size_t size = 0;
+    int weight = 0;
+    void *data = NULL, *first = NULL, *second = NULL;
+    fscanf(file, "%zu", &size);
+    while (size--) {
+        data = readline(file, "");
+        graph_add_node(graph, data);
+    }
+    while ((first = readline(file, "")) != NULL) {
+        second = readline(file, "");
+        fscanf(file, "%d", &weight);
+        graph_add_edge(graph, first, second, weight);
+        free(first);
+        free(second);
+    }
+    fclose(file);
     return GRAPH_OK;
 }

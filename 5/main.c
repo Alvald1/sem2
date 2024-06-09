@@ -8,29 +8,11 @@ int
 main() {
     Graph* graph = NULL;
     graph_init(&graph);
-    graph_add_node(graph, strdup("a"));
-    graph_add_node(graph, strdup("b"));
-    graph_add_node(graph, strdup("c"));
-    graph_add_node(graph, strdup("d"));
-    graph_add_node(graph, strdup("e"));
+    graph_import(graph, "test");
 
-    graph_add_edge(graph, ("a"), ("c"), 2);
-    graph_add_edge(graph, ("b"), ("d"), 3);
-    graph_add_edge(graph, ("b"), ("e"), 4);
-    graph_add_edge(graph, ("e"), ("c"), 5);
-    graph_add_edge(graph, ("d"), ("a"), 6);
-    //graph_delete_node(graph, "a");
-    graph_delete_edge(graph, "b", "d");
-    graph_add_edge(graph, ("b"), ("b"), 7);
-    graph_add_edge(graph, ("b"), ("c"), 8);
-    graph_add_edge(graph, ("b"), ("d"), 9);
-    graph_add_edge(graph, ("d"), ("e"), -10);
-    graph_add_edge(graph, ("d"), ("e"), -10);
-    graph_change_edge(graph, ("d"), ("e"), 10);
-    graph_change_node(graph, "b", strdup("f"));
     graph_bfs(graph, "d");
-    graph_bellman_ford(graph, "f", "c");
-    graph_floyd_warshall(graph, "f");
+    graph_bellman_ford(graph, "a", "d");
+    graph_floyd_warshall(graph, "d");
     graph_graphViz(graph);
     graph_dealloc(graph);
     return 0;
