@@ -466,11 +466,19 @@ graph_bellman_ford(Graph* graph, void* data_first, void* data_second) {
     }
     FILE* file = fopen("result_bellman_ford", "w");
     size_t next = second;
-    while (next != first) {
+    while (next != capacity && next != first) {
         path[next] = parents[next];
         printf("%s <- ", (char*)items[next].key);
         fprintf(file, "%s\n", (char*)items[next].key);
         next = parents[next];
+    }
+    if (next == capacity) {
+        printf("Path not exist\n");
+        fclose(file);
+        free(path);
+        free(distance);
+        free(parents);
+        return GRAPH_OK;
     }
     printf("%s\n", (char*)items[next].key);
     fprintf(file, "%s\n", (char*)items[next].key);
@@ -615,12 +623,13 @@ graph_floyd_warshall(Graph* graph, void* data_first, void* data_second) {
     Item* items = graph->table->items;
     if (parents[first][next].value == INF / 2) {
         printf("Path not exist\n");
+    } else {
+        while (next != first) {
+            printf("%s <- ", (char*)items[next].key);
+            next = parents[first][next].value;
+        }
+        printf("%s\n", (char*)items[next].key);
     }
-    while (next != first) {
-        printf("%s <- ", (char*)items[next].key);
-        next = parents[first][next].value;
-    }
-    printf("%s\n", (char*)items[next].key);
     __matrix_dealloc(matrix, capacity);
     __matrix_dealloc(parents, capacity);
     return GRAPH_OK;
