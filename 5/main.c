@@ -6,7 +6,7 @@
 #include "lib/readline.h"
 
 #define PROMPT                                                                                                         \
-    "\n(a) - add_node\n(A) - add_edge\n(d) - delete_node\n(D) - delete_edge\n(C) - change_node\n"                      \
+    "\n(a) - add_node\n(A) - add_edge\n(d) - delete_node\n(D) - delete_edge\n(c) - change_node\n"                      \
     "(C) - change_edge\n(b) - bfs\n(B) - bellman_ford\n"                                                               \
     "(f) - floyd_warshall\n(g) - graphViz\n(i) - import\n"
 

@@ -53,16 +53,25 @@ valgrind: debug
 fuzz: afl
 	rm -rf in out
 	mkdir in out
-	echo 'i' > in/i
-	echo 'r' > in/r
-	echo 's' > in/s
-	echo 'S' > in/S
-	echo 'g' > in/g
-	echo 'P' > in/P
+	echo '-' > in/-
+	echo '1' > in/1
+	echo '-3' > in/-3
 	echo '2' > in/2
-	echo 'p' > in/p
+	echo '4' > in/4
+	echo '9' > in/9
+	echo '100' > in/100
+	echo 'a' > in/a
+	echo 'A' > in/A
 	echo 'd' > in/d
-	echo 'ir' > in/ir
+	echo 'D' > in/D
+	echo 'c' > in/c
+	echo 'C' > in/C
+	echo 'b' > in/b
+	echo 'B' > in/B
+	echo 'f' > in/f
+	echo 'g' > in/g
+	echo 'i' > in/i
+	echo 'gr' > in/gr
 	echo 'sf' > in/sf
 	echo 'grp' > in/grp
 	echo 'd2p' > in/d2p

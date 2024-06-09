@@ -168,7 +168,7 @@ graph_graphViz(Graph* graph) {
     }
     fprintf(file, "}\n");
     fclose(file);
-    system("dot -Tpng output.dot -o output.png");
+    system("dot -T svg output.dot -o output.svg");
     system("rm output.dot");
     return GRAPH_OK;
 }
@@ -395,7 +395,7 @@ graph_bfs(Graph* graph, void* data) {
     }
     fprintf(file, "}\n");
     fclose(file);
-    system("dot -Tpng output.dot -o output_bfs.png");
+    system("dot -T svg output.dot -o output_bfs.svg");
     system("rm output.dot");
     free(colors);
     free(distance);
@@ -519,7 +519,7 @@ graph_bellman_ford(Graph* graph, void* data_first, void* data_second) {
     }
     fprintf(file, "}\n");
     fclose(file);
-    system("dot -Tpng output.dot -o output_bellman_ford.png");
+    system("dot -T svg output.dot -o output_bellman_ford.svg");
     system("rm output.dot");
     free(distance);
     free(path);
@@ -693,7 +693,7 @@ graph_floyd_warshall(Graph* graph, void* data_first) {
         }
         fprintf(file, "}\n");
         fclose(file);
-        system("dot -Tpng output.dot -o output_floyd_warshall.png");
+        system("dot -T svg output.dot -o output_floyd_warshall.svg");
         system("rm output.dot");
     }
     free(path);
