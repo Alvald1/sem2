@@ -542,7 +542,7 @@ __matrix_init(size_t capacity) {
         }
         for (size_t j = 0; j < capacity; ++j) {
             matrix[i][j].status = NOT_OK;
-            matrix[i][j].value = INF / 2;
+            matrix[i][j].value = -INF / 2;
         }
     }
     return matrix;
@@ -591,26 +591,29 @@ graph_floyd_warshall(Graph* graph, void* data_first, void* data_second) {
     size_t capacity = graph->table->capacity;
     Matrix** matrix = __convert_to_matrix(graph);
     Matrix** parents = __matrix_init(capacity);
-    if (matrix == NULL || parents == NULL) {
+    size_t* path = (size_t*)malloc(capacity * sizeof(size_t));
+    if (matrix == NULL || parents == NULL || path == NULL) {
         __matrix_dealloc(matrix, capacity);
         __matrix_dealloc(parents, capacity);
+        free(path);
         return GRAPH_BAD_ALLOC;
     }
     for (size_t i = 0; i < capacity; ++i) {
         if (matrix[i][i].status == OK) {
             for (size_t j = 0; j < capacity; ++j) {
-                if (i != j && matrix[i][j].value < INF / 2) {
+                if (i != j && matrix[i][j].value > -INF / 2) {
                     parents[i][j].value = i;
                 }
             }
         }
+        path[i] = capacity;
     }
     for (size_t k = 0; k < capacity; ++k) {
         if (matrix[k][k].status == OK) {
             for (size_t i = 0; i < capacity; ++i) {
                 if (matrix[i][i].status == OK) {
                     for (size_t j = 0; j < capacity; ++j) {
-                        if (matrix[i][j].value > matrix[i][k].value + matrix[k][j].value) {
+                        if (matrix[i][j].value < matrix[i][k].value + matrix[k][j].value) {
                             matrix[i][j].value = matrix[i][k].value + matrix[k][j].value;
                             parents[i][j].value = parents[k][j].value;
                         }
@@ -621,15 +624,70 @@ graph_floyd_warshall(Graph* graph, void* data_first, void* data_second) {
     }
     size_t next = second;
     Item* items = graph->table->items;
-    if (parents[first][next].value == INF / 2) {
-        printf("Path not exist\n");
-    } else {
-        while (next != first) {
-            printf("%s <- ", (char*)items[next].key);
-            next = parents[first][next].value;
+    int flag = 1;
+    for (size_t i = 0; i < capacity; ++i) {
+        if (matrix[i][i].value > 0) {
+            printf("Cycle\n");
+            flag = 0;
+            break;
         }
-        printf("%s\n", (char*)items[next].key);
     }
+    FILE* file = NULL;
+    if (flag) {
+        file = fopen("result_floyd_warshall", "w");
+        if (parents[first][next].value == -INF / 2) {
+            printf("Path not exist\n");
+        } else {
+            while (next != first) {
+                path[next] = parents[first][next].value;
+                printf("%s <- ", (char*)items[next].key);
+                fprintf(file, "%s <- ", (char*)items[next].key);
+                next = parents[first][next].value;
+            }
+            printf("%s\n", (char*)items[next].key);
+            fprintf(file, "%s <- ", (char*)items[next].key);
+        }
+        fclose(file);
+    }
+    file = fopen("output.dot", "w");
+    if (file == NULL) {
+        free(path);
+        __matrix_dealloc(matrix, capacity);
+        __matrix_dealloc(parents, capacity);
+        return GRAPH_BAD_FILE;
+    }
+    Node* node = NULL;
+    fprintf(file, "digraph {\n");
+    int weight = 0;
+    size_t tmp = 0;
+    for (size_t i = 0; i < capacity; ++i) {
+        if (items[i].status == HASH_BUSY) {
+            if (i == first || i == second) {
+                fprintf(file, "%s [color = red] [label = \"%s | %d\"]\n", (char*)items[i].key, (char*)items[i].key,
+                        matrix[first][i].value);
+            } else {
+                fprintf(file, "%s [label = \"%s | %d\"]\n", (char*)items[i].key, (char*)items[i].key,
+                        matrix[first][i].value);
+            }
+            node = ((Node_Info*)items[i].data)->node;
+            while (node != NULL) {
+                weight = node->weight;
+                __table_search(graph->table, node->data, &tmp);
+                if (path[tmp] == i) {
+                    fprintf(file, "%s -> %s [color = red] [label = %d]\n", (char*)items[i].key, (char*)node->data,
+                            weight);
+                } else {
+                    fprintf(file, "%s -> %s [label = %d]\n", (char*)items[i].key, (char*)node->data, weight);
+                }
+                node = node->next;
+            }
+        }
+    }
+    fprintf(file, "}\n");
+    fclose(file);
+    system("dot -Tpng output.dot -o output_floyd_warshall.png");
+    system("rm output.dot");
+    free(path);
     __matrix_dealloc(matrix, capacity);
     __matrix_dealloc(parents, capacity);
     return GRAPH_OK;
