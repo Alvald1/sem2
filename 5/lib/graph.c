@@ -582,10 +582,9 @@ __matrix_dealloc(Matrix** matrix, size_t capacity) {
 }
 
 Graph_Foo
-graph_floyd_warshall(Graph* graph, void* data_first, void* data_second) {
+graph_floyd_warshall(Graph* graph, void* data_first) {
     size_t first = 0, second = 0;
-    if (__table_search(graph->table, data_first, &first) != HASH_OK
-        || __table_search(graph->table, data_second, &second) != HASH_OK) {
+    if (__table_search(graph->table, data_first, &first) != HASH_OK) {
         return GRAPH_BAD_DATA;
     }
     size_t capacity = graph->table->capacity;
@@ -622,16 +621,23 @@ graph_floyd_warshall(Graph* graph, void* data_first, void* data_second) {
             }
         }
     }
-    size_t next = second;
     Item* items = graph->table->items;
-    int flag = 1;
+    int flag = 1, max = -INF, ind = 0;
     for (size_t i = 0; i < capacity; ++i) {
         if (matrix[i][i].value > 0) {
             printf("Cycle\n");
             flag = 0;
             break;
         }
+        if (matrix[i][i].status == OK) {
+            if (matrix[first][i].value > max) {
+                max = matrix[first][i].value;
+                ind = i;
+            }
+        }
     }
+    second = ind;
+    size_t next = second;
     FILE* file = NULL;
     if (flag) {
         file = fopen("result_floyd_warshall", "w");

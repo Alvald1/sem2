@@ -29,8 +29,8 @@ main() {
     graph_change_edge(graph, ("d"), ("e"), 10);
     graph_change_node(graph, "b", strdup("f"));
     graph_bfs(graph, "d");
-    graph_bellman_ford(graph, "d", "c");
-    graph_floyd_warshall(graph, "d", "c");
+    graph_bellman_ford(graph, "f", "c");
+    graph_floyd_warshall(graph, "f");
     graph_graphViz(graph);
     graph_dealloc(graph);
     return 0;
