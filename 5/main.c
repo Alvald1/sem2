@@ -32,8 +32,8 @@ main() {
     graph_change_edge(graph, ("d"), ("e"), 10);
     graph_change_node(graph, "b", strdup("f"));
     graph_bfs(graph, "d");
-    graph_bellman_ford(graph, "d", "e");
-    graph_floyd_warshall(graph, "d", "e");
+    graph_bellman_ford(graph, "c", "d");
+    graph_floyd_warshall(graph, "c", "d");
     graph_graphViz(graph);
     graph_dealloc(graph);
     return 0;
