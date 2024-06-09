@@ -10,6 +10,7 @@
 #include "../hash_table/table_lib.h"
 #include "general.h"
 #include "graph_lib.h"
+#include "numbers.h"
 #include "queue.h"
 #include "readline.h"
 
@@ -655,45 +656,46 @@ graph_floyd_warshall(Graph* graph, void* data_first) {
             fprintf(file, "%s <- ", (char*)items[next].key);
         }
         fclose(file);
-    }
-    file = fopen("output.dot", "w");
-    if (file == NULL) {
-        free(path);
-        __matrix_dealloc(matrix, capacity);
-        __matrix_dealloc(parents, capacity);
-        return GRAPH_BAD_FILE;
-    }
-    Node* node = NULL;
-    fprintf(file, "digraph {\n");
-    int weight = 0;
-    size_t tmp = 0;
-    for (size_t i = 0; i < capacity; ++i) {
-        if (items[i].status == HASH_BUSY) {
-            if (i == first || i == second) {
-                fprintf(file, "%s [color = red] [label = \"%s | %d\"]\n", (char*)items[i].key, (char*)items[i].key,
-                        matrix[first][i].value);
-            } else {
-                fprintf(file, "%s [label = \"%s | %d\"]\n", (char*)items[i].key, (char*)items[i].key,
-                        matrix[first][i].value);
-            }
-            node = ((Node_Info*)items[i].data)->node;
-            while (node != NULL) {
-                weight = node->weight;
-                __table_search(graph->table, node->data, &tmp);
-                if (path[tmp] == i) {
-                    fprintf(file, "%s -> %s [color = red] [label = %d]\n", (char*)items[i].key, (char*)node->data,
-                            weight);
+
+        file = fopen("output.dot", "w");
+        if (file == NULL) {
+            free(path);
+            __matrix_dealloc(matrix, capacity);
+            __matrix_dealloc(parents, capacity);
+            return GRAPH_BAD_FILE;
+        }
+        Node* node = NULL;
+        fprintf(file, "digraph {\n");
+        int weight = 0;
+        size_t tmp = 0;
+        for (size_t i = 0; i < capacity; ++i) {
+            if (items[i].status == HASH_BUSY) {
+                if (i == first || i == second) {
+                    fprintf(file, "%s [color = red] [label = \"%s | %d\"]\n", (char*)items[i].key, (char*)items[i].key,
+                            matrix[first][i].value);
                 } else {
-                    fprintf(file, "%s -> %s [label = %d]\n", (char*)items[i].key, (char*)node->data, weight);
+                    fprintf(file, "%s [label = \"%s | %d\"]\n", (char*)items[i].key, (char*)items[i].key,
+                            matrix[first][i].value);
                 }
-                node = node->next;
+                node = ((Node_Info*)items[i].data)->node;
+                while (node != NULL) {
+                    weight = node->weight;
+                    __table_search(graph->table, node->data, &tmp);
+                    if (path[tmp] == i) {
+                        fprintf(file, "%s -> %s [color = red] [label = %d]\n", (char*)items[i].key, (char*)node->data,
+                                weight);
+                    } else {
+                        fprintf(file, "%s -> %s [label = %d]\n", (char*)items[i].key, (char*)node->data, weight);
+                    }
+                    node = node->next;
+                }
             }
         }
+        fprintf(file, "}\n");
+        fclose(file);
+        system("dot -Tpng output.dot -o output_floyd_warshall.png");
+        system("rm output.dot");
     }
-    fprintf(file, "}\n");
-    fclose(file);
-    system("dot -Tpng output.dot -o output_floyd_warshall.png");
-    system("rm output.dot");
     free(path);
     __matrix_dealloc(matrix, capacity);
     __matrix_dealloc(parents, capacity);
@@ -710,13 +712,15 @@ graph_import(Graph* graph, const char* file_name) {
     int weight = 0;
     void *data = NULL, *first = NULL, *second = NULL;
     fscanf(file, "%zu", &size);
+    fscanf(file, "%*[^\n]");
+    fscanf(file, "%*c");
     while (size--) {
         data = readline(file, "");
         graph_add_node(graph, data);
     }
     while ((first = readline(file, "")) != NULL) {
         second = readline(file, "");
-        fscanf(file, "%d", &weight);
+        read_num(file, &weight, "");
         graph_add_edge(graph, first, second, weight);
         free(first);
         free(second);

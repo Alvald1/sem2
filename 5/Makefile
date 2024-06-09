@@ -96,4 +96,4 @@ static:
 	clang --analyze -Xanalyzer -analyzer-output=html *.c $(LIB_DIR)/*.c
 
 clean:
-	rm -rf $(EXECUTABLE)* $(OBJECT_DIR) *.plist in gmon.out
+	rm -rf $(EXECUTABLE)* $(OBJECT_DIR) *.plist in gmon.out output* result*

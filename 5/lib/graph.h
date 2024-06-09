@@ -6,7 +6,6 @@
 
 typedef struct _graph Graph;
 
-Graph_Foo graph_import(Graph* graph, const char* file_name);
 Graph_Foo graph_init(Graph** graph);
 void graph_dealloc(Graph* graph);
 Graph_Foo graph_add_node(Graph* graph, void* data);
@@ -19,5 +18,6 @@ Graph_Foo graph_bfs(Graph* graph, void* data);
 Graph_Foo graph_bellman_ford(Graph* graph, void* data_first, void* data_second);
 Graph_Foo graph_floyd_warshall(Graph* graph, void* data_first);
 Graph_Foo graph_graphViz(Graph* graph);
+Graph_Foo graph_import(Graph* graph, const char* file_name);
 
 #endif
