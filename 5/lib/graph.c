@@ -710,6 +710,11 @@ graph_import(Graph* graph, const char* file_name) {
     if (file == NULL) {
         return GRAPH_BAD_FILE;
     }
+    void* tmp = graph->table->info;
+    table_dealloc(graph->table);
+    if (table_init(&(graph->table), 5, tmp) == HASH_BAD_ALLOC) {
+        return GRAPH_BAD_ALLOC;
+    }
     size_t size = 0;
     int weight = 0;
     void *data = NULL, *first = NULL, *second = NULL;
