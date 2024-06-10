@@ -704,6 +704,29 @@ graph_floyd_warshall(Graph* graph, void* data_first) {
     return GRAPH_OK;
 }
 
+void
+graph_print(Graph* graph) {
+    Item* items = graph->table->items;
+    size_t capacity = graph->table->capacity;
+    Node_Info* node_info = NULL;
+    Node* node = NULL;
+    for (size_t i = 0; i < capacity; ++i) {
+        if (items[i].status == HASH_BUSY) {
+            graph->table->info->key_print(items[i].key);
+            printf(": ");
+            node_info = (Node_Info*)(items[i].data);
+            if (node_info != NULL) {
+                node = node_info->node;
+                while (node != NULL) {
+                    graph->table->info->key_print(node->data);
+                    node = node->next;
+                }
+            }
+            printf("\n");
+        }
+    }
+}
+
 Graph_Foo
 graph_import(Graph* graph, const char* file_name) {
     FILE* file = fopen(file_name, "r");

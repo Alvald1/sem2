@@ -19,5 +19,6 @@ Graph_Foo graph_bellman_ford(Graph* graph, void* data_first, void* data_second);
 Graph_Foo graph_floyd_warshall(Graph* graph, void* data_first);
 Graph_Foo graph_graphViz(Graph* graph);
 Graph_Foo graph_import(Graph* graph, const char* file_name);
+void graph_print(Graph* graph);
 
 #endif

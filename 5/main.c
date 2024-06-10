@@ -8,7 +8,7 @@
 #define PROMPT                                                                                                         \
     "\n(a) - add_node\n(A) - add_edge\n(d) - delete_node\n(D) - delete_edge\n(c) - change_node\n"                      \
     "(C) - change_edge\n(b) - bfs\n(B) - bellman_ford\n"                                                               \
-    "(f) - floyd_warshall\n(g) - graphViz\n(i) - import\n"
+    "(f) - floyd_warshall\n(g) - graphViz\n(i) - import\n(p) - print\n"
 
 int
 main() {
@@ -81,6 +81,7 @@ main() {
                 }
                 break;
             case 'g': graphViz(graph); break;
+            case 'p': graph_print(graph);
             default: printf("Incorrect input_2\n"); break;
         }
         printf(PROMPT);
