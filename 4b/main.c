@@ -8,11 +8,12 @@
 #include "lib/info.h"
 #include "lib/numbers.h"
 #include "lib/readline.h"
+#include "lib/word_search.h"
 
 #define PROMPT                                                                                                         \
     "\n(i) - insert\n(r) - remove\n(s) - search\n(S) - search_nearest\n(2) - print_2D\n"                               \
     "(p) - print_inorder\n(P) - print_postorder\n(o) - print_out_of_range\n"                                           \
-    "(f) - file\n(g) - graphViz\n"
+    "(f) - file\n(g) - graphViz\n(w) - word search\n"
 
 int
 main() {
@@ -60,6 +61,12 @@ main() {
                     return 0;
                 }
                 break;
+            case 'w':
+                if (_word_search(rb) == _EOF) {
+                    info_dealloc(info);
+                    return 0;
+                }
+                break;
             case 'g': graphviz(rb); break;
             case '2': print_2D(rb); break;
             case 'p': print_inorder(rb); break;
@@ -73,6 +80,20 @@ main() {
     rb_dealloc(rb);
     info_dealloc(info);
     return 0;
+}
+
+Foo
+_word_search(RB* rb) {
+    Foo return_code = OK;
+    char* file_name = readline(stdin, "File name: ");
+    if (file_name == NULL) {
+        rb_dealloc(rb);
+        return _EOF;
+    }
+    return_code = word_search(rb, file_name);
+    free(file_name);
+    fprintf(stderr, "file - %s", errors[return_code]);
+    return OK;
 }
 
 void

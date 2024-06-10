@@ -19,5 +19,6 @@ Foo print_out_of_range(RB* rb);
 void print_inorder(RB* rb);
 void print_postorder(RB* rb);
 void print_2D(RB* rb);
+Foo _word_search(RB* rb);
 
 #endif
