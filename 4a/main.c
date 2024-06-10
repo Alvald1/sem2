@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "lib/frec_dict.h"
 #include "lib/fstream.h"
 #include "lib/info.h"
 #include "lib/numbers.h"
@@ -11,7 +12,7 @@
 #define PROMPT                                                                                                         \
     "\n(i) - insert\n(r) - remove\n(s) - search\n(m) - search max key\n(2) - print_2D\n(d) - print_desc\n(p) - "       \
     "print_postorder\n(f) - "                                                                                          \
-    "file\n(g) - graphViz\n"
+    "file\n(g) - graphViz\n(F) - frec dict\n"
 
 int
 main() {
@@ -48,6 +49,13 @@ main() {
                     return 0;
                 }
                 break;
+            case 'F':
+                scanf("%*c");
+                if (freq(tree) == _EOF) {
+                    info_dealloc(info);
+                    return 0;
+                }
+                break;
             case 'g': graphviz(tree); break;
             case 'm': max(tree); break;
             case '2': print_2D(tree); break;
@@ -62,6 +70,20 @@ main() {
     tree_dealloc(tree);
     info_dealloc(info);
     return 0;
+}
+
+Foo
+freq(Tree* tree) {
+    Foo return_code = OK;
+    char* file_name = readline(stdin, "File name: ");
+    if (file_name == NULL) {
+        tree_dealloc(tree);
+        return _EOF;
+    }
+    return_code = frec_dict(tree, file_name);
+    free(file_name);
+    fprintf(stderr, "%s", errors[return_code]);
+    return OK;
 }
 
 void

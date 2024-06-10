@@ -18,5 +18,6 @@ void max(Tree* tree);
 void print_desc(Tree* tree);
 void print_postorder(Tree* tree);
 void print_2D(Tree* tree);
+Foo freq(Tree* tree);
 
 #endif
