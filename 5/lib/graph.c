@@ -305,6 +305,7 @@ graph_change_edge(Graph* graph, void* data_first, void* data_second, int weight)
             node->weight = weight;
             break;
         }
+        node = node->next;
     }
     node_info = items[second].data;
     Back_Trace* back_trace = node_info->back_trace;
@@ -313,6 +314,7 @@ graph_change_edge(Graph* graph, void* data_first, void* data_second, int weight)
             back_trace->weight = weight;
             break;
         }
+        back_trace = back_trace->next;
     }
     return GRAPH_OK;
 }
